@@ -7,7 +7,7 @@
   "sport": "NFL",
   "season": 2026,
   "createdAt": "2026-08-30T13:23:00-07:00",
-  "updatedAt": "2026-11-04T00:33:33.764Z",
+  "updatedAt": "2026-11-04T00:38:41.073Z",
   "authority": {
     "owner": "Graham Mercer",
     "waltersInterface": "core/walters-intelligence-interface-v1.4.json",
@@ -36281,11 +36281,11 @@
       "team": "Green Bay",
       "abbr": "GB",
       "seedRating": 26.5,
-      "currentRating": 27.932590582,
-      "priorRating": 28.432590582,
-      "lastDelta": -0.5,
-      "lastUpdatedAt": "2026-10-22T21:49:19.630Z",
-      "lastUpdateType": "GRAHAM_ONE_TIME_CURRENT_RATING_REVIEW",
+      "currentRating": 28.2697614038,
+      "priorRating": 27.932590582,
+      "lastDelta": 0.3371708218,
+      "lastUpdatedAt": "2026-11-04T00:38:41.073Z",
+      "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "MANUAL_CURRENT_BASELINE_ESTIMATE",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
@@ -36319,7 +36319,10 @@
         "data/walters/nfl/2026/rating-reviews/2026-10-22-team-epa.json",
         "data/walters/nfl/2026/rating-reviews/2026-10-22-score-diagnostics.json",
         "data/walters/nfl/2026/rating-reviews/2026-10-22-paired-injury-diagnostics.json",
-        "data/walters/nfl/2026/weeks-01-03-closeout-audit-20260930.json"
+        "data/walters/nfl/2026/weeks-01-03-closeout-audit-20260930.json",
+        "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json",
+        "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-7"
       ],
       "history": [
         {
@@ -41230,6 +41233,845 @@
           ],
           "marketViewed": false,
           "estimateAcknowledged": true
+        },
+        {
+          "sequence": 10,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w07-to-w08-manual-20261104T003841073Z",
+          "fromRating": 27.932590582,
+          "priorRating": 27.932590582,
+          "delta": 0.3371708218,
+          "toRating": 28.2697614038,
+          "currentRating": 28.2697614038,
+          "effectiveAt": "2026-11-04T00:38:41.073Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W07-GB-DET: TGPL 31.3042988; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 7,
+          "targetWeek": 8,
+          "gameKey": "2026-W07-GB-DET",
+          "opponent": "DET",
+          "kickoff": "2026-10-25T13:25:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": -3,
+            "opponentOldRating": 26.4812988,
+            "teamInjuryLoss": 7.705,
+            "opponentInjuryLoss": 1.964,
+            "teamLocationAdvantage": -2.082
+          },
+          "tgpl": 31.3042988,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json",
+            "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+            "data/walters/nfl-power-ratings-ledger.json",
+            "https://www.nfl.com/schedules/2026/by-week/week-7"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json",
+            "blobSha": "f8d7c08dc50f984f110fce43e18fba5dbf9ec4e4"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "GB",
+              "estimates": [
+                {
+                  "caseKey": "2026-W07-GB-Chris-Brooks",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Collin-Oliver",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Luke-Musgrave",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Warren-Brinson",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Zach-Tom",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1,
+                  "rawTeamContributionDelta": -1,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1,
+                    "max": 1
+                  },
+                  "weights": [
+                    {
+                      "player": "Anthony Belton",
+                      "eaPlayerId": "15127",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Team confirms Zach Tom is now Zach Bako-Bewele, on reserve since Sept. 28. Same archived player and distinct starting right tackle relief Anthony Belton.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Micah-Parsons",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 2.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 2.5,
+                  "rawTeamContributionDelta": -2.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 2.5,
+                    "max": 2.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Barryn Sorrell",
+                      "eaPlayerId": "15179",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Edgerrin-Cooper",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.9,
+                  "rawTeamContributionDelta": -0.9,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.9,
+                    "max": 0.9
+                  },
+                  "weights": [
+                    {
+                      "player": "Ty'Ron Hopper",
+                      "eaPlayerId": "14910",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Prior McDuffie/Hopper rotation alongside Franklin yields two distinct replacement duties on matchday. Position-specific Week 7 report and official starters support Hopper at WILL replacing Cooper, McDuffie independently at MIKE replacing Franklin. No duplicate healthy duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Jayden-Reed",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Bo Melton",
+                      "eaPlayerId": "22084",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Approved prior Week 6 documented net WR depth allocation retains Melton; represents incremental available receiving depth displaced by the separate Reed absence rather than asserting a Melton slot start. Savion Williams independently fills Moore slot relief; retain Melton primary return baseline.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Jonathan-Ford",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Skyy-Moore",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Savion Williams",
+                      "eaPlayerId": "15063",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club activated Williams while placing Moore on IR. Week 7 shows Williams actual slot role as successor to Moore. Preserve incumbent boundary receivers. Prior Reed net additional depth allocation Melton remains separate and is an explicit counterfactual approximation. No separate Moore return-only credit.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Javon-Hargrave",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "EQUAL_SHARE_COMMITTEE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.1,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 0.8,
+                  "rawTeamContributionDelta": -0.8,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.9
+                  },
+                  "weights": [
+                    {
+                      "player": "Chris McClellan",
+                      "eaPlayerId": "1859",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "Anthony Campbell",
+                      "eaPlayerId": "4801",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Benjamin-St-Juste",
+                  "modelId": "graham-st-only-duty-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "SPECIAL_TEAMS_ONLY_DUTY_ESTIMATE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.25,
+                  "rawTeamContributionDelta": -0.25,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Kitan Oladapo",
+                      "eaPlayerId": "14967",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "St-Juste was final injury inactive with hamstring and established ST-only coverage duties. Oladapo is documented first-team gunner depth and was active for 10 ST-only snaps. Select the available professional ST coverage depth as an assumption, not an observed substitution. Team reported Sturdivant already had regular gunner work opposite Melton; preserve that baseline. Earlier precedent used Sturdivant but the two have equal calibrated value, so no selection by value and no duplication of Golden receiver relief.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "proxyConvention": "ZERO_TO_FULL_NON_QB_DIFFERENCE_MIDPOINT",
+                  "roleScopeRationale": "Week 5 gamebook and approved Week 6 closure establish special-teams coverage only (zero defensive work when active). Current starter Cisse and other actual defensive roles remained available. Use the approved bounded proxy for missing coverage, retaining Sturdivant/Melton regular coverage and return baseline and using no full defensive loss.",
+                  "limitation": "Explicit midpoint between zero ST-only loss and the full non-QB replacement-difference proxy. The ceiling is an assumed modelling bound, not a calibrated ST value or confidence interval. Source-supported depth is an allocation assumption, not an observed substitution or snap-to-time conversion."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Zaire-Franklin",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Isaiah McDuffie",
+                      "eaPlayerId": "21903",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club final ruled out (shin). Week 7 observed position report has McDuffie starting MIKE in his place and Hopper at WILL covering Cooper. No overlapping relief and no use of current undated generic depth over game roles.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Sean-Rhyan",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Official ankle injury fourth offensive snap; Monk and later Williams covered center. Frozen zero gives zero incremental calibrated loss under the exact role inventory.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Jacob-Monk",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Official quad injury while serving as active center reserve; John Williams finished at center. No second credit for replacing the same center duty and frozen zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Devonte-Wyatt",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.023,
+                  "rawTeamContributionDelta": -0.023,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.046
+                  },
+                  "weights": [
+                    {
+                      "player": "Jordon Riley",
+                      "eaPlayerId": "23280",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Game-specific positional reporting corroborates Riley directly absorbed increased DT workload after injury; official activation and gamebook p.17 confirm active interior role. Preserve his original rotation and the distinct Hargrave relief players.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.5,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.04555555555555556,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.09111111111111111
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1646,
+                        "startLatest": 1716,
+                        "endEarliest": 1716,
+                        "endLatest": 1974,
+                        "sourceIds": [
+                          "review-gb-det-gamebook",
+                          "review-gb-game-recap",
+                          "review-gb-week7-injury-followup",
+                          "review-gb-activation",
+                          "review-gb-week7-role-report"
+                        ],
+                        "rationale": "Gamebook p.10 last observed Wyatt duty is a Q2 2:34 tackle, then team places locker-room departure in final two minutes and p.10 prints a questionable update after Q2 1:24. Use the earlier observed tackle as a conservative earliest onset, since physical duty could have ended before the locker-room departure. The affirmative p.12 return update at Q3 12:06 is the latest return bound; no exact return snap or snap-to-time conversion."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Gamebook p.10 last observed Wyatt duty is a Q2 2:34 tackle, then team places locker-room departure in final two minutes and p.10 prints a questionable update after Q2 1:24. Use the earlier observed tackle as a conservative earliest onset, since physical duty could have ended before the locker-room departure. The affirmative p.12 return update at Q3 12:06 is the latest return bound; no exact return snap or snap-to-time conversion.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  }
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Matthew-Golden",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.003,
+                  "rawTeamContributionDelta": -0.003,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.006
+                  },
+                  "weights": [
+                    {
+                      "player": "J.Michael Sturdivant",
+                      "eaPlayerId": "1816",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club chart and dated Week 7 chart name Sturdivant immediately behind Golden, and p.17 shows active offensive duty. This is available depth, not observed substitution.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.5,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.006388888888888889,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.012777777777777779
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1398,
+                        "startLatest": 1398,
+                        "endEarliest": 1398,
+                        "endLatest": 1444,
+                        "sourceIds": [
+                          "review-gb-det-gamebook",
+                          "review-gb-dated-depth",
+                          "review-gb-depth"
+                        ],
+                        "rationale": "Gamebook p.10 injury on Q2 6:42 play, affirmative return update printed at Q2 5:56; exact earlier return unobserved, and no named offensive duty is assumed during the interval."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Gamebook p.10 injury on Q2 6:42 play, affirmative return update printed at Q2 5:56; exact earlier return unobserved, and no named offensive duty is assumed during the interval.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "team": "DET",
+              "estimates": [
+                {
+                  "caseKey": "2026-W07-DET-Giovanni-Manu",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Damone-Clark",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Kendrick-Law",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Tom-Kennedy",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Kerby-Joseph",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.2,
+                  "rawTeamContributionDelta": -1.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Chuck Clark",
+                      "eaPlayerId": "12785",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Avonte-Maddox",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Christian Izien",
+                      "eaPlayerId": "23287",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club specifically names Izien as safety depth after Maddox and Harper IR. Both game-active safety roles Branch and Chuck Clark remain baseline; Clark reserved for Joseph and outside CB Rakestraw stays separate. Izien was active (10 special-teams snaps), a professional available documented safety depth with the same frozen value, not a claim of observed Week 7 defensive substitution.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Ben-Bartch",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Miles Frazier",
+                      "eaPlayerId": "15132",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Isiah-Pacheco",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.5,
+                  "rawTeamContributionDelta": -0.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Sione Vaki",
+                      "eaPlayerId": "14999",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Vaki actually supplied relief scrimmage reserve role with nine offensive snaps and a carry. Saylors handled only special teams this game; Gibbs baseline remains. Vaki and Saylors have the same locked value; no changed value from approved prior committee.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Payton-Turner",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": true,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Derrick Moore",
+                      "eaPlayerId": "16174",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Devin-White",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Malcolm Rodriguez",
+                      "eaPlayerId": "22460",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-DET-DET-Thomas-Harper",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Official Sept 26 reserve and no Week 7 activation, same prior approved exact frozen zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-DET-DET-Ennis-Rakestraw-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.064,
+                  "rawTeamContributionDelta": -0.064,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.028,
+                    "max": 0.1
+                  },
+                  "weights": [
+                    {
+                      "player": "Rock Ya-Sin",
+                      "eaPlayerId": "20451",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Official club depth lists active reserve Rock Ya-Sin behind outside corner Rakestraw. The gamebook verifies his participation and a tackle next to the injury notice. Assume additional outside coverage only through the documented-depth model, preserving normal Ya-Sin packages, McCreary’s slot role, Reed’s opposite role and Izien’s distinct safety duty. Actual exclusive substitution was not established.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.3209722222222222,
+                    "fractionRange": {
+                      "min": 0.14194444444444446,
+                      "max": 0.5
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1800,
+                        "startLatest": 3089,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "review-gb-det-gamebook",
+                          "review-det-game-recap",
+                          "review-det-depth",
+                          "review-det-yasin-relief"
+                        ],
+                        "rationale": "Club confirms second-half departure without return. Earliest Q3 15:00; p.14 questionability notice after Q4 8:31 gives latest. Do not infer departure from game totals, substitution attribution or unaffirmed exact injury snap."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Club confirms second-half departure without return. Earliest Q3 15:00; p.14 questionability notice after Q4 8:31 gives latest. Do not infer departure from game totals, substitution attribution or unaffirmed exact injury snap.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "externalComparisons": {
@@ -47163,10 +48005,10 @@
       "team": "Detroit",
       "abbr": "DET",
       "seedRating": 26,
-      "currentRating": 26.4812988,
-      "priorRating": 24.584183,
-      "lastDelta": 1.8971158,
-      "lastUpdatedAt": "2026-10-20T20:52:52.077Z",
+      "currentRating": 26.1441279782,
+      "priorRating": 26.4812988,
+      "lastDelta": -0.3371708218,
+      "lastUpdatedAt": "2026-11-04T00:38:41.073Z",
       "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "PRESEASON_SEED",
       "sourceRefs": [
@@ -47187,7 +48029,11 @@
         "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-det-ari-ready-reconciliation.json",
         "data/walters/nfl/2026/week-05-current-numbers.json",
         "data/walters/nfl/2026/week-05-final-facts-20261013.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-5"
+        "https://www.nfl.com/schedules/2026/by-week/week-5",
+        "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json",
+        "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+        "data/walters/nfl-power-ratings-ledger.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-7"
       ],
       "history": [
         {
@@ -50003,6 +50849,845 @@
                   "roleAllocationRange": {
                     "min": 0.5,
                     "max": 0.5
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequence": 5,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w07-to-w08-manual-20261104T003841073Z",
+          "fromRating": 26.4812988,
+          "priorRating": 26.4812988,
+          "delta": -0.3371708218,
+          "toRating": 26.1441279782,
+          "currentRating": 26.1441279782,
+          "effectiveAt": "2026-11-04T00:38:41.073Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W07-GB-DET: TGPL 23.109590582; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 7,
+          "targetWeek": 8,
+          "gameKey": "2026-W07-GB-DET",
+          "opponent": "GB",
+          "kickoff": "2026-10-25T13:25:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": 3,
+            "opponentOldRating": 27.932590582,
+            "teamInjuryLoss": 1.964,
+            "opponentInjuryLoss": 7.705,
+            "teamLocationAdvantage": 2.082
+          },
+          "tgpl": 23.109590582,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json",
+            "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+            "data/walters/nfl-power-ratings-ledger.json",
+            "https://www.nfl.com/schedules/2026/by-week/week-7"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json",
+            "blobSha": "f8d7c08dc50f984f110fce43e18fba5dbf9ec4e4"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "GB",
+              "estimates": [
+                {
+                  "caseKey": "2026-W07-GB-Chris-Brooks",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Collin-Oliver",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Luke-Musgrave",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Warren-Brinson",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Zach-Tom",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1,
+                  "rawTeamContributionDelta": -1,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1,
+                    "max": 1
+                  },
+                  "weights": [
+                    {
+                      "player": "Anthony Belton",
+                      "eaPlayerId": "15127",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Team confirms Zach Tom is now Zach Bako-Bewele, on reserve since Sept. 28. Same archived player and distinct starting right tackle relief Anthony Belton.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Micah-Parsons",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 2.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 2.5,
+                  "rawTeamContributionDelta": -2.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 2.5,
+                    "max": 2.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Barryn Sorrell",
+                      "eaPlayerId": "15179",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Edgerrin-Cooper",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.9,
+                  "rawTeamContributionDelta": -0.9,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.9,
+                    "max": 0.9
+                  },
+                  "weights": [
+                    {
+                      "player": "Ty'Ron Hopper",
+                      "eaPlayerId": "14910",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Prior McDuffie/Hopper rotation alongside Franklin yields two distinct replacement duties on matchday. Position-specific Week 7 report and official starters support Hopper at WILL replacing Cooper, McDuffie independently at MIKE replacing Franklin. No duplicate healthy duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Jayden-Reed",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Bo Melton",
+                      "eaPlayerId": "22084",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Approved prior Week 6 documented net WR depth allocation retains Melton; represents incremental available receiving depth displaced by the separate Reed absence rather than asserting a Melton slot start. Savion Williams independently fills Moore slot relief; retain Melton primary return baseline.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Jonathan-Ford",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Skyy-Moore",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Savion Williams",
+                      "eaPlayerId": "15063",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club activated Williams while placing Moore on IR. Week 7 shows Williams actual slot role as successor to Moore. Preserve incumbent boundary receivers. Prior Reed net additional depth allocation Melton remains separate and is an explicit counterfactual approximation. No separate Moore return-only credit.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Javon-Hargrave",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "EQUAL_SHARE_COMMITTEE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.1,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 0.8,
+                  "rawTeamContributionDelta": -0.8,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.9
+                  },
+                  "weights": [
+                    {
+                      "player": "Chris McClellan",
+                      "eaPlayerId": "1859",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "Anthony Campbell",
+                      "eaPlayerId": "4801",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-Benjamin-St-Juste",
+                  "modelId": "graham-st-only-duty-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "SPECIAL_TEAMS_ONLY_DUTY_ESTIMATE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.25,
+                  "rawTeamContributionDelta": -0.25,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Kitan Oladapo",
+                      "eaPlayerId": "14967",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "St-Juste was final injury inactive with hamstring and established ST-only coverage duties. Oladapo is documented first-team gunner depth and was active for 10 ST-only snaps. Select the available professional ST coverage depth as an assumption, not an observed substitution. Team reported Sturdivant already had regular gunner work opposite Melton; preserve that baseline. Earlier precedent used Sturdivant but the two have equal calibrated value, so no selection by value and no duplication of Golden receiver relief.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "proxyConvention": "ZERO_TO_FULL_NON_QB_DIFFERENCE_MIDPOINT",
+                  "roleScopeRationale": "Week 5 gamebook and approved Week 6 closure establish special-teams coverage only (zero defensive work when active). Current starter Cisse and other actual defensive roles remained available. Use the approved bounded proxy for missing coverage, retaining Sturdivant/Melton regular coverage and return baseline and using no full defensive loss.",
+                  "limitation": "Explicit midpoint between zero ST-only loss and the full non-QB replacement-difference proxy. The ceiling is an assumed modelling bound, not a calibrated ST value or confidence interval. Source-supported depth is an allocation assumption, not an observed substitution or snap-to-time conversion."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Zaire-Franklin",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Isaiah McDuffie",
+                      "eaPlayerId": "21903",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club final ruled out (shin). Week 7 observed position report has McDuffie starting MIKE in his place and Hopper at WILL covering Cooper. No overlapping relief and no use of current undated generic depth over game roles.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Sean-Rhyan",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Official ankle injury fourth offensive snap; Monk and later Williams covered center. Frozen zero gives zero incremental calibrated loss under the exact role inventory.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Jacob-Monk",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Official quad injury while serving as active center reserve; John Williams finished at center. No second credit for replacing the same center duty and frozen zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Devonte-Wyatt",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.023,
+                  "rawTeamContributionDelta": -0.023,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.046
+                  },
+                  "weights": [
+                    {
+                      "player": "Jordon Riley",
+                      "eaPlayerId": "23280",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Game-specific positional reporting corroborates Riley directly absorbed increased DT workload after injury; official activation and gamebook p.17 confirm active interior role. Preserve his original rotation and the distinct Hargrave relief players.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.5,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.04555555555555556,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.09111111111111111
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1646,
+                        "startLatest": 1716,
+                        "endEarliest": 1716,
+                        "endLatest": 1974,
+                        "sourceIds": [
+                          "review-gb-det-gamebook",
+                          "review-gb-game-recap",
+                          "review-gb-week7-injury-followup",
+                          "review-gb-activation",
+                          "review-gb-week7-role-report"
+                        ],
+                        "rationale": "Gamebook p.10 last observed Wyatt duty is a Q2 2:34 tackle, then team places locker-room departure in final two minutes and p.10 prints a questionable update after Q2 1:24. Use the earlier observed tackle as a conservative earliest onset, since physical duty could have ended before the locker-room departure. The affirmative p.12 return update at Q3 12:06 is the latest return bound; no exact return snap or snap-to-time conversion."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Gamebook p.10 last observed Wyatt duty is a Q2 2:34 tackle, then team places locker-room departure in final two minutes and p.10 prints a questionable update after Q2 1:24. Use the earlier observed tackle as a conservative earliest onset, since physical duty could have ended before the locker-room departure. The affirmative p.12 return update at Q3 12:06 is the latest return bound; no exact return snap or snap-to-time conversion.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  }
+                },
+                {
+                  "caseKey": "2026-W07-DET-GB-Matthew-Golden",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.003,
+                  "rawTeamContributionDelta": -0.003,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.006
+                  },
+                  "weights": [
+                    {
+                      "player": "J.Michael Sturdivant",
+                      "eaPlayerId": "1816",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club chart and dated Week 7 chart name Sturdivant immediately behind Golden, and p.17 shows active offensive duty. This is available depth, not observed substitution.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.5,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.006388888888888889,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.012777777777777779
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1398,
+                        "startLatest": 1398,
+                        "endEarliest": 1398,
+                        "endLatest": 1444,
+                        "sourceIds": [
+                          "review-gb-det-gamebook",
+                          "review-gb-dated-depth",
+                          "review-gb-depth"
+                        ],
+                        "rationale": "Gamebook p.10 injury on Q2 6:42 play, affirmative return update printed at Q2 5:56; exact earlier return unobserved, and no named offensive duty is assumed during the interval."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Gamebook p.10 injury on Q2 6:42 play, affirmative return update printed at Q2 5:56; exact earlier return unobserved, and no named offensive duty is assumed during the interval.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "team": "DET",
+              "estimates": [
+                {
+                  "caseKey": "2026-W07-DET-Giovanni-Manu",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Damone-Clark",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Kendrick-Law",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Tom-Kennedy",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Kerby-Joseph",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.2,
+                  "rawTeamContributionDelta": -1.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Chuck Clark",
+                      "eaPlayerId": "12785",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Avonte-Maddox",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Christian Izien",
+                      "eaPlayerId": "23287",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Club specifically names Izien as safety depth after Maddox and Harper IR. Both game-active safety roles Branch and Chuck Clark remain baseline; Clark reserved for Joseph and outside CB Rakestraw stays separate. Izien was active (10 special-teams snaps), a professional available documented safety depth with the same frozen value, not a claim of observed Week 7 defensive substitution.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Ben-Bartch",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Miles Frazier",
+                      "eaPlayerId": "15132",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Isiah-Pacheco",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.5,
+                  "rawTeamContributionDelta": -0.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Sione Vaki",
+                      "eaPlayerId": "14999",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Vaki actually supplied relief scrimmage reserve role with nine offensive snaps and a carry. Saylors handled only special teams this game; Gibbs baseline remains. Vaki and Saylors have the same locked value; no changed value from approved prior committee.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Payton-Turner",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": true,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Derrick Moore",
+                      "eaPlayerId": "16174",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-DET-Devin-White",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Malcolm Rodriguez",
+                      "eaPlayerId": "22460",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W07-GB-DET-DET-Thomas-Harper",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Official Sept 26 reserve and no Week 7 activation, same prior approved exact frozen zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W07-GB-DET-DET-Ennis-Rakestraw-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.064,
+                  "rawTeamContributionDelta": -0.064,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.028,
+                    "max": 0.1
+                  },
+                  "weights": [
+                    {
+                      "player": "Rock Ya-Sin",
+                      "eaPlayerId": "20451",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Official club depth lists active reserve Rock Ya-Sin behind outside corner Rakestraw. The gamebook verifies his participation and a tackle next to the injury notice. Assume additional outside coverage only through the documented-depth model, preserving normal Ya-Sin packages, McCreary’s slot role, Reed’s opposite role and Izien’s distinct safety duty. Actual exclusive substitution was not established.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.3209722222222222,
+                    "fractionRange": {
+                      "min": 0.14194444444444446,
+                      "max": 0.5
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1800,
+                        "startLatest": 3089,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "review-gb-det-gamebook",
+                          "review-det-game-recap",
+                          "review-det-depth",
+                          "review-det-yasin-relief"
+                        ],
+                        "rationale": "Club confirms second-half departure without return. Earliest Q3 15:00; p.14 questionability notice after Q4 8:31 gives latest. Do not infer departure from game totals, substitution attribution or unaffirmed exact injury snap."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Club confirms second-half departure without return. Earliest Q3 15:00; p.14 questionability notice after Q4 8:31 gives latest. Do not infer departure from game totals, substitution attribution or unaffirmed exact injury snap.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.2,
+                    "max": 0.2
                   }
                 }
               ]
@@ -134597,7 +136282,7 @@
     "sourceWeek": 7,
     "targetWeek": 8,
     "state": "PARTIAL_BLOCKED",
-    "appliedAt": "2026-11-04T00:33:33.764Z",
+    "appliedAt": "2026-11-04T00:38:41.073Z",
     "formulaIds": [
       "BW-R016",
       "BW-R017",
@@ -134605,8 +136290,8 @@
     ],
     "marketViewed": false,
     "gamesProcessed": 14,
-    "gamesUpdated": 5,
-    "teamsUpdated": 10,
+    "gamesUpdated": 6,
+    "teamsUpdated": 12,
     "blockedGames": [
       {
         "gameKey": "2026-W07-PIT-NO",
@@ -134696,20 +136381,6 @@
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-afternoon-window-official-gamebooks-status-reconciled.json",
-          "data/walters/nfl/2026/week-07-current-numbers.json",
-          "data/walters/nfl/2026/week-07-final-facts-20261027.json",
-          "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
-        ]
-      },
-      {
-        "gameKey": "2026-W07-GB-DET",
-        "away": "GB",
-        "home": "DET",
-        "reasons": [
-          "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: Sean Rhyan and Jordan Monk are first printed as Questionable without an initial injury play; Rhyan is later Out. Devonte Wyatt has a return but no printed initial injury play, and Ennis Rakestraw has a Questionable notice without a return. Matthew Golden has a complete injury-to-return interval. REQUIRED: Use the complete Golden interval. For Rhyan, Monk, Wyatt and Rakestraw, use an already approved bounded method only if its conditions are satisfied; otherwise retain the unknown boundary."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-reused-prior-case-resolutions.json",
           "data/walters/nfl/2026/week-07-current-numbers.json",
           "data/walters/nfl/2026/week-07-final-facts-20261027.json",
           "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
@@ -135118,6 +136789,152 @@
           "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-cin-bal-targeted-reconciliation.json",
           "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-cle-ten-targeted-reconciliation.json",
           "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-ind-min-targeted-reconciliation.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "auditId": "walters-weekly-90-10-2026-w07-to-w08-manual-20261104T003841073Z",
+        "appliedAt": "2026-11-04T00:38:41.073Z",
+        "newGamesUpdated": 1,
+        "newTeamsUpdated": 2,
+        "alreadyAppliedGames": [
+          "2026-W07-NE-CHI",
+          "2026-W07-CIN-BAL",
+          "2026-W07-IND-MIN",
+          "2026-W07-CLE-TEN",
+          "2026-W07-LAR-LV"
+        ],
+        "blockedGames": [
+          {
+            "gameKey": "2026-W07-PIT-NO",
+            "away": "PIT",
+            "home": "NO",
+            "reasons": [
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: All available official inactive, reserve, elevation, starter, substitute, DNP, quarterback and specialist evidence is assembled. Remaining cases require immutable-value or governed expected-role/replacement allocation decisions: PIT Joseph-Day, Echols, Heidenreich and Terell Smith; NO Saldiveri, Ruiz, Shepherd, Tyree Wilson, Mike Reid and Treyton Welch. Missing values are not zero, and special-teams-only activity does not establish a defensive replacement effect. REQUIRED: Use the existing immutable registry and approved labelled estimates where eligible; apply one-for-one or distinct-cluster safeguards to the official gamebook participants, and route only the residual source/method decisions to the existing owners.",
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: CJ Donaldson's official sequence is Questionable at Q2 15:00 and Out at Q3 7:32; Justin Reid is printed Out at Q3 7:32. The recap supplies only first-half/before-halftime wording, and neither source prints the original injury play or a return. REQUIRED: Apply an already approved governed boundary method if eligible or obtain a source identifying the exit play. Do not manufacture exact clocks, returns or durations."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W07-SF-ATL",
+            "away": "SF",
+            "home": "ATL",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The complete official final, starter, substitute, DNP, inactive, quarterback, specialist and printed injury-update evidence is assembled for both teams, but 13 existing fail-closed personnel cases still require governed reconciliation. REQUIRED: Reconcile every listed unresolvedNumericalCase through the existing value/replacement owner, then compute the paired injury interval and validate together.",
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: The gamebook prints one or more injury status/return notices, but not every initial injury boundary is printed as a separate update. REQUIRED: Use play-by-play injury annotations and participation intervals where explicit; otherwise preserve the boundary as unknown and do not manufacture precision.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: 13 existing cases remain explicit; missing values are not zero. REQUIRED: Reuse supported prior cases and approved labelled estimates where eligible; route only the remaining immutable identity/value or replacement-method decisions."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W07-TB-CAR",
+            "away": "TB",
+            "home": "CAR",
+            "reasons": [
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: The gamebook prints one or more injury status/return notices, but not every initial injury boundary is printed as a separate update. REQUIRED: Use play-by-play injury annotations and participation intervals where explicit; otherwise preserve the boundary as unknown and do not manufacture precision."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W07-NYG-HOU",
+            "away": "NYG",
+            "home": "HOU",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The complete official final, starter, substitute, DNP, inactive, quarterback, specialist and printed injury-update evidence is assembled for both teams, but 14 existing fail-closed personnel cases still require governed reconciliation. REQUIRED: Reconcile every listed unresolvedNumericalCase through the existing value/replacement owner, then compute the paired injury interval and validate together.",
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: The gamebook prints one or more injury status/return notices, but not every initial injury boundary is printed as a separate update. REQUIRED: Use play-by-play injury annotations and participation intervals where explicit; otherwise preserve the boundary as unknown and do not manufacture precision.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: 14 existing cases remain explicit; missing values are not zero. REQUIRED: Reuse supported prior cases and approved labelled estimates where eligible; route only the remaining immutable identity/value or replacement-method decisions."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W07-MIA-NYJ",
+            "away": "MIA",
+            "home": "NYJ",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The complete official final, starter, substitute, DNP, inactive, quarterback, specialist and printed injury-update evidence is assembled for both teams, but 5 existing fail-closed personnel cases still require governed reconciliation. REQUIRED: Reconcile every listed unresolvedNumericalCase through the existing value/replacement owner, then compute the paired injury interval and validate together.",
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: The gamebook prints one or more injury status/return notices, but not every initial injury boundary is printed as a separate update. REQUIRED: Use play-by-play injury annotations and participation intervals where explicit; otherwise preserve the boundary as unknown and do not manufacture precision.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: 5 existing cases remain explicit; missing values are not zero. REQUIRED: Reuse supported prior cases and approved labelled estimates where eligible; route only the remaining immutable identity/value or replacement-method decisions."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W07-DEN-ARI",
+            "away": "DEN",
+            "home": "ARI",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The complete official final, starter, substitute, DNP, inactive, quarterback, specialist and printed injury-sequence evidence is assembled for both teams, but 7 existing fail-closed personnel cases still require governed reconciliation. REQUIRED: Reconcile every listed unresolvedNumericalCase through the existing value/replacement owner, then compute the paired injury interval and validate together.",
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: The gamebook prints injury annotations and status/return notices, but not every sequence supplies a complete exit-to-return interval. REQUIRED: Use the explicit play-by-play injury annotations and participation intervals where complete; otherwise preserve the boundary as unknown and do not manufacture precision.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: 7 existing cases remain explicit; missing values are not zero. REQUIRED: Reuse supported prior cases and approved labelled estimates where eligible; route only the remaining immutable identity/value or replacement-method decisions."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-afternoon-window-official-gamebooks-status-reconciled.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W07-KC-SEA",
+            "away": "KC",
+            "home": "SEA",
+            "reasons": [
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: The official gamebook is fully assembled. It does not print the originating injury play for Rashid Shaheed or Charles Cross; their first literal notices are Q3 12:04 Questionable and after Q4 3:13 Out, respectively. Velus Jones is numerically closed at a calibrated zero healthy value. Nick Bolton's exact one-play interval is complete. REQUIRED: Use a source-supported exit play or an approved bounded/snap-exposure method for Shaheed and Cross. Preserve the unprinted facts rather than inventing a clock.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: Jimmy Holiday, Rashee Rice and Drake Thomas are resolved through approved prior cases plus official participation. Remaining role work is limited to Shaheed's distinct receiver/return relief, Cross's distinct left-tackle relief and Bolton's one-play linebacker relief. REQUIRED: Bind each relief role from source-supported personnel or film evidence, or apply the existing approved capacity method; special-teams-only participation does not establish a defensive replacement effect."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W07-DAL-PHI",
+            "away": "DAL",
+            "home": "PHI",
+            "reasons": [
+              "SOURCE_NOT_YET_AVAILABLE: The official Eagles media-center Week 7 row shows the Game Book control without a downloadable link at capture time. REQUIRED: Recheck the official NFL Game Center and Eagles media-center gamebook index; ingest the immutable PDF as soon as published.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The official final inactive and complete reserve sources add Emari Demercado, Tyrus Wheat, Kelvin Gilliam, DJ Rogers, Jake Majors and Tucker Large beyond the prior numerical candidate set. They are retained explicitly as UNRESOLVED cases. REQUIRED: Apply the approved value hierarchy and source-confirmed role assessment after complete participation is bound; use a supported no-established-baseline-role ruling when eligible, never a fabricated zero.",
+              "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED: The official recap prints Britain Covey out, Quinyon Mitchell injured on a known play and Dameon Pierce leaving in a coarse window, but does not print every initial/return boundary. REQUIRED: Use the complete official gamebook injury sequence when available; retain unknown boundaries rather than manufacturing duration.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: All previously supported personnel cases are retained; explicit new and continuing identity/value, cluster and distinct-replacement cases remain. Missing values are not zero. REQUIRED: Resolve the listed cases through the approved source/value and replacement owners after final participation is bound, then validate both teams together."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-dal-phi-final-preparation.json",
+              "data/walters/nfl/2026/week-07-current-numbers.json",
+              "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          }
+        ],
+        "sourceRefs": [
+          "data/walters/nfl/2026/week-07-final-facts-20261027.json",
+          "data/walters/nfl-power-ratings-ledger.json",
+          "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json"
         ],
         "marketViewed": false
       }
