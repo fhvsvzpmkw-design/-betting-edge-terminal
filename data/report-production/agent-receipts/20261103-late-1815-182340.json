@@ -5,13 +5,17 @@
   "taskId": "main-2026-11-03-1815",
   "executionRunId": "20261103-late-1815-182340",
   "workBinding": {
-    "candidateId": "2026-11-03T18:23:40.000-07:00|5",
+    "candidateId": "2026-11-03T18:40:00.000-07:00|5",
     "feedBlobSha": "2e68bc036c348ade461e7c67ac67c1c2fdf6b2f4",
     "checkpointPath": "data/report-production/checkpoints/20261103-late-1815-182340.json",
-    "checkpointRevision": 1,
+    "checkpointRevisionAtLaunch": 1,
+    "checkpointRevisionAtStage": 13,
+    "operatingDate": "2026-11-03",
+    "canonicalSlot": 5,
+    "expectedReportTime": "18:15",
     "events": ["72909334"]
   },
-  "mode": "AGENTS_READY",
+  "mode": "ADAPTIVE_PARTIAL_POOL",
   "reason": "One-event slate: one complete-event owner plus two bounded critical reviews for personnel/identity/opposing case and forecast/History Fit/Guy eligibility. Spare researchers were not launched to avoid duplicate event ownership.",
   "workers": [
     {
@@ -19,24 +23,30 @@
       "id": "/root/researcher_1",
       "assignmentIds": ["72909334:all-primary-markets"],
       "boundary": "READ_ONLY_NO_SHARED_WRITES_NO_ODDS_NO_SUBAGENTS",
-      "state": "ACKNOWLEDGED",
-      "acknowledgedAt": "2026-11-04T01:25:42.103Z"
+      "state": "RETURNED",
+      "acknowledgedAt": "2026-11-04T01:25:42.103Z",
+      "error": null,
+      "returnedWork": "Completed Anaheim–Vancouver across moneyline, puck-line and total families, including current lineup/goalie, Support/Contrary, History Fit and exact-contract review."
     },
     {
       "role": "CRITICAL_REVIEWER_PERSONNEL_IDENTITY_OPPOSITION",
       "id": "/root/reviewer_1",
       "assignmentIds": ["72909334:personnel-price-settlement-opposition"],
       "boundary": "READ_ONLY_NO_SHARED_WRITES_NO_ODDS_NO_SUBAGENTS",
-      "state": "ACKNOWLEDGED",
-      "acknowledgedAt": "2026-11-04T01:25:42.103Z"
+      "state": "RETURNED",
+      "acknowledgedAt": "2026-11-04T01:25:42.103Z",
+      "error": null,
+      "returnedWork": "Caught the exact 6.5 executable versus 7.0 Pinnacle total mismatch and tightened personnel attribution to the official NHL and ESPN evidence."
     },
     {
       "role": "CRITICAL_REVIEWER_FORECAST_HISTORY_GUY",
       "id": "/root/reviewer_2",
       "assignmentIds": ["72909334:forecast-history-guy"],
       "boundary": "READ_ONLY_NO_SHARED_WRITES_NO_ODDS_NO_SUBAGENTS",
-      "state": "ACKNOWLEDGED",
-      "acknowledgedAt": "2026-11-04T01:25:42.103Z"
+      "state": "RETURNED",
+      "acknowledgedAt": "2026-11-04T01:25:42.103Z",
+      "error": null,
+      "returnedWork": "Recomputed the current forecast comparisons, challenged the stale blanket goalie-corrected statement, and reviewed History Fit and Guy eligibility."
     }
   ],
   "scalingDecisions": [
@@ -47,16 +57,37 @@
       "releaseCondition": "Return the event dossier and the two bounded reviews, then release all workers."
     }
   ],
-  "qualityFindings": [],
-  "completedWork": {
-    "acknowledgments": 3,
-    "eventResearch": 0,
-    "reviews": 0
-  },
-  "remainingWork": [
-    "Complete event research across moneyline, puck line and total.",
-    "Complete two bounded critical reviews and reconcile findings.",
-    "Save the coordinator event checkpoint and run final validation/publication."
+  "qualityFindings": [
+    "Exact-contract review prevented the executable 6.5 total from being benchmarked against Pinnacle's different 7.0 main total; both 6.5 sides remained SOURCE_UNAVAILABLE.",
+    "Current forecast math supports a Vancouver moneyline directional LEAN, but adverse Pinnacle context, the strong Anaheim contrary case and unresolved model/goalie applicability kept it at zero stake.",
+    "Guy's retained MoneyPuck capture was about 180 minutes old and outside his 75-minute eligibility rule, so no stale shortlist or call was adopted."
   ],
-  "recordedAt": "2026-11-04T01:25:42.103Z"
+  "decisionCorrections": [
+    "Removed the false blanket claim that goalie-corrected models were below every executable break-even point; MoneyPuck and Dimers were both positive for Vancouver ML.",
+    "Kept Anaheim ML and both puck-line sides as PASS after exact Pinnacle and forecast comparisons; issued only the Vancouver ML as a zero-stake LEAN.",
+    "Recorded the total-family problem as two source-specific shortfalls rather than transposing a different settlement line or leaving producer work unfinished."
+  ],
+  "completedWork": {
+    "acknowledgmentTest": "3_OF_3_USEFUL_WORKERS_BOUND_WITHIN_60_SECONDS",
+    "eventResearchReturned": 1,
+    "eventResearchCompleted": 1,
+    "criticalReviewsReturned": 2,
+    "availableSelections": 6,
+    "controllerEventSaves": 1,
+    "publisherState": "SUCCEEDED",
+    "publisherWorkflowRunId": 41756061483,
+    "publisherCommit": "963b878d99e1ae317ce982bc1f663cd50c22f4ef",
+    "durableControllerReadback": true,
+    "controllerFinalRevision": 14
+  },
+  "remainingWork": {
+    "eventResearch": 0,
+    "criticalReviews": 0,
+    "coordinatorMerge": false,
+    "controllerEventSaves": 0,
+    "prepareFreezeStageReadback": "COMPLETE",
+    "guyFollowUp": "No current eligible shortlist; the retained model capture exceeded Guy's 75-minute clock."
+  },
+  "recordedAt": "2026-11-04T01:57:20.085Z",
+  "state": "FINAL_SAVED"
 }
