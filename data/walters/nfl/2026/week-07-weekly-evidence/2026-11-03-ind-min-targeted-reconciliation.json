@@ -1,0 +1,1340 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 7,
+  "marketViewed": false,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "inputCommit": "0424fa8fa49c30c6a26233884936b36b93653b54",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
+    "data/walters/nfl/2026/week-07-personnel-ledger.json": "488c3c54ddf09b6531437a1fc9855c1c93065358",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "9742cdf1ec46832d829e5791011fe232ba5b0efd",
+    "data/walters/nfl/matchup-production-current.json": "3a34b442ab0eed10b372f2c71b636a966a2705d9"
+  },
+  "sources": [
+    {
+      "id": "nfl-gamebook-2026-w07-ind-min",
+      "kind": "OFFICIAL",
+      "publisher": "Official team/NFL source",
+      "title": "Indianapolis Colts at Minnesota Vikings official Week 7 gamebook",
+      "checkedAt": "2026-10-26T09:09:12.465Z",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "url": "https://static.www.nfl.com/image/upload/v1792957940/gamecenter/aad5a2ac-4feb-11f1-abca-2c54536568a9.pdf",
+      "finding": "Official final, inactive, starter, substitute, DNP, quarterback, specialist and printed injury evidence."
+    },
+    {
+      "id": "prior-week6-ten-ind-ready-reconciliation",
+      "kind": "REPORTING",
+      "publisher": "Betting Edge Terminal governed repository evidence",
+      "title": "Approved Week 6 Tyler Warren replacement allocation",
+      "checkedAt": "2026-10-26T09:09:12.465Z",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/blob/d6e9af364eedef0453f300ceb138c6dfafd59312/data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-ten-ind-ready-reconciliation.json",
+      "finding": "Approved prior case assigns Mo Alie-Cox to Warren primary tight-end duty with other common tight-end roles preserved.",
+      "repositoryPath": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-ten-ind-ready-reconciliation.json",
+      "immutableCapture": {
+        "gitBlobSha": "3518684d067eb247c7ef0c7e6b230d9a007642a2"
+      }
+    },
+    {
+      "id": "immutable-player-values-2026-v1",
+      "kind": "REPORTING",
+      "publisher": "Betting Edge Terminal governed repository evidence",
+      "title": "Immutable 2026 player value registry",
+      "checkedAt": "2026-10-26T09:09:12.465Z",
+      "gameKeys": [
+        "2026-W07-CLE-TEN",
+        "2026-W07-IND-MIN"
+      ],
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/blob/d6e9af364eedef0453f300ceb138c6dfafd59312/data/walters/nfl/player-values/player-values-2026-v1.json",
+      "finding": "Binds Tyler Warren 0.9, Mo Alie-Cox 0.0, Mike Hall Jr. 0.2 and Adin Huntington 0.0; zero values are registry-supported.",
+      "repositoryPath": "data/walters/nfl/player-values/player-values-2026-v1.json",
+      "immutableCapture": {
+        "gitBlobSha": "dbba71f6830daff5e07b622597681b8abdc9f011"
+      }
+    },
+    {
+      "id": "prior-week3-full-slate-recovery-cameron-mitchell",
+      "kind": "REPORTING",
+      "publisher": "Betting Edge Terminal governed repository evidence",
+      "title": "Week 3 full-slate recovery — Cameron Mitchell approved estimate",
+      "checkedAt": "2026-10-26T09:14:30.000Z",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/blob/11782fd4879e51f1a6d15abb574c40995163f215/data/walters/nfl/2026/week-03-weekly-evidence/2026-10-04-full-slate-recovery.json",
+      "finding": "The approved Week 3 Indianapolis case binds Cameron Mitchell as a CB with an acknowledged independent Madden 27 overall of 71 and an explicit ZERO_IMPUTED_BASELINE_ESTIMATE. Reuse produces a supported zero-point healthy baseline; it is not a missing value.",
+      "repositoryPath": "data/walters/nfl/2026/week-03-weekly-evidence/2026-10-04-full-slate-recovery.json",
+      "immutableCapture": {
+        "gitBlobSha": "e613c83994a3b54cbf1510b6c23e43da957c0f71"
+      }
+    },
+    {
+      "id": "review-ind-min-gamebook",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1792957940/gamecenter/aad5a2ac-4feb-11f1-abca-2c54536568a9.pdf",
+      "finding": "Original gamebook successfully retrieved; p.13 explicitly annotates Taylor-Britt Q4 15:00 and Aaron Jones Q4 12:22 injuries, and records Taylor-Britt out after the 8:32 play. Also official final, lineups, QBs, specialists, and p.16 snaps.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-week7-depth",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-7-game-at-minnesota-vikings",
+      "finding": "Dated Week 7 depth chart: Ward/Taylor-Britt on one corner row, Gardner on opposite corner row, Walley/Gushiken at nickel.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-week7-inactives",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.colts.com/news/colts-announce-7-inactive-players-for-week-7-game-at-minnesota-vikings",
+      "finding": "Colts confirm inactives and Saturday elevations of cornerback Kenneth Harris and linebacker Germaine Pratt.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-week7-injury",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.colts.com/news/colts-rule-out-te-tyler-warren-wr-anthony-gould-cb-sauce-gardner-for-week-7",
+      "finding": "Indianapolis rule-outs Warren, Gould, Gardner and original role of injury for Boettcher/Walley.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-full-final-report",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.colts.com/team/injury-report/week/reg-7",
+      "finding": "Full team Week 7 injury list; no injury designation for inactive Dalton Tucker or active DNP DJ Giddens.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-postgame-injuries",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.colts.com/news/shane-steichen-not-considering-qb-change-pleased-with-colts-effort-in-low-scoring-loss-to-vikings",
+      "finding": "Official postgame report confirms Gardner calf absence and game-day Walley and Taylor-Britt injury exits.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-sideline-secondary",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "REPORTING",
+      "url": "https://www.aol.com/articles/colts-cornerback-questionable-return-v-192132000.html",
+      "finding": "Paul Bretl, Colts Wire, reports Week 7 Walley outside opposite Ward in Gardner vacancy, Taylor-Britt mostly nickel, then Harris outside and Gushiken slot after both injured; corroborated by original gamebook participation and team postgame injury confirmation.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-harris-ea-week7",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/kenneth-harris/4841",
+      "finding": "Official EA Madden NFL 27 Week 7 Ratings, Indianapolis CB Kenneth Harris, exact EA ID 4841, OVR 66; exact name/team/position/height/weight match official Colts.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-ind-harris",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.colts.com/news/colts-sign-cb-kenneth-harris-to-53-man-roster-from-practice-squad-place-cb-cam-taylor-britt-on-injured-reserve-sign-2-players-to-practice-squad",
+      "finding": "Club identifies Week 7 elevated Kenneth Harris and corresponding roster move with injured Taylor-Britt.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-min-week7-inactives",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.vikings.com/news/inactives-colts-week-7-2026",
+      "finding": "Club enumerates final six inactives and Max Brosmer emergency-QB status.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-min-mason-activation",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.vikings.com/news/jordan-mason-activated-colts-game-week-7-2026",
+      "finding": "Vikings say all players on active roster available, Mason activated and DeeJay Dallas elevated.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    },
+    {
+      "id": "review-min-jones-mason",
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.vikings.com/news/colts-week-7-game-observations-4th-quarter-lockdown",
+      "finding": "Vikings report pre-existing 1A/1B Mason/Jones role, Jones left with a knee injury at the end of his Q4 17-yard gain.",
+      "checkedAt": "2026-11-04T00:26:25.849Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-IND-MIN",
+      "away": "IND",
+      "home": "MIN",
+      "state": "READY",
+      "sourceIds": [
+        "review-ind-min-gamebook",
+        "review-ind-week7-depth",
+        "review-ind-week7-inactives",
+        "review-ind-week7-injury",
+        "review-ind-full-final-report",
+        "review-ind-postgame-injuries",
+        "review-ind-sideline-secondary",
+        "review-ind-harris-ea-week7",
+        "review-ind-harris",
+        "review-min-week7-inactives",
+        "review-min-mason-activation",
+        "review-min-jones-mason"
+      ],
+      "teams": [
+        {
+          "team": "IND",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Exact archived cases and full game-day inactives, reserve, elevations, QB, specialists and in-game injury duty all accounted for through the attached sources.",
+          "sourceIds": [
+            "review-ind-min-gamebook",
+            "review-ind-week7-depth",
+            "review-ind-week7-inactives",
+            "review-ind-week7-injury",
+            "review-ind-full-final-report",
+            "review-ind-postgame-injuries",
+            "review-ind-sideline-secondary",
+            "review-ind-harris-ea-week7",
+            "review-ind-harris"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Daniel Jones played all 61 offensive snaps; no quarterback injury-caused missed duty.",
+            "sourceIds": [
+              "review-ind-min-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "caseKey": "2026-W07-IND-Micheal-Clemons",
+              "player": "Micheal Clemons",
+              "eaPlayerId": "22162",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-IND-D-J-Montgomery",
+              "player": "D.J. Montgomery",
+              "eaPlayerId": "23377",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-IND-Cameron-Mitchell",
+              "player": "Cameron Mitchell",
+              "eaPlayerId": "estimate:cameron-mitchell",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "rationale": "Reuse Week 3 exact positional identity and approved sourced independent Madden 27 71 overall estimate; it is not frozen zero and no missing value is imputed as an unexplained zero.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "prior-week3-full-slate-recovery-cameron-mitchell"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse Week 3 exact positional identity and approved sourced independent Madden 27 71 overall estimate; it is not frozen zero and no missing value is imputed as an unexplained zero."
+            },
+            {
+              "caseKey": "2026-W07-IND-Arden-Key",
+              "player": "Arden Key",
+              "eaPlayerId": "13120",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "replacements": [
+                {
+                  "player": "JT Tuimoloau",
+                  "eaPlayerId": "15175",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-ind-week7-depth",
+                    "review-ind-week7-inactives",
+                    "review-ind-week7-injury",
+                    "review-ind-full-final-report",
+                    "review-ind-postgame-injuries",
+                    "review-ind-sideline-secondary",
+                    "review-ind-harris-ea-week7",
+                    "review-ind-harris"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-IND-Alec-Pierce",
+              "player": "Alec Pierce",
+              "eaPlayerId": "22085",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "replacements": [
+                {
+                  "player": "Laquon Treadwell",
+                  "eaPlayerId": "17555",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-ind-week7-depth",
+                    "review-ind-week7-inactives",
+                    "review-ind-week7-injury",
+                    "review-ind-full-final-report",
+                    "review-ind-postgame-injuries",
+                    "review-ind-sideline-secondary",
+                    "review-ind-harris-ea-week7",
+                    "review-ind-harris"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-IND-Ashton-Dulin",
+              "player": "Ashton Dulin",
+              "eaPlayerId": "20649",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-IND-Jaylon-Carlies",
+              "player": "Jaylon Carlies",
+              "eaPlayerId": "1089",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Active and played 23 defensive snaps and 11 special-team snaps; official gamebook has no Carlies injury notice.",
+              "sourceIds": [
+                "review-ind-min-gamebook"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-IND-Tyler-Warren",
+              "player": "Tyler Warren",
+              "eaPlayerId": "15102",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Gamebook lists Warren inactive and Alie-Cox starting; prior approved Week 6 allocation retains distinct regular Mallory and Ogletree duties.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "prior-week6-ten-ind-ready-reconciliation"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Gamebook lists Warren inactive and Alie-Cox starting; prior approved Week 6 allocation retains distinct regular Mallory and Ogletree duties.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Gamebook lists Warren inactive and Alie-Cox starting; prior approved Week 6 allocation retains distinct regular Mallory and Ogletree duties.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "prior-week6-ten-ind-ready-reconciliation"
+              ],
+              "roleRationale": "Gamebook lists Warren inactive and Alie-Cox starting; prior approved Week 6 allocation retains distinct regular Mallory and Ogletree duties.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "prior-week6-ten-ind-ready-reconciliation"
+              ],
+              "replacements": [
+                {
+                  "player": "Mo Alie-Cox",
+                  "eaPlayerId": "13872",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Gamebook lists Warren inactive and Alie-Cox starting; prior approved Week 6 allocation retains distinct regular Mallory and Ogletree duties.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-ind-week7-inactives",
+                    "review-ind-week7-injury",
+                    "prior-week6-ten-ind-ready-reconciliation"
+                  ]
+                }
+              ],
+              "primaryEvidence": "NAMED_STARTER"
+            },
+            {
+              "caseKey": "2026-W07-IND-CJ-Allen",
+              "player": "CJ Allen",
+              "eaPlayerId": "16172",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-full-final-report",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7",
+                "review-ind-harris"
+              ],
+              "replacements": [
+                {
+                  "player": "Austin Ajiake",
+                  "eaPlayerId": "4742",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-ind-week7-depth",
+                    "review-ind-week7-inactives",
+                    "review-ind-week7-injury",
+                    "review-ind-full-final-report",
+                    "review-ind-postgame-injuries",
+                    "review-ind-sideline-secondary",
+                    "review-ind-harris-ea-week7",
+                    "review-ind-harris"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-MIN-IND-Anthony-Gould",
+              "player": "Anthony Gould",
+              "eaPlayerId": "15019",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Official Colts ruled out with concussion; exact frozen healthy value zero. No replacement role assumed.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official Colts ruled out with concussion; exact frozen healthy value zero. No replacement role assumed."
+            },
+            {
+              "caseKey": "2026-W07-MIN-IND-Bryce-Boettcher",
+              "player": "Bryce Boettcher",
+              "eaPlayerId": "16383",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Official Colts report groin injury and final inactive; exact frozen healthy value zero.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official Colts report groin injury and final inactive; exact frozen healthy value zero."
+            },
+            {
+              "caseKey": "2026-W07-MIN-IND-Justin-Walley",
+              "player": "Justin Walley",
+              "eaPlayerId": "15320",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Official gamebook Q4 questionable injury notice and official pregame knee listing; exact frozen healthy value zero. No exit clock or rotational inference.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official gamebook Q4 questionable injury notice and official pregame knee listing; exact frozen healthy value zero. No exit clock or rotational inference."
+            },
+            {
+              "caseKey": "2026-W07-MIN-IND-Sauce-Gardner",
+              "player": "Sauce Gardner",
+              "eaPlayerId": "22260",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Club confirms Gardner missed the whole game with calf injury. Contemporaneous reporting directly identifies Walley as his outside relief opposite Ward and Taylor-Britt as mostly nickel. After Walley exits, Harris takes outside; EA lists Harris exact 66 OVR, in the same calibrated zero band as Walley, so the numerical outside-role replacement value is invariant across the change. Reserve Harris to this continuation only; no secondary full-game adjustment or second role credit.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-week7-depth",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris",
+                "review-ind-harris-ea-week7"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club confirms Gardner missed the whole game with calf injury. Contemporaneous reporting directly identifies Walley as his outside relief opposite Ward and Taylor-Britt as mostly nickel. After Walley exits, Harris takes outside; EA lists Harris exact 66 OVR, in the same calibrated zero band as Walley, so the numerical outside-role replacement value is invariant across the change. Reserve Harris to this continuation only; no secondary full-game adjustment or second role credit.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Club confirms Gardner missed the whole game with calf injury. Contemporaneous reporting directly identifies Walley as his outside relief opposite Ward and Taylor-Britt as mostly nickel. After Walley exits, Harris takes outside; EA lists Harris exact 66 OVR, in the same calibrated zero band as Walley, so the numerical outside-role replacement value is invariant across the change. Reserve Harris to this continuation only; no secondary full-game adjustment or second role credit.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-week7-depth",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris",
+                "review-ind-harris-ea-week7"
+              ],
+              "roleRationale": "Club confirms Gardner missed the whole game with calf injury. Contemporaneous reporting directly identifies Walley as his outside relief opposite Ward and Taylor-Britt as mostly nickel. After Walley exits, Harris takes outside; EA lists Harris exact 66 OVR, in the same calibrated zero band as Walley, so the numerical outside-role replacement value is invariant across the change. Reserve Harris to this continuation only; no secondary full-game adjustment or second role credit.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-week7-injury",
+                "review-ind-week7-depth",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris",
+                "review-ind-harris-ea-week7"
+              ],
+              "replacements": [
+                {
+                  "player": "Justin Walley",
+                  "eaPlayerId": "15320",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Club confirms Gardner missed the whole game with calf injury. Contemporaneous reporting directly identifies Walley as his outside relief opposite Ward and Taylor-Britt as mostly nickel. After Walley exits, Harris takes outside; EA lists Harris exact 66 OVR, in the same calibrated zero band as Walley, so the numerical outside-role replacement value is invariant across the change. Reserve Harris to this continuation only; no secondary full-game adjustment or second role credit.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-ind-week7-inactives",
+                    "review-ind-week7-injury",
+                    "review-ind-week7-depth",
+                    "review-ind-postgame-injuries",
+                    "review-ind-sideline-secondary",
+                    "review-ind-harris",
+                    "review-ind-harris-ea-week7"
+                  ]
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY"
+            },
+            {
+              "caseKey": "2026-W07-MIN-IND-Cam-Taylor-Britt",
+              "player": "Cam Taylor-Britt",
+              "eaPlayerId": "22220",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "rationale": "Gamebook annotates Taylor-Britt injury Q4 15:00 then confirms OUT, with the club confirming his exit. Colts Wire identified Taylor-Britt mostly nickel and Gushiken as the slot fill. Harris supplies the other outside duty following Walley; not a second relief for Taylor-Britt. Gushiken retains normal package duties and only adds missing nickel work; use approved bound official historical EA 4805.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Gamebook annotates Taylor-Britt injury Q4 15:00 then confirms OUT, with the club confirming his exit. Colts Wire identified Taylor-Britt mostly nickel and Gushiken as the slot fill. Harris supplies the other outside duty following Walley; not a second relief for Taylor-Britt. Gushiken retains normal package duties and only adds missing nickel work; use approved bound official historical EA 4805.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Gamebook annotates Taylor-Britt injury Q4 15:00 then confirms OUT, with the club confirming his exit. Colts Wire identified Taylor-Britt mostly nickel and Gushiken as the slot fill. Harris supplies the other outside duty following Walley; not a second relief for Taylor-Britt. Gushiken retains normal package duties and only adds missing nickel work; use approved bound official historical EA 4805.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris"
+              ],
+              "roleRationale": "Gamebook annotates Taylor-Britt injury Q4 15:00 then confirms OUT, with the club confirming his exit. Colts Wire identified Taylor-Britt mostly nickel and Gushiken as the slot fill. Harris supplies the other outside duty following Walley; not a second relief for Taylor-Britt. Gushiken retains normal package duties and only adds missing nickel work; use approved bound official historical EA 4805.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-week7-inactives",
+                "review-ind-postgame-injuries",
+                "review-ind-sideline-secondary",
+                "review-ind-harris"
+              ],
+              "replacements": [
+                {
+                  "player": "Kapena Gushiken",
+                  "eaPlayerId": "4805",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Gamebook annotates Taylor-Britt injury Q4 15:00 then confirms OUT, with the club confirming his exit. Colts Wire identified Taylor-Britt mostly nickel and Gushiken as the slot fill. Harris supplies the other outside duty following Walley; not a second relief for Taylor-Britt. Gushiken retains normal package duties and only adds missing nickel work; use approved bound official historical EA 4805.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-ind-week7-depth",
+                    "review-ind-week7-inactives",
+                    "review-ind-postgame-injuries",
+                    "review-ind-sideline-secondary",
+                    "review-ind-harris"
+                  ]
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Official Q4 15:00 annotated injury, later explicit OUT after 8:32, club confirmed exit and later IR; no return to regulation end.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "review-ind-min-gamebook",
+                  "review-ind-postgame-injuries",
+                  "review-ind-harris"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2700,
+                    "startLatest": 2700,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "review-ind-min-gamebook",
+                      "review-ind-postgame-injuries",
+                      "review-ind-harris"
+                    ],
+                    "rationale": "Official Q4 15:00 annotated injury, later explicit OUT after 8:32, club confirmed exit and later IR; no return to regulation end."
+                  }
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Dalton Tucker",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Club reports him inactive and no injury designation in final full injury report.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-full-final-report"
+              ]
+            },
+            {
+              "player": "Riley Leonard",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Emergency QB only; no loss of starter Daniel Jones.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives"
+              ]
+            },
+            {
+              "player": "Anthony Richardson",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Gamebook active DNP backup; Daniel Jones played all 61 offensive snaps.",
+              "sourceIds": [
+                "review-ind-min-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "unresolvedChecks": [],
+          "participationReviews": [
+            {
+              "player": "DJ Giddens",
+              "finding": "Official Week 7 depth lists third back; active DNP in the gamebook, with no team injury designation or in-game injury; McGowan handled reserve duty.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-full-final-report"
+              ]
+            },
+            {
+              "player": "Kenneth Harris",
+              "finding": "Professional elevated outside relief after Walley departed. Exact official historical EA 66 CB value falls in the same calibrated zero band as Walley. Keep both source-bound identities, one invariant outside replacement value and no duplication of Taylor-Britt/Gushiken nickel lane.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-inactives",
+                "review-ind-harris",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7"
+              ]
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "rationale": "Pierce and Warren are absent, but active Josh Downs and Keenan Allen are equally top-valued expected receiving options in the frozen expected-role inventory. Both played substantial offense, so two uniquely highest options are not simultaneously absent. Reserve Gould and Montgomery do not trigger the multiplier.",
+            "sourceIds": [
+              "review-ind-min-gamebook",
+              "review-ind-week7-depth",
+              "review-ind-week7-inactives",
+              "review-ind-week7-injury"
+            ]
+          },
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Gardner/Walley/Harris outside role and Taylor-Britt/Gushiken nickel role are distinct; preserve Ward as common other outside starter. Walley’s own calibrated-zero interruption does not spend Harris as separate relief or reuse Gushiken.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-ind-week7-depth",
+                "review-ind-sideline-secondary",
+                "review-ind-harris-ea-week7"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "MIN",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Exact archived cases and full game-day inactives, reserve, elevations, QB, specialists and in-game injury duty all accounted for through the attached sources.",
+          "sourceIds": [
+            "review-ind-min-gamebook",
+            "review-min-week7-inactives",
+            "review-min-mason-activation",
+            "review-min-jones-mason"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Kyler Murray started and was the only quarterback used; no injury-caused missed QB duty reported.",
+            "sourceIds": [
+              "review-ind-min-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "caseKey": "2026-W07-MIN-Christian-Darrisaw",
+              "player": "Christian Darrisaw",
+              "eaPlayerId": "21534",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-MIN-Donovan-Jackson",
+              "player": "Donovan Jackson",
+              "eaPlayerId": "15123",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "replacements": [
+                {
+                  "player": "Joe Huber",
+                  "eaPlayerId": "15135",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-min-week7-inactives",
+                    "review-min-mason-activation",
+                    "review-min-jones-mason"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-MIN-Josh-Oliver",
+              "player": "Josh Oliver",
+              "eaPlayerId": "20358",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "replacements": [
+                {
+                  "player": "Benjamin Yurosek",
+                  "eaPlayerId": "4665",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-min-week7-inactives",
+                    "review-min-mason-activation",
+                    "review-min-jones-mason"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-MIN-Jordan-Addison",
+              "player": "Jordan Addison",
+              "eaPlayerId": "22693",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-MIN-Charles-Demmings",
+              "player": "Charles Demmings",
+              "eaPlayerId": "4707",
+              "availabilityStatus": "INACTIVE_HEALTHY_SCRATCH",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Club reported active roster available, then designated him a healthy matchday inactive. Preserve the existing archived case and the exact frozen zero, without claiming he played or suffered injury.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club reported active roster available, then designated him a healthy matchday inactive. Preserve the existing archived case and the exact frozen zero, without claiming he played or suffered injury."
+            },
+            {
+              "caseKey": "2026-W07-MIN-Jamal-Adams",
+              "player": "Jamal Adams",
+              "eaPlayerId": "12524",
+              "availabilityStatus": "IR",
+              "resolution": "EQUAL_SHARE_COMMITTEE",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "replacements": [
+                {
+                  "player": "Blake Cashman",
+                  "eaPlayerId": "20693",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-min-week7-inactives",
+                    "review-min-mason-activation",
+                    "review-min-jones-mason"
+                  ]
+                },
+                {
+                  "player": "Eric Wilson",
+                  "eaPlayerId": "12885",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-min-week7-inactives",
+                    "review-min-mason-activation",
+                    "review-min-jones-mason"
+                  ]
+                },
+                {
+                  "player": "Ivan Pace Jr",
+                  "eaPlayerId": "22977",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-min-week7-inactives",
+                    "review-min-mason-activation",
+                    "review-min-jones-mason"
+                  ]
+                },
+                {
+                  "player": "Jake Golday",
+                  "eaPlayerId": "1891",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-min-week7-inactives",
+                    "review-min-mason-activation",
+                    "review-min-jones-mason"
+                  ]
+                }
+              ]
+            },
+            {
+              "caseKey": "2026-W07-MIN-Tyler-Batty",
+              "player": "Tyler Batty",
+              "eaPlayerId": "15196",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-MIN-Nick-Samac",
+              "player": "Nick Samac",
+              "eaPlayerId": "1149",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-MIN-Jordan-Mason",
+              "player": "Jordan Mason",
+              "eaPlayerId": "22332",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-MIN-T-J-Hockenson",
+              "player": "T.J. Hockenson",
+              "eaPlayerId": "20518",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives",
+                "review-min-mason-activation",
+                "review-min-jones-mason"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-IND-MIN-MIN-Myles-Price",
+              "player": "Myles Price",
+              "eaPlayerId": "4657",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Official gamebook p.8 Q1 6:21 injury on punt return, p.10 affirmative return near Q2 12:16 and subsequent punt returns. Exact identity and frozen calibrated zero.",
+              "sourceIds": [
+                "review-ind-min-gamebook"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official gamebook p.8 Q1 6:21 injury on punt return, p.10 affirmative return near Q2 12:16 and subsequent punt returns. Exact identity and frozen calibrated zero."
+            },
+            {
+              "caseKey": "2026-W07-IND-MIN-MIN-Aaron-Jones-Sr",
+              "player": "Aaron Jones Sr",
+              "eaPlayerId": "12748",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_VALUE_INVARIANT",
+              "rationale": "Minnesota documents pre-existing Jones/Mason rotation and injury exit; Mason took next offensive snap and later running duty. Value only Mason’s incremental Jones duties, retaining his original rotation. Gamebook prints no continuing impairment on any active snap.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-jones-mason",
+                "review-min-mason-activation"
+              ],
+              "modelId": "graham-partial-value-invariant-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Minnesota documents pre-existing Jones/Mason rotation and injury exit; Mason took next offensive snap and later running duty. Value only Mason’s incremental Jones duties, retaining his original rotation. Gamebook prints no continuing impairment on any active snap.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Minnesota documents pre-existing Jones/Mason rotation and injury exit; Mason took next offensive snap and later running duty. Value only Mason’s incremental Jones duties, retaining his original rotation. Gamebook prints no continuing impairment on any active snap.",
+              "baselineSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-jones-mason",
+                "review-min-mason-activation"
+              ],
+              "roleRationale": "Minnesota documents pre-existing Jones/Mason rotation and injury exit; Mason took next offensive snap and later running duty. Value only Mason’s incremental Jones duties, retaining his original rotation. Gamebook prints no continuing impairment on any active snap.",
+              "roleSourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-jones-mason",
+                "review-min-mason-activation"
+              ],
+              "replacements": [
+                {
+                  "player": "Jordan Mason",
+                  "eaPlayerId": "22332",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Minnesota documents pre-existing Jones/Mason rotation and injury exit; Mason took next offensive snap and later running duty. Value only Mason’s incremental Jones duties, retaining his original rotation. Gamebook prints no continuing impairment on any active snap.",
+                  "sourceIds": [
+                    "review-ind-min-gamebook",
+                    "review-min-jones-mason",
+                    "review-min-mason-activation"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "activeEffectivenessConvention": "NO_UNREPORTED_IMPAIRMENT"
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Jakobe Thomas",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "No active roster injury designation, per club; officially inactive for sixth straight game.",
+              "sourceIds": [
+                "review-min-week7-inactives",
+                "review-min-mason-activation"
+              ]
+            },
+            {
+              "player": "Max Brosmer",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Emergency quarterback; gamebook shows no quarterback change.",
+              "sourceIds": [
+                "review-ind-min-gamebook",
+                "review-min-week7-inactives"
+              ]
+            },
+            {
+              "player": "Carson Wentz",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Gamebook active DNP backup; starter played throughout.",
+              "sourceIds": [
+                "review-ind-min-gamebook"
+              ]
+            },
+            {
+              "player": "Demond Claiborne",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Available active-roster player per official Saturday announcement, listed inactive Sunday.",
+              "sourceIds": [
+                "review-min-week7-inactives",
+                "review-min-mason-activation"
+              ]
+            },
+            {
+              "player": "Caleb Tiernan",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Available active-roster player per official Saturday announcement, listed inactive Sunday.",
+              "sourceIds": [
+                "review-min-week7-inactives",
+                "review-min-mason-activation"
+              ]
+            },
+            {
+              "player": "Elijah Williams",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Available active-roster player per official Saturday announcement, inactive for sixth consecutive game.",
+              "sourceIds": [
+                "review-min-week7-inactives",
+                "review-min-mason-activation"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "unresolvedChecks": []
+        }
+      ]
+    }
+  ],
+  "valueEstimates": [
+    {
+      "player": "Cameron Mitchell",
+      "identity": "estimate:cameron-mitchell",
+      "position": "CB",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 71,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "MaddenRatings.com",
+      "estimateAcknowledged": true,
+      "rationale": "Reuse immutable approved historical Week 3 Indianapolis value estimate with same official exact identity; not a registry override.",
+      "sourceIds": [
+        "prior-week3-full-slate-recovery-cameron-mitchell"
+      ],
+      "roleSourceIds": [
+        "prior-week3-full-slate-recovery-cameron-mitchell",
+        "review-ind-min-gamebook"
+      ],
+      "gameKeys": [
+        "2026-W07-IND-MIN"
+      ]
+    }
+  ],
+  "valueSupplements": [
+    {
+      "path": "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+      "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+      "commit": "008dc914db78e7a8e76765128fb98fc0367b4833",
+      "eaPlayerIds": [
+        "4805"
+      ],
+      "estimateAcknowledged": true,
+      "rationale": "Exact approved Week 1 official EA capture binds game-active nickel relief Kapena Gushiken to the unchanged calibration."
+    },
+    {
+      "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-ind-kenneth-harris-official-ea-capture.json",
+      "commit": "167e370ef08c044af19eaf24e36b64c5e3f69c36",
+      "blobSha": "caaa2f95d7110636e123b55208b9440b806557d4",
+      "eaPlayerIds": [
+        "4841"
+      ],
+      "estimateAcknowledged": true,
+      "rationale": "Exact official Week 7 EA Madden NFL 27 capture for the game-active Indianapolis outside-corner relief; identity is absent from the immutable registry. Bind OVR 66 to the unchanged curve and retain only as evidence of the calibrated-zero continuation; no additional player value or role is charged."
+    }
+  ],
+  "recordedAt": "2026-11-04T00:28:04.751Z",
+  "scope": "Source-bound paired Indianapolis–Minnesota Week 7 historical injury reconciliation; retain distinct outside and nickel relief and the exact EA value provenance."
+}
