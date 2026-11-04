@@ -1,0 +1,2313 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 7,
+  "marketViewed": false,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "inputCommit": "0424fa8fa49c30c6a26233884936b36b93653b54",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
+    "data/walters/nfl/2026/week-07-personnel-ledger.json": "488c3c54ddf09b6531437a1fc9855c1c93065358",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "9742cdf1ec46832d829e5791011fe232ba5b0efd",
+    "data/walters/nfl/matchup-production-current.json": "3a34b442ab0eed10b372f2c71b636a966a2705d9"
+  },
+  "sources": [
+    {
+      "id": "official-gb-det-play-annotations-audit",
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1792971384/gamecenter/aaf6fda2-4feb-11f1-abca-2c54536568a9.pdf",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "checkedAt": "2026-11-01T02:34:20Z",
+      "retrievalState": "TEXT_RETRIEVED",
+      "finding": "Original official PDF checked for play-level injury annotations, separate injury/return notices and snap-count appendix. No numerical rating/fair was changed."
+    },
+    {
+      "id": "review-gb-det-gamebook",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1792971384/gamecenter/aaf6fda2-4feb-11f1-abca-2c54536568a9.pdf",
+      "finding": "Official final p.1, QB inactives and starters, p.10 Golden injury and Wyatt first report, p.12 Wyatt return, p.14 Rakestraw status, pp.17–18 snaps.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-transactions",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/team/transactions/",
+      "finding": "Dated reserve changes and roster exits, October 17 Savion Williams activation paired with Moore/Hargrave/Ford IR, October 24 Jacobs and Riley activated with Owen signed and Mosby elevated.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-final-injury",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/news/packers-rule-out-zaire-franklin-list-four-questionable-vs-lions-week-7-injury-report",
+      "finding": "Final team report Franklin out, St-Juste hamstring questionable, Banks/Riley/Melton questionable; discusses prior McDuffie/Hopper platoon alongside Franklin.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-final-inactives",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/news/packers-lions-week-7-inactives-oct-25-2026",
+      "finding": "Final club inactive identities and official confirmation Banks and Melton were active.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-activation",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/news/packers-activate-rb-josh-jacobs-dt-jordon-riley-oct-24-2026",
+      "finding": "Official October 24 activations Jacobs and Riley; signed Owen and elevated Mosby.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-game-recap",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/news/in-game-updates-week-7-lions-2026",
+      "finding": "Week 7 club recap confirms injury sequence Rhyan then Monk, both replaced at center, and Wyatt locker room departure late second quarter.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-week7-injury-followup",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/news/packers-list-four-questionable-rule-out-three-vs-panthers-week-8-injury-report",
+      "finding": "Official retrospective Week 7 facts: Golden and Wyatt briefly left then returned; confirms exact center injuries and Glover played the whole Detroit game, pain reported following day.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-depth",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/team/depth-chart",
+      "finding": "Club available WR depth Sturdivant behind Golden, Melton as outside WR depth, and DT role depth; crosschecked contemporaneous Week 7 and participation.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-dated-depth",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://myfootballtoolbox.com/nfl/depth-charts/2026/week-07/packers/",
+      "finding": "Dated entering Week 7 chart with link to team source, Sturdivant behind Golden; Melton behind Watson, Hadden reserve corner. Used for corroboration only.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-week7-role-report",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://www.acmepackingcompany.com/green-bay-packers-roster/88713/packers-snap-counts-week-7-who-was-on-the-field-vs-the-lions",
+      "finding": "Contemporaneous Week 7 role observations: McDuffie at Mike and Hopper at Will; Riley absorbed added duty following Wyatt injury; Savion Williams slot and Melton WR4. Uses gamebook official counts in preference to unofficial counts.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-banks-clearance",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://staging-aws.sports.yahoo.com/articles/green-bay-packers-josh-jacobs-191011702.html",
+      "finding": "Game-day Milwaukee Journal Sentinel reports Banks cleared and available; week 7 gamebook confirms four special-teams snaps and no offensive start. No injury withdrawal.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-prior-st-role",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://www.acmepackingcompany.com/green-bay-packers-analysis/86672/what-the-packers-game-day-roster-could-look-like-week-2-new-york-jets",
+      "finding": "Prior source identifies established St-Juste coverage work and Sturdivant as a possible special-teams successor; original Week 5 and Week 6 approved reconciliation scoped injury to his ST-only role.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-gunner-depth",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://cheeseheadtv.com/blog/packers-practice-roundup-august-26-2026-445",
+      "finding": "Direct practice report names Kitan Oladapo among first team punt gunners, and records him downing a Whelan punt. Week 7 official gamebook independently confirms active Oladapo with 10 special-teams snaps only. This establishes distinct documented coverage depth, not observed replacement.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-club-gunner-role",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/news/unsung-heroes-helping-packers-power-through-early-adversity-oct-16-2026",
+      "finding": "Contemporaneous club role report establishes Sturdivant already had standing punt gunner work opposite Melton before this game as well as added receiver duties. A Week 7 punt tackle therefore does not independently prove Sturdivant was the sole incremental St-Juste relief.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-bako-alias",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.packers.com/news/aaron-banks-attacking-leadership-role-on-packers-offensive-line-aug-3-2026",
+      "finding": "Club identifies Zach Bako-Bewele as formerly Zach Tom; same archived player and identity.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-det-transactions",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.detroitlions.com/team/transactions/",
+      "finding": "Official dated continuing reserve and practice-squad moves; September 26 Harper IR, October 16 Bartch/Kennedy/White IR, October 24 availability changes.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-det-inactives",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.detroitlions.com/news/inactives-lions-vs-packers-branch-mays",
+      "finding": "Club final five inactives all healthy, Branch/Mays activated and active.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-det-game-recap",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.detroitlions.com/news/recap-lions-vs-packers-goff-williams-stbrown-branch",
+      "finding": "Club confirms Rakestraw left in second half with ankle injury and did not return.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-det-depth",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.detroitlions.com/team/depth-chart",
+      "finding": "Club outside CB depth with Rock Ya-Sin behind Rakestraw; archived cases align to separate safety and outside corner roles.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-det-izien-depth",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "OFFICIAL",
+      "url": "https://www.detroitlions.com/news/detroit-lions-jared-goff-playing-at-a-high-level-to-start-the-season-vaki-izien",
+      "finding": "Club explicitly describes Christian Izien available for safety duties after Maddox and Harper went to IR.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-det-yasin-relief",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://www.rotowire.com/football/player/ennis-rakestraw-17720",
+      "finding": "The public injury entry corroborates Rakestraw’s exit. The NFL gamebook separately records Ya-Sin’s Q4 8:31 tackle. This does not establish exclusive relief.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-det-stbrown-no-departure",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/lions-dont-expect-amon-ra-st-brown-ennis-rakestraw-to-practice-wednesday",
+      "finding": "Postgame ankle treatment for St. Brown; no in-game injury departure reported. Week 7 gamebook and team recap show normal role and no reported removal.",
+      "checkedAt": "2026-11-04T00:35:41.928Z"
+    },
+    {
+      "id": "review-gb-prior-approved",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/blob/0424fa8fa49c30c6a26233884936b36b93653b54/data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-dal-gb-ready-reconciliation.json",
+      "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-dal-gb-ready-reconciliation.json",
+      "blobSha": "714140fb6ea787b0f94dd767f3dbdd47ca8f585b",
+      "commit": "0424fa8fa49c30c6a26233884936b36b93653b54",
+      "finding": "Approved Week 6 role accounting, including established St-Juste ST-only scope, exact Bako-Bewele identity and Belton relief, plus archived reserve continuity.",
+      "checkedAt": "2026-11-04T00:35:41.931Z"
+    },
+    {
+      "id": "review-det-prior-approved",
+      "gameKeys": [
+        "2026-W07-GB-DET"
+      ],
+      "kind": "REPORTING",
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/blob/0424fa8fa49c30c6a26233884936b36b93653b54/data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-det-ari-ready-reconciliation.json",
+      "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-det-ari-ready-reconciliation.json",
+      "blobSha": "eaae2701395d60be1618c1904ef3af78b19b5044",
+      "commit": "0424fa8fa49c30c6a26233884936b36b93653b54",
+      "finding": "Approved Week 5 frozen zero for Harper and continuing reserve/camp disposition classifications.",
+      "checkedAt": "2026-11-04T00:35:41.934Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-GB-DET",
+      "away": "GB",
+      "home": "DET",
+      "state": "READY",
+      "sourceIds": [
+        "review-gb-det-gamebook",
+        "review-gb-transactions",
+        "review-gb-final-injury",
+        "review-gb-final-inactives",
+        "review-gb-activation",
+        "review-gb-game-recap",
+        "review-gb-week7-injury-followup",
+        "review-gb-depth",
+        "review-gb-dated-depth",
+        "review-gb-week7-role-report",
+        "review-gb-banks-clearance",
+        "review-gb-prior-st-role",
+        "review-gb-gunner-depth",
+        "review-gb-club-gunner-role",
+        "review-gb-bako-alias",
+        "review-gb-prior-approved",
+        "review-det-transactions",
+        "review-det-inactives",
+        "review-det-game-recap",
+        "review-det-depth",
+        "review-det-izien-depth",
+        "review-det-yasin-relief",
+        "review-det-stbrown-no-departure",
+        "review-det-prior-approved"
+      ],
+      "teams": [
+        {
+          "team": "GB",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Exact archived cases and full game-day inactives, reserve, elevations, QB, specialists and in-game injury duty all accounted for through the attached sources.",
+          "sourceIds": [
+            "review-gb-det-gamebook",
+            "review-gb-transactions",
+            "review-gb-final-injury",
+            "review-gb-final-inactives",
+            "review-gb-activation",
+            "review-gb-game-recap",
+            "review-gb-week7-injury-followup",
+            "review-gb-depth",
+            "review-gb-dated-depth",
+            "review-gb-week7-role-report",
+            "review-gb-banks-clearance",
+            "review-gb-prior-st-role",
+            "review-gb-gunner-depth",
+            "review-gb-club-gunner-role",
+            "review-gb-bako-alias",
+            "review-gb-prior-approved"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Jordan Love all Week 7 competitive QB snaps; no injury interruption.",
+            "sourceIds": [
+              "review-gb-det-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "caseKey": "2026-W07-GB-Chris-Brooks",
+              "player": "Chris Brooks",
+              "eaPlayerId": "23350",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-GB-Collin-Oliver",
+              "player": "Collin Oliver",
+              "eaPlayerId": "15184",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-GB-Luke-Musgrave",
+              "player": "Luke Musgrave",
+              "eaPlayerId": "22825",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-GB-Jordon-Riley",
+              "player": "Jordon Riley",
+              "eaPlayerId": "23280",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Official Week 7 activated off PUP, 29 defensive snaps and no reported lost role; supersedes stale IR status.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-activation"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-GB-Warren-Brinson",
+              "player": "Warren Brinson",
+              "eaPlayerId": "15212",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-GB-Zach-Tom",
+              "player": "Zach Tom",
+              "eaPlayerId": "22434",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Team confirms Zach Tom is now Zach Bako-Bewele, on reserve since Sept. 28. Same archived player and distinct starting right tackle relief Anthony Belton.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Team confirms Zach Tom is now Zach Bako-Bewele, on reserve since Sept. 28. Same archived player and distinct starting right tackle relief Anthony Belton.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Team confirms Zach Tom is now Zach Bako-Bewele, on reserve since Sept. 28. Same archived player and distinct starting right tackle relief Anthony Belton.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "roleRationale": "Team confirms Zach Tom is now Zach Bako-Bewele, on reserve since Sept. 28. Same archived player and distinct starting right tackle relief Anthony Belton.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Anthony Belton",
+                  "eaPlayerId": "15127",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Team confirms Zach Tom is now Zach Bako-Bewele, on reserve since Sept. 28. Same archived player and distinct starting right tackle relief Anthony Belton.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-transactions",
+                    "review-gb-bako-alias",
+                    "review-gb-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-GB-Micah-Parsons",
+              "player": "Micah Parsons",
+              "eaPlayerId": "21476",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Barryn Sorrell",
+                  "eaPlayerId": "15179",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-transactions",
+                    "review-gb-final-injury",
+                    "review-gb-final-inactives",
+                    "review-gb-activation",
+                    "review-gb-game-recap",
+                    "review-gb-week7-injury-followup",
+                    "review-gb-depth",
+                    "review-gb-dated-depth",
+                    "review-gb-week7-role-report",
+                    "review-gb-banks-clearance",
+                    "review-gb-prior-st-role",
+                    "review-gb-gunner-depth",
+                    "review-gb-club-gunner-role",
+                    "review-gb-bako-alias",
+                    "review-gb-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-GB-Aaron-Banks",
+              "player": "Aaron Banks",
+              "eaPlayerId": "21544",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Club final active, cleared for duty; gamebook p.18 shows four special-teams snaps, Tomlinson retained starting LG, and no injury withdrawal. ACTIVE_FULL is availability; it does not claim he started or took an offensive snap.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-banks-clearance"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-GB-Edgerrin-Cooper",
+              "player": "Edgerrin Cooper",
+              "eaPlayerId": "14902",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Prior McDuffie/Hopper rotation alongside Franklin yields two distinct replacement duties on matchday. Position-specific Week 7 report and official starters support Hopper at WILL replacing Cooper, McDuffie independently at MIKE replacing Franklin. No duplicate healthy duty.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-week7-role-report"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Prior McDuffie/Hopper rotation alongside Franklin yields two distinct replacement duties on matchday. Position-specific Week 7 report and official starters support Hopper at WILL replacing Cooper, McDuffie independently at MIKE replacing Franklin. No duplicate healthy duty.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Prior McDuffie/Hopper rotation alongside Franklin yields two distinct replacement duties on matchday. Position-specific Week 7 report and official starters support Hopper at WILL replacing Cooper, McDuffie independently at MIKE replacing Franklin. No duplicate healthy duty.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-week7-role-report"
+              ],
+              "roleRationale": "Prior McDuffie/Hopper rotation alongside Franklin yields two distinct replacement duties on matchday. Position-specific Week 7 report and official starters support Hopper at WILL replacing Cooper, McDuffie independently at MIKE replacing Franklin. No duplicate healthy duty.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-week7-role-report"
+              ],
+              "replacements": [
+                {
+                  "player": "Ty'Ron Hopper",
+                  "eaPlayerId": "14910",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Prior McDuffie/Hopper rotation alongside Franklin yields two distinct replacement duties on matchday. Position-specific Week 7 report and official starters support Hopper at WILL replacing Cooper, McDuffie independently at MIKE replacing Franklin. No duplicate healthy duty.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-final-injury",
+                    "review-gb-week7-role-report"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-GB-Jayden-Reed",
+              "player": "Jayden Reed",
+              "eaPlayerId": "22786",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Approved prior Week 6 documented net WR depth allocation retains Melton; represents incremental available receiving depth displaced by the separate Reed absence rather than asserting a Melton slot start. Savion Williams independently fills Moore slot relief; retain Melton primary return baseline.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-depth",
+                "review-gb-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Approved prior Week 6 documented net WR depth allocation retains Melton; represents incremental available receiving depth displaced by the separate Reed absence rather than asserting a Melton slot start. Savion Williams independently fills Moore slot relief; retain Melton primary return baseline.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Approved prior Week 6 documented net WR depth allocation retains Melton; represents incremental available receiving depth displaced by the separate Reed absence rather than asserting a Melton slot start. Savion Williams independently fills Moore slot relief; retain Melton primary return baseline.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-depth",
+                "review-gb-prior-approved"
+              ],
+              "roleRationale": "Approved prior Week 6 documented net WR depth allocation retains Melton; represents incremental available receiving depth displaced by the separate Reed absence rather than asserting a Melton slot start. Savion Williams independently fills Moore slot relief; retain Melton primary return baseline.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-depth",
+                "review-gb-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Bo Melton",
+                  "eaPlayerId": "22084",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Approved prior Week 6 documented net WR depth allocation retains Melton; represents incremental available receiving depth displaced by the separate Reed absence rather than asserting a Melton slot start. Savion Williams independently fills Moore slot relief; retain Melton primary return baseline.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-week7-role-report",
+                    "review-gb-depth",
+                    "review-gb-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-GB-Jonathan-Ford",
+              "player": "Jonathan Ford",
+              "eaPlayerId": "22454",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-GB-Skyy-Moore",
+              "player": "Skyy Moore",
+              "eaPlayerId": "22362",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Club activated Williams while placing Moore on IR. Week 7 shows Williams actual slot role as successor to Moore. Preserve incumbent boundary receivers. Prior Reed net additional depth allocation Melton remains separate and is an explicit counterfactual approximation. No separate Moore return-only credit.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-week7-role-report",
+                "review-gb-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club activated Williams while placing Moore on IR. Week 7 shows Williams actual slot role as successor to Moore. Preserve incumbent boundary receivers. Prior Reed net additional depth allocation Melton remains separate and is an explicit counterfactual approximation. No separate Moore return-only credit.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Club activated Williams while placing Moore on IR. Week 7 shows Williams actual slot role as successor to Moore. Preserve incumbent boundary receivers. Prior Reed net additional depth allocation Melton remains separate and is an explicit counterfactual approximation. No separate Moore return-only credit.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-week7-role-report",
+                "review-gb-prior-approved"
+              ],
+              "roleRationale": "Club activated Williams while placing Moore on IR. Week 7 shows Williams actual slot role as successor to Moore. Preserve incumbent boundary receivers. Prior Reed net additional depth allocation Melton remains separate and is an explicit counterfactual approximation. No separate Moore return-only credit.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-week7-role-report",
+                "review-gb-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Savion Williams",
+                  "eaPlayerId": "15063",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Club activated Williams while placing Moore on IR. Week 7 shows Williams actual slot role as successor to Moore. Preserve incumbent boundary receivers. Prior Reed net additional depth allocation Melton remains separate and is an explicit counterfactual approximation. No separate Moore return-only credit.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-transactions",
+                    "review-gb-week7-role-report",
+                    "review-gb-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-GB-Javon-Hargrave",
+              "player": "Javon Hargrave",
+              "eaPlayerId": "17670",
+              "availabilityStatus": "IR",
+              "resolution": "EQUAL_SHARE_COMMITTEE",
+              "rationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-transactions",
+                "review-gb-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-transactions",
+                "review-gb-prior-approved"
+              ],
+              "roleRationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-transactions",
+                "review-gb-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Chris McClellan",
+                  "eaPlayerId": "1859",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-week7-role-report",
+                    "review-gb-transactions",
+                    "review-gb-prior-approved"
+                  ]
+                },
+                {
+                  "player": "Anthony Campbell",
+                  "eaPlayerId": "4801",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse documented McClellan/Campbell interior rotation for Hargrave full absence. Both game-active, McClellan starts; Riley separately absorbs added duty due to Wyatt exit. Keep Brooks/Wyatt baseline, preserve Riley earlier rotation, no snap-derived committee shares.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-week7-role-report",
+                    "review-gb-transactions",
+                    "review-gb-prior-approved"
+                  ]
+                }
+              ]
+            },
+            {
+              "caseKey": "2026-W07-GB-Benjamin-St-Juste",
+              "player": "Benjamin St-Juste",
+              "eaPlayerId": "21704",
+              "availabilityStatus": "OUT",
+              "resolution": "SPECIAL_TEAMS_ONLY_DUTY_ESTIMATE",
+              "rationale": "St-Juste was final injury inactive with hamstring and established ST-only coverage duties. Oladapo is documented first-team gunner depth and was active for 10 ST-only snaps. Select the available professional ST coverage depth as an assumption, not an observed substitution. Team reported Sturdivant already had regular gunner work opposite Melton; preserve that baseline. Earlier precedent used Sturdivant but the two have equal calibrated value, so no selection by value and no duplication of Golden receiver relief.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-final-injury",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-prior-approved"
+              ],
+              "modelId": "graham-st-only-duty-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "St-Juste was final injury inactive with hamstring and established ST-only coverage duties. Oladapo is documented first-team gunner depth and was active for 10 ST-only snaps. Select the available professional ST coverage depth as an assumption, not an observed substitution. Team reported Sturdivant already had regular gunner work opposite Melton; preserve that baseline. Earlier precedent used Sturdivant but the two have equal calibrated value, so no selection by value and no duplication of Golden receiver relief.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "St-Juste was final injury inactive with hamstring and established ST-only coverage duties. Oladapo is documented first-team gunner depth and was active for 10 ST-only snaps. Select the available professional ST coverage depth as an assumption, not an observed substitution. Team reported Sturdivant already had regular gunner work opposite Melton; preserve that baseline. Earlier precedent used Sturdivant but the two have equal calibrated value, so no selection by value and no duplication of Golden receiver relief.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-final-injury",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-prior-approved"
+              ],
+              "roleRationale": "St-Juste was final injury inactive with hamstring and established ST-only coverage duties. Oladapo is documented first-team gunner depth and was active for 10 ST-only snaps. Select the available professional ST coverage depth as an assumption, not an observed substitution. Team reported Sturdivant already had regular gunner work opposite Melton; preserve that baseline. Earlier precedent used Sturdivant but the two have equal calibrated value, so no selection by value and no duplication of Golden receiver relief.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-final-injury",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Kitan Oladapo",
+                  "eaPlayerId": "14967",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "St-Juste was final injury inactive with hamstring and established ST-only coverage duties. Oladapo is documented first-team gunner depth and was active for 10 ST-only snaps. Select the available professional ST coverage depth as an assumption, not an observed substitution. Team reported Sturdivant already had regular gunner work opposite Melton; preserve that baseline. Earlier precedent used Sturdivant but the two have equal calibrated value, so no selection by value and no duplication of Golden receiver relief.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-final-inactives",
+                    "review-gb-final-injury",
+                    "review-gb-prior-st-role",
+                    "review-gb-gunner-depth",
+                    "review-gb-club-gunner-role",
+                    "review-gb-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "specialTeamsOnly": true,
+              "documentedInjuryAbsence": true,
+              "offenseOrDefenseDutyExcluded": true,
+              "proxyConvention": "ZERO_TO_FULL_NON_QB_DIFFERENCE_MIDPOINT",
+              "roleScopeRationale": "Week 5 gamebook and approved Week 6 closure establish special-teams coverage only (zero defensive work when active). Current starter Cisse and other actual defensive roles remained available. Use the approved bounded proxy for missing coverage, retaining Sturdivant/Melton regular coverage and return baseline and using no full defensive loss.",
+              "roleScopeSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-prior-approved"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-GB-Tucker-Kraft",
+              "player": "Tucker Kraft",
+              "eaPlayerId": "22828",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Started, played normal receiver/TE duties and no continuing or new injury reduction was reported.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-game-recap"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-GB-MarShawn-Lloyd",
+              "player": "MarShawn Lloyd",
+              "eaPlayerId": "14628",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Active usual running back rotation with Jacobs back; no injury withdrawal or reported lost workload.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-activation",
+                "review-gb-game-recap"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-GB-Brandon-Cisse",
+              "player": "Brandon Cisse",
+              "eaPlayerId": "16349",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-activation",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-depth",
+                "review-gb-dated-depth",
+                "review-gb-week7-role-report",
+                "review-gb-banks-clearance",
+                "review-gb-prior-st-role",
+                "review-gb-gunner-depth",
+                "review-gb-club-gunner-role",
+                "review-gb-bako-alias",
+                "review-gb-prior-approved"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-DET-GB-Zaire-Franklin",
+              "player": "Zaire Franklin",
+              "eaPlayerId": "13480",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Club final ruled out (shin). Week 7 observed position report has McDuffie starting MIKE in his place and Hopper at WILL covering Cooper. No overlapping relief and no use of current undated generic depth over game roles.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-week7-role-report"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club final ruled out (shin). Week 7 observed position report has McDuffie starting MIKE in his place and Hopper at WILL covering Cooper. No overlapping relief and no use of current undated generic depth over game roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Club final ruled out (shin). Week 7 observed position report has McDuffie starting MIKE in his place and Hopper at WILL covering Cooper. No overlapping relief and no use of current undated generic depth over game roles.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-week7-role-report"
+              ],
+              "roleRationale": "Club final ruled out (shin). Week 7 observed position report has McDuffie starting MIKE in his place and Hopper at WILL covering Cooper. No overlapping relief and no use of current undated generic depth over game roles.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-final-inactives",
+                "review-gb-week7-role-report"
+              ],
+              "replacements": [
+                {
+                  "player": "Isaiah McDuffie",
+                  "eaPlayerId": "21903",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Club final ruled out (shin). Week 7 observed position report has McDuffie starting MIKE in his place and Hopper at WILL covering Cooper. No overlapping relief and no use of current undated generic depth over game roles.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-final-injury",
+                    "review-gb-final-inactives",
+                    "review-gb-week7-role-report"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-DET-GB-Sean-Rhyan",
+              "player": "Sean Rhyan",
+              "eaPlayerId": "22443",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Official ankle injury fourth offensive snap; Monk and later Williams covered center. Frozen zero gives zero incremental calibrated loss under the exact role inventory.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official ankle injury fourth offensive snap; Monk and later Williams covered center. Frozen zero gives zero incremental calibrated loss under the exact role inventory."
+            },
+            {
+              "caseKey": "2026-W07-DET-GB-Jacob-Monk",
+              "player": "Jacob Monk",
+              "eaPlayerId": "1092",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Official quad injury while serving as active center reserve; John Williams finished at center. No second credit for replacing the same center duty and frozen zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official quad injury while serving as active center reserve; John Williams finished at center. No second credit for replacing the same center duty and frozen zero."
+            },
+            {
+              "caseKey": "2026-W07-DET-GB-Devonte-Wyatt",
+              "player": "Devonte Wyatt",
+              "eaPlayerId": "22166",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "rationale": "Game-specific positional reporting corroborates Riley directly absorbed increased DT workload after injury; official activation and gamebook p.17 confirm active interior role. Preserve his original rotation and the distinct Hargrave relief players.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-activation",
+                "review-gb-week7-role-report"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Game-specific positional reporting corroborates Riley directly absorbed increased DT workload after injury; official activation and gamebook p.17 confirm active interior role. Preserve his original rotation and the distinct Hargrave relief players.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Game-specific positional reporting corroborates Riley directly absorbed increased DT workload after injury; official activation and gamebook p.17 confirm active interior role. Preserve his original rotation and the distinct Hargrave relief players.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-activation",
+                "review-gb-week7-role-report"
+              ],
+              "roleRationale": "Game-specific positional reporting corroborates Riley directly absorbed increased DT workload after injury; official activation and gamebook p.17 confirm active interior role. Preserve his original rotation and the distinct Hargrave relief players.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-game-recap",
+                "review-gb-week7-injury-followup",
+                "review-gb-activation",
+                "review-gb-week7-role-report"
+              ],
+              "replacements": [
+                {
+                  "player": "Jordon Riley",
+                  "eaPlayerId": "23280",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Game-specific positional reporting corroborates Riley directly absorbed increased DT workload after injury; official activation and gamebook p.17 confirm active interior role. Preserve his original rotation and the distinct Hargrave relief players.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-game-recap",
+                    "review-gb-week7-injury-followup",
+                    "review-gb-activation",
+                    "review-gb-week7-role-report"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Gamebook p.10 last observed Wyatt duty is a Q2 2:34 tackle, then team places locker-room departure in final two minutes and p.10 prints a questionable update after Q2 1:24. Use the earlier observed tackle as a conservative earliest onset, since physical duty could have ended before the locker-room departure. The affirmative p.12 return update at Q3 12:06 is the latest return bound; no exact return snap or snap-to-time conversion.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "review-gb-det-gamebook",
+                  "review-gb-game-recap",
+                  "review-gb-week7-injury-followup",
+                  "review-gb-activation",
+                  "review-gb-week7-role-report"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1646,
+                    "startLatest": 1716,
+                    "endEarliest": 1716,
+                    "endLatest": 1974,
+                    "sourceIds": [
+                      "review-gb-det-gamebook",
+                      "review-gb-game-recap",
+                      "review-gb-week7-injury-followup",
+                      "review-gb-activation",
+                      "review-gb-week7-role-report"
+                    ],
+                    "rationale": "Gamebook p.10 last observed Wyatt duty is a Q2 2:34 tackle, then team places locker-room departure in final two minutes and p.10 prints a questionable update after Q2 1:24. Use the earlier observed tackle as a conservative earliest onset, since physical duty could have ended before the locker-room departure. The affirmative p.12 return update at Q3 12:06 is the latest return bound; no exact return snap or snap-to-time conversion."
+                  }
+                ]
+              }
+            },
+            {
+              "caseKey": "2026-W07-DET-GB-Matthew-Golden",
+              "player": "Matthew Golden",
+              "eaPlayerId": "15096",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "rationale": "Club chart and dated Week 7 chart name Sturdivant immediately behind Golden, and p.17 shows active offensive duty. This is available depth, not observed substitution.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-dated-depth",
+                "review-gb-depth"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club chart and dated Week 7 chart name Sturdivant immediately behind Golden, and p.17 shows active offensive duty. This is available depth, not observed substitution.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Club chart and dated Week 7 chart name Sturdivant immediately behind Golden, and p.17 shows active offensive duty. This is available depth, not observed substitution.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-dated-depth",
+                "review-gb-depth"
+              ],
+              "roleRationale": "Club chart and dated Week 7 chart name Sturdivant immediately behind Golden, and p.17 shows active offensive duty. This is available depth, not observed substitution.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-dated-depth",
+                "review-gb-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "J. Michael Sturdivant",
+                  "eaPlayerId": "1816",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Club chart and dated Week 7 chart name Sturdivant immediately behind Golden, and p.17 shows active offensive duty. This is available depth, not observed substitution.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-gb-dated-depth",
+                    "review-gb-depth"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Gamebook p.10 injury on Q2 6:42 play, affirmative return update printed at Q2 5:56; exact earlier return unobserved, and no named offensive duty is assumed during the interval.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "review-gb-det-gamebook",
+                  "review-gb-dated-depth",
+                  "review-gb-depth"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1398,
+                    "startLatest": 1398,
+                    "endEarliest": 1398,
+                    "endLatest": 1444,
+                    "sourceIds": [
+                      "review-gb-det-gamebook",
+                      "review-gb-dated-depth",
+                      "review-gb-depth"
+                    ],
+                    "rationale": "Gamebook p.10 injury on Q2 6:42 play, affirmative return update printed at Q2 5:56; exact earlier return unobserved, and no named offensive duty is assumed during the interval."
+                  }
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Kaleb Johnson",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Official final inactive and absent from final injury designation; same-day reporting confirms scratch rather than injury.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-final-injury",
+                "review-gb-week7-role-report"
+              ]
+            },
+            {
+              "player": "Jager Burton",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Official final inactive and absent from final injury designation; same-day reporting confirms scratch rather than injury.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-final-injury",
+                "review-gb-week7-role-report"
+              ]
+            },
+            {
+              "player": "Donovan Jennings",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Official final inactive and absent from final injury designation; same-day reporting confirms scratch rather than injury.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-final-injury",
+                "review-gb-week7-role-report"
+              ]
+            },
+            {
+              "player": "Kevin Zeitler",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Official final inactive and absent from final injury designation; same-day reporting confirms scratch rather than injury.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-inactives",
+                "review-gb-final-injury",
+                "review-gb-week7-role-report"
+              ]
+            },
+            {
+              "player": "Tyrod Taylor",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Active DNP backup; Jordan Love handled all quarterback duties.",
+              "sourceIds": [
+                "review-gb-det-gamebook"
+              ]
+            },
+            {
+              "player": "McCallan Castles",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "Trey Dean III",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "Thomas Yassmin",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "Johnathan Baldwin II",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "Marlon Jones",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "Luke Lachey",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "RJ Maryland",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "Brenden Rice",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Club documented preseason waived/injured camp player without an established regular-season active duty.",
+              "sourceIds": [
+                "review-gb-transactions"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            }
+          ],
+          "specialistCases": [],
+          "unresolvedChecks": [],
+          "clusterReviews": [
+            {
+              "group": "LINEBACKER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Separate MIKE and WILL duties and actual distinct starters; explicit additive treatment for simultaneous losses.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-final-injury"
+              ]
+            },
+            {
+              "group": "DEFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Use approved separate Hargrave McClellan/Campbell rotation and Wyatt Riley temporary additional duties; preserve healthy Brooks and other common duties.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-role-report",
+                "review-gb-prior-approved"
+              ]
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "rationale": "Kraft and Watson retained active primary roles. The Reed and Moore simultaneous roster absences did not remove both top expected receiving options; Golden temporary issue does not also remove Kraft or Watson. Do not infer eligibility from number of receivers unavailable.",
+            "sourceIds": [
+              "review-gb-det-gamebook",
+              "review-gb-final-injury",
+              "review-gb-week7-role-report"
+            ]
+          },
+          "participationReviews": [
+            {
+              "player": "Josh Jacobs",
+              "finding": "Activated from commissioner exempt status before kickoff; started and handled normal lead RB role.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-activation",
+                "review-gb-week7-role-report"
+              ]
+            },
+            {
+              "player": "Savion Williams",
+              "finding": "Returned Oct 17, started in slot rotation and played; not a continuing reserve injury.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-transactions",
+                "review-gb-week7-role-report"
+              ]
+            },
+            {
+              "player": "Travis Glover",
+              "finding": "Official later report says he first reported knee pain after this game; p.17 67 of 67 offensive snaps. No documented Week 7 role loss.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-week7-injury-followup"
+              ]
+            },
+            {
+              "player": "Bo Melton",
+              "finding": "Cleared from Week 7 questionable designation; active receiving and return depth without reported injury lost duty.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-final-injury",
+                "review-gb-final-inactives"
+              ]
+            },
+            {
+              "player": "Trey Smack / Daniel Whelan / Matt Orzech",
+              "finding": "Normal K/P/LS and holder filled; Week 7 missed and blocked field goals were not identified as injury-driven substitutions.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-game-recap"
+              ]
+            },
+            {
+              "player": "Coleman Owen / Arron Mosby",
+              "finding": "Signed/elevated Saturday; both game-active, chiefly specialist coverage/return roles.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-gb-activation"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "DET",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Exact archived cases and full game-day inactives, reserve, elevations, QB, specialists and in-game injury duty all accounted for through the attached sources.",
+          "sourceIds": [
+            "review-gb-det-gamebook",
+            "review-det-transactions",
+            "review-det-inactives",
+            "review-det-game-recap",
+            "review-det-depth",
+            "review-det-izien-depth",
+            "review-det-yasin-relief",
+            "review-det-stbrown-no-departure",
+            "review-det-prior-approved"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Jared Goff played all 68 offensive snaps, no lost quarterback duty.",
+            "sourceIds": [
+              "review-gb-det-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "caseKey": "2026-W07-DET-Giovanni-Manu",
+              "player": "Giovanni Manu",
+              "eaPlayerId": "1084",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-DET-Damone-Clark",
+              "player": "Damone Clark",
+              "eaPlayerId": "22185",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-DET-Kendrick-Law",
+              "player": "Kendrick Law",
+              "eaPlayerId": "16191",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-DET-Rock-Ya-Sin",
+              "player": "Rock Ya-Sin",
+              "eaPlayerId": "20451",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Active p.17 with 14 defensive snaps, a later named tackle and additional outside relief. Supersedes stale pregame health question.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-inactives",
+                "review-det-yasin-relief"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-DET-Tom-Kennedy",
+              "player": "Tom Kennedy",
+              "eaPlayerId": "20867",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain archived availability and exact frozen calibrated zero; nonnegative relief makes any additional loss zero."
+            },
+            {
+              "caseKey": "2026-W07-DET-Brian-Branch",
+              "player": "Brian Branch",
+              "eaPlayerId": "23024",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-DET-Kerby-Joseph",
+              "player": "Kerby Joseph",
+              "eaPlayerId": "22227",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Chuck Clark",
+                  "eaPlayerId": "12785",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-det-transactions",
+                    "review-det-inactives",
+                    "review-det-game-recap",
+                    "review-det-depth",
+                    "review-det-izien-depth",
+                    "review-det-yasin-relief",
+                    "review-det-stbrown-no-departure",
+                    "review-det-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-DET-Avonte-Maddox",
+              "player": "Avonte Maddox",
+              "eaPlayerId": "13332",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Club specifically names Izien as safety depth after Maddox and Harper IR. Both game-active safety roles Branch and Chuck Clark remain baseline; Clark reserved for Joseph and outside CB Rakestraw stays separate. Izien was active (10 special-teams snaps), a professional available documented safety depth with the same frozen value, not a claim of observed Week 7 defensive substitution.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-izien-depth"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club specifically names Izien as safety depth after Maddox and Harper IR. Both game-active safety roles Branch and Chuck Clark remain baseline; Clark reserved for Joseph and outside CB Rakestraw stays separate. Izien was active (10 special-teams snaps), a professional available documented safety depth with the same frozen value, not a claim of observed Week 7 defensive substitution.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Club specifically names Izien as safety depth after Maddox and Harper IR. Both game-active safety roles Branch and Chuck Clark remain baseline; Clark reserved for Joseph and outside CB Rakestraw stays separate. Izien was active (10 special-teams snaps), a professional available documented safety depth with the same frozen value, not a claim of observed Week 7 defensive substitution.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-izien-depth"
+              ],
+              "roleRationale": "Club specifically names Izien as safety depth after Maddox and Harper IR. Both game-active safety roles Branch and Chuck Clark remain baseline; Clark reserved for Joseph and outside CB Rakestraw stays separate. Izien was active (10 special-teams snaps), a professional available documented safety depth with the same frozen value, not a claim of observed Week 7 defensive substitution.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-izien-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Christian Izien",
+                  "eaPlayerId": "23287",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Club specifically names Izien as safety depth after Maddox and Harper IR. Both game-active safety roles Branch and Chuck Clark remain baseline; Clark reserved for Joseph and outside CB Rakestraw stays separate. Izien was active (10 special-teams snaps), a professional available documented safety depth with the same frozen value, not a claim of observed Week 7 defensive substitution.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-det-transactions",
+                    "review-det-izien-depth"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-DET-Cade-Mays",
+              "player": "Cade Mays",
+              "eaPlayerId": "22123",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "rationale": "Prior Week 7 availability and current official gamebook participation confirm no reported injury-related lost role.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-DET-Ben-Bartch",
+              "player": "Ben Bartch",
+              "eaPlayerId": "21100",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Miles Frazier",
+                  "eaPlayerId": "15132",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-det-transactions",
+                    "review-det-inactives",
+                    "review-det-game-recap",
+                    "review-det-depth",
+                    "review-det-izien-depth",
+                    "review-det-yasin-relief",
+                    "review-det-stbrown-no-departure",
+                    "review-det-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-DET-Isiah-Pacheco",
+              "player": "Isiah Pacheco",
+              "eaPlayerId": "22334",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Vaki actually supplied relief scrimmage reserve role with nine offensive snaps and a carry. Saylors handled only special teams this game; Gibbs baseline remains. Vaki and Saylors have the same locked value; no changed value from approved prior committee.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Vaki actually supplied relief scrimmage reserve role with nine offensive snaps and a carry. Saylors handled only special teams this game; Gibbs baseline remains. Vaki and Saylors have the same locked value; no changed value from approved prior committee.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Vaki actually supplied relief scrimmage reserve role with nine offensive snaps and a carry. Saylors handled only special teams this game; Gibbs baseline remains. Vaki and Saylors have the same locked value; no changed value from approved prior committee.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ],
+              "roleRationale": "Vaki actually supplied relief scrimmage reserve role with nine offensive snaps and a carry. Saylors handled only special teams this game; Gibbs baseline remains. Vaki and Saylors have the same locked value; no changed value from approved prior committee.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Sione Vaki",
+                  "eaPlayerId": "14999",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Vaki actually supplied relief scrimmage reserve role with nine offensive snaps and a carry. Saylors handled only special teams this game; Gibbs baseline remains. Vaki and Saylors have the same locked value; no changed value from approved prior committee.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-det-transactions",
+                    "review-det-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-DET-Payton-Turner",
+              "player": "Payton Turner",
+              "eaPlayerId": "21688",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Derrick Moore",
+                  "eaPlayerId": "16174",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-det-transactions",
+                    "review-det-inactives",
+                    "review-det-game-recap",
+                    "review-det-depth",
+                    "review-det-izien-depth",
+                    "review-det-yasin-relief",
+                    "review-det-stbrown-no-departure",
+                    "review-det-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-DET-Devin-White",
+              "player": "Devin White",
+              "eaPlayerId": "20581",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "rationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-inactives",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-stbrown-no-departure",
+                "review-det-prior-approved"
+              ],
+              "replacements": [
+                {
+                  "player": "Malcolm Rodriguez",
+                  "eaPlayerId": "22460",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Reuse archived Week 7 documented additional-duty assignment, subject to final same-game availability. Preserve regular duties and reserve identities against all other cases.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-det-transactions",
+                    "review-det-inactives",
+                    "review-det-game-recap",
+                    "review-det-depth",
+                    "review-det-izien-depth",
+                    "review-det-yasin-relief",
+                    "review-det-stbrown-no-departure",
+                    "review-det-prior-approved"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "caseKey": "2026-W07-GB-DET-DET-Thomas-Harper",
+              "player": "Thomas Harper",
+              "eaPlayerId": "1265",
+              "newlyIdentified": true,
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "rationale": "Official Sept 26 reserve and no Week 7 activation, same prior approved exact frozen zero.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official Sept 26 reserve and no Week 7 activation, same prior approved exact frozen zero."
+            },
+            {
+              "caseKey": "2026-W07-GB-DET-DET-Ennis-Rakestraw-Jr",
+              "player": "Ennis Rakestraw Jr",
+              "eaPlayerId": "14934",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "rationale": "Official club depth lists active reserve Rock Ya-Sin behind outside corner Rakestraw. The gamebook verifies his participation and a tackle next to the injury notice. Assume additional outside coverage only through the documented-depth model, preserving normal Ya-Sin packages, McCreary’s slot role, Reed’s opposite role and Izien’s distinct safety duty. Actual exclusive substitution was not established.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-yasin-relief"
+              ],
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official club depth lists active reserve Rock Ya-Sin behind outside corner Rakestraw. The gamebook verifies his participation and a tackle next to the injury notice. Assume additional outside coverage only through the documented-depth model, preserving normal Ya-Sin packages, McCreary’s slot role, Reed’s opposite role and Izien’s distinct safety duty. Actual exclusive substitution was not established.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Official club depth lists active reserve Rock Ya-Sin behind outside corner Rakestraw. The gamebook verifies his participation and a tackle next to the injury notice. Assume additional outside coverage only through the documented-depth model, preserving normal Ya-Sin packages, McCreary’s slot role, Reed’s opposite role and Izien’s distinct safety duty. Actual exclusive substitution was not established.",
+              "baselineSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-yasin-relief"
+              ],
+              "roleRationale": "Official club depth lists active reserve Rock Ya-Sin behind outside corner Rakestraw. The gamebook verifies his participation and a tackle next to the injury notice. Assume additional outside coverage only through the documented-depth model, preserving normal Ya-Sin packages, McCreary’s slot role, Reed’s opposite role and Izien’s distinct safety duty. Actual exclusive substitution was not established.",
+              "roleSourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-game-recap",
+                "review-det-depth",
+                "review-det-yasin-relief"
+              ],
+              "replacements": [
+                {
+                  "player": "Rock Ya-Sin",
+                  "eaPlayerId": "20451",
+                  "availabilityStatus": "ACTIVE",
+                  "roleRationale": "Official club depth lists active reserve Rock Ya-Sin behind outside corner Rakestraw. The gamebook verifies his participation and a tackle next to the injury notice. Assume additional outside coverage only through the documented-depth model, preserving normal Ya-Sin packages, McCreary’s slot role, Reed’s opposite role and Izien’s distinct safety duty. Actual exclusive substitution was not established.",
+                  "sourceIds": [
+                    "review-gb-det-gamebook",
+                    "review-det-game-recap",
+                    "review-det-depth",
+                    "review-det-yasin-relief"
+                  ]
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Club confirms second-half departure without return. Earliest Q3 15:00; p.14 questionability notice after Q4 8:31 gives latest. Do not infer departure from game totals, substitution attribution or unaffirmed exact injury snap.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "review-gb-det-gamebook",
+                  "review-det-game-recap",
+                  "review-det-depth",
+                  "review-det-yasin-relief"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1800,
+                    "startLatest": 3089,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "review-gb-det-gamebook",
+                      "review-det-game-recap",
+                      "review-det-depth",
+                      "review-det-yasin-relief"
+                    ],
+                    "rationale": "Club confirms second-half departure without return. Earliest Q3 15:00; p.14 questionability notice after Q4 8:31 gives latest. Do not infer departure from game totals, substitution attribution or unaffirmed exact injury snap."
+                  }
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Jackson Meeks",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Club reports final inactive without an injury designation.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-inactives"
+              ]
+            },
+            {
+              "player": "Bishop Fitzgerald",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Club reports final inactive without an injury designation.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-inactives"
+              ]
+            },
+            {
+              "player": "Seth McLaughlin",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Club reports final inactive without an injury designation.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-inactives"
+              ]
+            },
+            {
+              "player": "Mekhi Wingo",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Club reports final inactive without an injury designation.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-inactives"
+              ]
+            },
+            {
+              "player": "Ahmed Hassanein",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Club reports final inactive without an injury designation.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-inactives"
+              ]
+            },
+            {
+              "player": "Joshua Dobbs",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Official active DNP backup; Goff played throughout.",
+              "sourceIds": [
+                "review-gb-det-gamebook"
+              ]
+            },
+            {
+              "player": "Mason Miller",
+              "category": "CAMP_ROSTER_ONLY",
+              "rationale": "Continuing developmental practice squad/injured guard without established regular-season duty.",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ],
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only role without established competitive regular-season duty; assume no missing healthy game-day contribution under approved camp-role scope."
+            },
+            {
+              "player": "Cedrick Wilson Jr",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Raheem Blackshear",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Anthony Firkser",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Aidan Keanaaina",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Loren Strickland",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Michael Niese",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Kye Robichaux",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "DeShawn Rucker",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Lawrence Keys",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            },
+            {
+              "player": "Miles Kitselman",
+              "category": "RELEASED_BEFORE_GAME",
+              "rationale": "Preseason reserve/waiver case resolved by dated pregame exit in approved Week 5 source; official transactions show no reinstated Week 7 active-roster duty (any later practice-squad assignment is not active duty).",
+              "sourceIds": [
+                "review-det-transactions",
+                "review-det-prior-approved"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "unresolvedChecks": [],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Three separately evaluated duties: starting safety Joseph to Chuck Clark, reserve safety Maddox to Christian Izien, and temporary Rakestraw outside corner to Rock Ya-Sin. Preserve Branch, outside starter Reed and slot McCreary; the backup safety does not consume either outside corner. Exact equal value Maddox/Izien and frozen-zero Harper need no extra relief or extra multiplier.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-depth",
+                "review-det-izien-depth",
+                "review-det-yasin-relief",
+                "review-det-prior-approved"
+              ]
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Brian Branch / Cade Mays",
+              "finding": "Both activated from reserve October 24. Branch started and played 45 defensive snaps, Mays all 68 offensive snaps. No game-day injury absence.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-inactives",
+                "review-det-transactions"
+              ]
+            },
+            {
+              "player": "Amon-Ra St. Brown",
+              "finding": "Reported ankle treatment after the game, with no corroborated injury-related lost duty or live designation. Club recap covers ordinary production; retain availability and no measured impairment.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-game-recap",
+                "review-det-stbrown-no-departure"
+              ]
+            },
+            {
+              "player": "Jake Bates / Jack Fox / Hogan Hatten",
+              "finding": "Normal K/P/LS and holder roles confirmed with no injury substitution or missed duty.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-game-recap"
+              ]
+            },
+            {
+              "player": "DeAndre Carter",
+              "finding": "Elevated Oct 24, officially participated on special teams including multiple returns. No reported injury.",
+              "sourceIds": [
+                "review-gb-det-gamebook",
+                "review-det-transactions"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "valueSupplements": [
+    {
+      "path": "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+      "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+      "commit": "008dc914db78e7a8e76765128fb98fc0367b4833",
+      "eaPlayerIds": [
+        "4801",
+        "1816"
+      ],
+      "estimateAcknowledged": true,
+      "rationale": "Reuse source-bound EA values for missing exact frozen players."
+    }
+  ],
+  "recordedAt": "2026-11-04T00:37:15.534Z",
+  "review": {
+    "independentReviewer": "week7_clean_review",
+    "notes": [
+      "Documented punt-gunner depth and ten special-teams-only snaps support an explicitly assumed Oladapo coverage role. Sturdivant was already an incumbent gunner and is reserved for the separate Golden receiver assignment. No actual injury replacement snap is inferred from participation alone.",
+      "Rechecked the Rakestraw source against the public body. Ya-Sin remains a labelled documented-depth assumption, with the unsupported direct substitution attribution removed."
+    ]
+  }
+}
