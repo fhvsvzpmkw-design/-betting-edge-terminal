@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_PRODUCTION_COORDINATOR",
+  "executionRunId": null,
+  "workBinding": {
+    "phase": "WEEK_7_HISTORICAL_LEARNING_RECONCILIATION",
+    "repository": "fhvsvzpmkw-design/-betting-edge-terminal",
+    "branch": "main",
+    "expectedMainHead": "1e5b3ea0d0836e159cfda115134ec4c841322052",
+    "activeManifestPath": "data/walters/nfl/active-week.json",
+    "activeManifestBlobSha": "a976ce31d988e0197b2940da57b4e8edd5451808",
+    "activeSeason": 2026,
+    "activeWeek": 8,
+    "sourceWeek": 7,
+    "readinessBlobSha": "8273eed014ac5d6f2a61438006aab3409d6b1852",
+    "caseKeys": [
+      "2026-W07-NYG-HOU",
+      "2026-W07-TB-CAR",
+      "2026-W07-MIA-NYJ",
+      "2026-W07-SF-ATL",
+      "2026-W07-DEN-ARI",
+      "2026-W07-DAL-PHI",
+      "2026-W07-PIT-NO",
+      "2026-W07-KC-SEA"
+    ],
+    "marketViewed": false
+  },
+  "mode": "AGENTS_READY",
+  "reason": "Eight unapplied historical pairs had named source, identity, exposure and replacement-allocation questions after verified baseline reuse. The normal Graham pool of two source-only researchers and one independent reviewer was sufficient; no expansion was needed.",
+  "workers": [
+    {
+      "role": "CASE_TEAM_RESEARCHER",
+      "workerId": "/root/graham_hist_r1",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "delegationAllowed": false,
+      "assignmentIds": [
+        "2026-W07-NYG-HOU",
+        "2026-W07-TB-CAR",
+        "2026-W07-MIA-NYJ",
+        "2026-W07-SF-ATL"
+      ],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": "2026-11-04T01:12:46Z",
+      "clockLimitation": "The collaboration API returned no message timestamps; launch and acknowledgment ordering was observed inside the 60-second bound but exact clocks were not exposed and are not inferred.",
+      "state": "RETURNED",
+      "error": null
+    },
+    {
+      "role": "CASE_TEAM_RESEARCHER",
+      "workerId": "/root/graham_hist_r2",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "delegationAllowed": false,
+      "assignmentIds": [
+        "2026-W07-DEN-ARI",
+        "2026-W07-DAL-PHI",
+        "2026-W07-PIT-NO",
+        "2026-W07-KC-SEA"
+      ],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": "2026-11-04T01:12:46Z",
+      "clockLimitation": "The collaboration API returned no message timestamps; launch and acknowledgment ordering was observed inside the 60-second bound but exact clocks were not exposed and are not inferred.",
+      "state": "RETURNED",
+      "error": null
+    },
+    {
+      "role": "CRITICAL_REVIEWER",
+      "workerId": "/root/graham_hist_review",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "delegationAllowed": false,
+      "assignmentIds": [
+        "2026-W07-NYG-HOU",
+        "2026-W07-TB-CAR",
+        "2026-W07-MIA-NYJ",
+        "2026-W07-SF-ATL",
+        "2026-W07-DEN-ARI",
+        "2026-W07-DAL-PHI",
+        "2026-W07-PIT-NO",
+        "2026-W07-KC-SEA"
+      ],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": "2026-11-04T01:12:46Z",
+      "clockLimitation": "The collaboration API returned no message timestamps; launch and acknowledgment ordering was observed inside the 60-second bound but exact clocks were not exposed and are not inferred.",
+      "state": "RETURNED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_NORMAL_GRAHAM_POOL",
+      "workerCount": 3,
+      "namedQuestion": "Can the eight remaining pairs be advanced by corrected official play clocks, identity/status facts and duplicate-free role allocation under existing methods?",
+      "expectedQualityBenefit": "Two disjoint source passes plus one independent double-counting and exposure review.",
+      "readOnlyAssignment": true,
+      "completionOrReleaseCondition": "Each pair returns exact accepted facts, corrections and its remaining source-versus-method blocker; reviewer checks all eight.",
+      "result": "COMPLETED_NO_EXPANSION"
+    }
+  ],
+  "qualityFindings": [
+    {
+      "caseKey": "2026-W07-NYG-HOU",
+      "finding": "Research correctly established Braden Smith as active with no injury absence, but the reviewer rejected describing him as a full-snap player because Trent Brown played all 61 Houston offensive snaps.",
+      "adoption": "ADOPTED_REVIEW_CORRECTION",
+      "decisionImpact": "Preserve active/no-absence status without assigning workload or relief credit."
+    },
+    {
+      "caseKey": "2026-W07-SF-ATL",
+      "finding": "The reviewer confirmed reported McCaffrey symptoms after return; only a quantified effectiveness loss remains unsupported under existing methods.",
+      "adoption": "ADOPTED_REVIEW_CORRECTION",
+      "decisionImpact": "Retain the symptom fact and block numerical impairment arithmetic."
+    }
+  ],
+  "completedWork": {
+    "researchersLaunched": 2,
+    "researchersReturned": 2,
+    "reviewersLaunched": 1,
+    "reviewersReturned": 1,
+    "pairsResearched": 8,
+    "pairsReviewed": 8,
+    "pairsProposedReady": 0,
+    "pairsAcceptedReady": 0,
+    "numericalChanges": 0,
+    "publishedPairs": 0,
+    "factsRecovered": [
+      "TB-CAR Gainwell notice placement Q3 12:57 and Moton injury play Q3 14:13",
+      "MIA-NYJ Trader interval Q3 6:38 through Q4 7:48 and Sweat injury play Q2 3:14",
+      "DAL-PHI Mitchell interval Q2 1:14 through 0:12 and Pierce injury Q4 8:38",
+      "PIT-NO Reid entry bound Q2 1:08 through 0:43 with Howden relief",
+      "KC-SEA Shaheed originating play Q2 0:23, Cross exit bound Q4 5:00 through 3:52, and Bolton one-play interval"
+    ],
+    "decision": "NO_PAIR_RELEASED; preserve the six previously applied pairs and all original receipts."
+  },
+  "remainingWork": [
+    {
+      "caseKey": "2026-W07-NYG-HOU",
+      "gapType": "SOURCE_AND_METHOD",
+      "missingFactOrDecision": "Distinct Newsome/Pinnock/DB occupants, Tracy overtime-bound treatment, duplicate-free Montgomery-Marks-Ogunbowale chain, Noel duty split, Whittington value provenance and remaining OL/TE classification.",
+      "footballImpact": "Unresolved secondary, running-back and receiver absence allocation prevents a supported paired team loss."
+    },
+    {
+      "caseKey": "2026-W07-TB-CAR",
+      "gapType": "METHOD",
+      "missingFactOrDecision": "An archive-preserving non-injury-inactive evaluator treatment for A.J. Dillon and Ja'Tavion Sanders.",
+      "footballImpact": "The otherwise source-complete pair cannot truthfully mark archived healthy scratches active, injured or omitted."
+    },
+    {
+      "caseKey": "2026-W07-MIA-NYJ",
+      "gapType": "SOURCE_AND_METHOD",
+      "missingFactOrDecision": "Distinct Brents and Wright relief, duplicate-free Sweat/Onyemata interior allocation, and Dial/Gay/Tolbert/Brownlee final role classification.",
+      "footballImpact": "DB, RB and DL capacity remains double-count prone."
+    },
+    {
+      "caseKey": "2026-W07-SF-ATL",
+      "gapType": "SOURCE_AND_METHOD",
+      "missingFactOrDecision": "Actual SF nickel, complete receiver capacity, bounded McCaffrey additional RB duty without impairment arithmetic, and two distinct Atlanta DB duties with reserve chronology.",
+      "footballImpact": "Receiver, running-back and defensive-back clusters remain unsupported."
+    },
+    {
+      "caseKey": "2026-W07-DEN-ARI",
+      "gapType": "SOURCE_AND_METHOD",
+      "missingFactOrDecision": "Distinct Elliss edge, Waddle receiver and Allen DL roles plus Roach missed-duty evidence and one overlap-safe DL allocation.",
+      "footballImpact": "Late receiver and defensive-line losses cannot be isolated from normal rotations."
+    },
+    {
+      "caseKey": "2026-W07-DAL-PHI",
+      "gapType": "SOURCE_AND_METHOD",
+      "missingFactOrDecision": "Joint Bigsby/Shipley capacity, Ojomo terminal status and added DT duty, Bennett/Sam DB capacity, and governed chronology/rebase across the post-kickoff PHI adjustment.",
+      "footballImpact": "Backfield, line, secondary and chronological handoff gates remain open."
+    },
+    {
+      "caseKey": "2026-W07-PIT-NO",
+      "gapType": "AVAILABLE_EVIDENCE_NOT_ASSEMBLED_AND_METHOD",
+      "missingFactOrDecision": "Merge verified Reid/Donaldson facts and resolve ten expected-role/value cases: PIT Joseph-Day, Echols, Heidenreich, Terell Smith; NO Saldiveri, Ruiz, Shepherd, Tyree Wilson, Mike Reid and Welch.",
+      "footballImpact": "Complete paired team sections and duplicate-free expected roles are still missing."
+    },
+    {
+      "caseKey": "2026-W07-KC-SEA",
+      "gapType": "SOURCE_AND_METHOD",
+      "missingFactOrDecision": "One disjoint Horton/Kupp allocation for Shaheed, direct Bolton alignment evidence, and explicit assembly of Cross, Jaylon Moore and Connor O'Toole into complete paired sections.",
+      "footballImpact": "Receiver/return and linebacker relief remain unproven despite corrected injury bounds."
+    }
+  ],
+  "recordedAt": "2026-11-04T01:12:46Z"
+}
