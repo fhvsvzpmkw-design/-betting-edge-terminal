@@ -22,8 +22,8 @@
       "publication"
     ]
   },
-  "mode": "AGENTS_READY",
-  "reason": "Reused two-worker pool acknowledged within the startup bound and both returned bounded read-only work. Fresh discovery found two future December events but zero new Nov. 7-8 candidates; coordinator retained market and publication authority.",
+  "mode": "COMPLETE",
+  "reason": "Two acknowledged read-only workers returned bounded evidence; the coordinator completed the market pass, exact-pair watchlist refresh, publication and durable readback.",
   "workers": [
     {
       "role": "fresh-discovery researcher",
@@ -84,19 +84,51 @@
       "https://www.badlefthook.com/boxing-news/120175/erislandy-lara-set-to-defend-wba-title-against-tim-tszyu-december-12-boxing-news-2026",
       "https://www.badlefthook.com/boxing-news/120170/david-benavidez-critiques-canelo-alvarezs-performance-against-christian-mbilli-boxing-news-2026",
       "https://www.badlefthook.com/boxing-schedule/120139/how-to-watch-buatsi-hutchinson-garcia-provodnikov-billam-smith-clarke-baumgardner-streaming-tv-schedule-boxing-news-2026"
+    ],
+    "marketPassCompleted": true,
+    "boardCardsPublished": 5,
+    "statusCounts": {
+      "PLAY": 0,
+      "WAIT": 1,
+      "WATCH": 0,
+      "PASS": 4
+    },
+    "activeWatchlistCounts": {
+      "MAIN": 4,
+      "CO_MAIN": 2,
+      "FEATURED": 0
+    },
+    "inWindowExactMatchMisses": 0,
+    "publication": {
+      "board": {
+        "path": "data/crypto-specials.json",
+        "commitSha": "f7c57e4107049306b80361b14aa9fd8717dbccab",
+        "contentSha": "ec0330601c8cb173c10842dc72c1e62dc28cadf8"
+      },
+      "watchlist": {
+        "path": "data/crypto-fight-watch.json",
+        "commitSha": "c9d3f2ad690725c1140d482ef8140f8b22cea8f8",
+        "contentSha": "9c2902e9a0facda9900adac044b9f0c0f97d3089"
+      }
+    },
+    "validations": [
+      "Exact configured source URL preserved",
+      "Fresh discovery completed before carry-forward",
+      "One configured source and current-day board only",
+      "Meat Desk title and description preserved",
+      "Five cards: 0 PLAY / 1 WAIT / 0 WATCH / 4 PASS",
+      "Every live card has a complete statusReason",
+      "Six active exact fighter pairs: 4 MAIN / 2 CO_MAIN / 0 FEATURED",
+      "All active pairs outside 30 hours; internal snapshot not invoked",
+      "No fabricated executable prices or substituted bouts"
     ]
   },
-  "remainingWork": [
-    "Finish coordinator market pass",
-    "Merge validated carry-forwards",
-    "Publish and perform durable readback",
-    "Finalize activity receipt"
-  ],
+  "remainingWork": [],
   "telemetry": {
     "model": null,
     "tokens": null,
     "credits": null,
     "overlap": null
   },
-  "recordedAt": "2026-11-04T20:06:38Z"
+  "recordedAt": "2026-11-04T20:09:15Z"
 }
