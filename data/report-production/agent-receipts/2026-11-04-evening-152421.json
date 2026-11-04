@@ -5,25 +5,39 @@
   "taskId": "main-15:15",
   "executionRunId": null,
   "workBinding": {
-    "candidateId": "2026-11-04T15:24:21-07:00|4",
+    "candidateId": "2026-11-04T15:37:20-07:00|4",
     "feedBlobSha": "be6b20f7a97845f4e8f28895a0c2a7fab9a10165",
     "checkpoint": "data/report-production/checkpoints/2026-11-04-evening-1515-152421.json",
-    "checkpointRevision": 1,
+    "checkpointRevision": 26,
     "operatingRevision": "2026-11-01.AdaptiveResearchAgents"
   },
-  "mode": "AGENTS_RUNNING",
-  "reason": "Twenty-one events and 126 selections justify the configured four complete-event researchers and two critical reviewers. All six existing threads acknowledged their exact read-only bindings inside the 60-second bound.",
+  "mode": "AGENTS_COMPLETE",
+  "reason": "Twenty-one events and 126 selections justified the configured four complete-event researchers and two critical reviewers. All six existing threads acknowledged inside the 60-second bound and returned substantive work; the coordinator reconciled the original binding to the final retimed candidate.",
   "workers": [
-    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719516","73719518","70898988","70918978","73719520"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719522","73719524","70894866","72909336","72909338"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719526","73719528","73719530","73719532","73719534"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719536","73719538","73719540","72909340","72909342","73719542","guy-shortlist"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["nhl-and-guy-opposing-case-review"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-price-and-line-identity-audit"],"acknowledgment":"BOUND","state":"RUNNING"}
+    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719516","73719518","70898988","70918978","73719520"],"acknowledgment":"BOUND","state":"RETURNED"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719522","73719524","70894866","72909336","72909338"],"acknowledgment":"BOUND","state":"RETURNED"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719526","73719528","73719530","73719532","73719534"],"acknowledgment":"BOUND","state":"RETURNED"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719536","73719538","73719540","72909340","72909342","73719542","guy-shortlist"],"acknowledgment":"BOUND","state":"RETURNED"},
+    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["nhl-and-guy-opposing-case-review"],"acknowledgment":"BOUND","state":"RETURNED"},
+    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-price-and-line-identity-audit"],"acknowledgment":"BOUND","state":"RETURNED"}
   ],
-  "scalingDecisions": [{"decision":"NORMAL_POOL","workers":6,"reason":"Twenty-one complete-event queues plus two independent challenge questions justify all configured roles.","expectedQualityBenefit":"Source-backed depth, Support/Contrary review, History Fit, Guy shortlist review and exact identity correction.","releaseCondition":"Assigned events or review questions returned, or genuine source routes exhausted."}],
-  "qualityFindings": [],
-  "completedWork": {"acknowledgments":6,"eventResearch":0,"reviews":0,"checkpointedEvents":0},
-  "remainingWork": {"events":21,"reviews":2,"merge":"coordinator only","publication":"not started"},
-  "recordedAt": "2026-11-04T22:25:30.000Z"
+  "scalingDecisions": [
+    {"decision":"NORMAL_POOL","workers":6,"reason":"Twenty-one complete-event queues plus two independent challenge questions justified all configured roles.","expectedQualityBenefit":"Source-backed depth, Support/Contrary review, History Fit, Guy shortlist review and exact identity correction.","releaseCondition":"All assigned events and both review questions returned."}
+  ],
+  "qualityFindings": [
+    {"finding":"The exact-price audit found zero favorable Pinnacle discrepancies across 110 exact-matched selections; all best executable prices were unfavorable.","correction":"The 09:30 Detroit -2.5 LEAN was downgraded to PASS. No BET, LEAN or WAIT remained."},
+    {"finding":"Sixteen spread selections lacked a qualified exact same-contract Pinnacle pair, including new Utah-New Orleans and Toronto-Denver line mismatches.","correction":"Those selections were retained as selection-scoped FAIR_MODEL_UNAVAILABLE blockers rather than compared across half-point differences."},
+    {"finding":"ESPN and Bet Better exposed material directional disagreements, but ESPN remained context-only and Bet Better supplied scores rather than exact probabilities.","correction":"Worker-proposed directional LEAN and WAIT labels were rejected where they lacked an eligible exact probability, calibrated uncertainty bound or favorable exact reference."},
+    {"finding":"All eight NHL starting goalies were confirmed, but the snapshot stated forecastRepricedForGoalie=false and independent exact-price corroboration remained insufficient.","correction":"All NHL Main selections remained PASS; Los Angeles, Buffalo and Seattle were not promoted from the Guy shortlist."}
+  ],
+  "completedWork": {"acknowledgments":6,"eventResearch":21,"reviews":2,"checkpointedEvents":21},
+  "remainingWork": {"events":0,"reviews":0,"merge":"coordinator only","publication":"candidate preparation pending"},
+  "reconciliationBinding": {
+    "candidateId":"2026-11-04T15:37:20-07:00|4",
+    "checkpointRevision":26,
+    "decisionCounts":{"bet":0,"lean":0,"wait":0,"pass":110,"blocked":16},
+    "originalWorkerBindingRetainedAsLead":true,
+    "coordinatorOnlyMerge":true
+  },
+  "recordedAt": "2026-11-04T22:38:00.000Z"
 }
