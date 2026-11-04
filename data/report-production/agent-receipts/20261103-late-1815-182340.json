@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-2026-11-03-1815",
+  "executionRunId": "20261103-late-1815-182340",
+  "workBinding": {
+    "candidateId": "2026-11-03T18:23:40.000-07:00|5",
+    "feedBlobSha": "2e68bc036c348ade461e7c67ac67c1c2fdf6b2f4",
+    "checkpointPath": "data/report-production/checkpoints/20261103-late-1815-182340.json",
+    "checkpointRevision": 1,
+    "events": ["72909334"]
+  },
+  "mode": "AGENTS_READY",
+  "reason": "One-event slate: one complete-event owner plus two bounded critical reviews for personnel/identity/opposing case and forecast/History Fit/Guy eligibility. Spare researchers were not launched to avoid duplicate event ownership.",
+  "workers": [
+    {
+      "role": "COMPLETE_EVENT_RESEARCHER",
+      "id": "/root/researcher_1",
+      "assignmentIds": ["72909334:all-primary-markets"],
+      "boundary": "READ_ONLY_NO_SHARED_WRITES_NO_ODDS_NO_SUBAGENTS",
+      "state": "ACKNOWLEDGED",
+      "acknowledgedAt": "2026-11-04T01:25:42.103Z"
+    },
+    {
+      "role": "CRITICAL_REVIEWER_PERSONNEL_IDENTITY_OPPOSITION",
+      "id": "/root/reviewer_1",
+      "assignmentIds": ["72909334:personnel-price-settlement-opposition"],
+      "boundary": "READ_ONLY_NO_SHARED_WRITES_NO_ODDS_NO_SUBAGENTS",
+      "state": "ACKNOWLEDGED",
+      "acknowledgedAt": "2026-11-04T01:25:42.103Z"
+    },
+    {
+      "role": "CRITICAL_REVIEWER_FORECAST_HISTORY_GUY",
+      "id": "/root/reviewer_2",
+      "assignmentIds": ["72909334:forecast-history-guy"],
+      "boundary": "READ_ONLY_NO_SHARED_WRITES_NO_ODDS_NO_SUBAGENTS",
+      "state": "ACKNOWLEDGED",
+      "acknowledgedAt": "2026-11-04T01:25:42.103Z"
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "selectedWorkers": 3,
+      "normalWorkers": 6,
+      "reason": "The queue contains one complete event. A single researcher owns all six market sides; two disjoint critical reviews address the consequential evidence questions without duplicating event ownership.",
+      "releaseCondition": "Return the event dossier and the two bounded reviews, then release all workers."
+    }
+  ],
+  "qualityFindings": [],
+  "completedWork": {
+    "acknowledgments": 3,
+    "eventResearch": 0,
+    "reviews": 0
+  },
+  "remainingWork": [
+    "Complete event research across moneyline, puck line and total.",
+    "Complete two bounded critical reviews and reconcile findings.",
+    "Save the coordinator event checkpoint and run final validation/publication."
+  ],
+  "recordedAt": "2026-11-04T01:25:42.103Z"
+}
