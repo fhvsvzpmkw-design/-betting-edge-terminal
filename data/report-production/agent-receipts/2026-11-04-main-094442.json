@@ -11,21 +11,34 @@
     "checkpointRevision": 1,
     "operatingRevision": "2026-11-01.AdaptiveResearchAgents"
   },
-  "mode": "AGENTS_READY",
-  "reason": "Twenty-one events and 126 available selections support the normal four complete-event researchers and two critical reviewers. All six existing threads acknowledged the immutable binding within the 60-second total startup bound.",
+  "reconciliationBinding": {
+    "candidateId": "2026-11-04T09:55:03.000-07:00|3",
+    "feedBlobSha": "6580fbf01ae7ca5f043ecc812fddbdb6ee723b62",
+    "checkpointRevision": 24,
+    "reason": "The coordinator retimed the same immutable feed after current source review, checkpointed all 21 event packets, and bound 206 captured forecast records to the current applicability review."
+  },
+  "mode": "AGENTS_COMPLETED",
+  "reason": "Twenty-one events and 126 available selections supported the normal four complete-event researchers and two critical reviewers. All six existing threads acknowledged within the 60-second bound, returned substantive work, and were reconciled by the coordinator without worker writes.",
   "workers": [
-    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["70898988","70918978","70894866","72909336","72909338"],"acknowledgment":"BOUND","state":"WORKING","scalingNote":"The initial handoff accidentally overlapped two NBA events; those were stopped before merge and replaced by the two otherwise-unassigned NHL events."},
-    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719516","73719518","73719520","73719522","73719524"],"acknowledgment":"BOUND","state":"WORKING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719526","73719528","73719530","73719532","73719534"],"acknowledgment":"BOUND","state":"WORKING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719536","73719538","73719540","73719542","72909340","72909342"],"acknowledgment":"BOUND","state":"WORKING"},
-    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-reference-gap-audit","market-family-and-identity-audit"],"acknowledgment":"BOUND","state":"WORKING"},
-    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["forecast-route-audit","Guy-shortlist-and-risk-audit"],"acknowledgment":"BOUND","state":"WORKING"}
+    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["70898988","70918978","70894866","72909336","72909338"],"acknowledgment":"BOUND","state":"RETURNED","returnedEvents":5,"scalingNote":"The initial handoff accidentally overlapped two NBA events; those were stopped before merge and replaced by the two otherwise-unassigned NHL events."},
+    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719516","73719518","73719520","73719522","73719524"],"acknowledgment":"BOUND","state":"RETURNED","returnedEvents":5},
+    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719526","73719528","73719530","73719532","73719534"],"acknowledgment":"BOUND","state":"RETURNED","returnedEvents":5},
+    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719536","73719538","73719540","73719542","72909340","72909342"],"acknowledgment":"BOUND","state":"RETURNED","returnedEvents":6},
+    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-reference-gap-audit","market-family-and-identity-audit","second-pass-board-review"],"acknowledgment":"BOUND","state":"RETURNED","returnedReviews":2},
+    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["forecast-route-audit","Guy-shortlist-and-risk-audit","second-pass-board-review"],"acknowledgment":"BOUND","state":"RETURNED","returnedReviews":2}
   ],
   "scalingDecisions": [
     {"decision":"NORMAL_POOL","workers":6,"reason":"Twenty-one disjoint complete games plus two material cross-slate review questions justify the configured pool.","expectedQualityBenefit":"Current source-backed event depth, opposing-case review and exact evidence-identity checks.","releaseCondition":"Assigned events and review questions returned or source routes exhausted."}
   ],
-  "qualityFindings": [],
-  "completedWork": {"acknowledgments":6,"eventResearch":0,"reviews":0},
-  "remainingWork": {"events":21,"reviews":2,"merge":"coordinator only","publication":"not started"},
-  "recordedAt": "2026-11-04T16:45:30.000Z"
+  "qualityFindings": [
+    {"finding":"All 126 selections were reviewed across moneyline, spread/run/puck-line and total families; the coordinator retained 114 evaluated decisions and 12 exact-contract blocks.","impact":"Prevented moneyline-only completion and preserved full-slate coverage."},
+    {"finding":"Only FanDuel Detroit -2.5 at 1.962 was favorable to the exact paired Pinnacle reference, by about 0.438 probability points.","impact":"Retained as a market-derived zero-stake LEAN only; Bet Better score context and ESPN moneyline disagreement were not promoted to an exact fair."},
+    {"finding":"Both spread sides lacked qualified exact paired references for Toledo-Sacramento State, Central Michigan-Eastern Michigan, Atlanta-Washington, Chicago-New York, Portland-Phoenix and LA Lakers-Sacramento.","impact":"Kept exactly 12 selection-level BLOCKED receipts; no nearest-line substitution."},
+    {"finding":"NHL MoneyPuck numbers were market-blended and no NHL side met the two-source/one-point route; most goalies remained projected.","impact":"All 24 NHL selections stayed PASS."},
+    {"finding":"Guy shortlist execution failed with ENOENT for data/game-intelligence/board.json; independent LA Kings review also found adverse Pinnacle, conflicting goalie projections and opposing DRatings/Dimers.","impact":"Guy NO CALL recorded as a specific Guy shortfall, not a Main publication veto."},
+    {"finding":"Worker-proposed generic WAIT and score-projection LEAN cases lacked exact-price conditions, calibrated probabilities, current personnel resolution, or independent agreement.","impact":"Second-pass reviewers approved 0 BET, 1 LEAN, 113 PASS and 12 BLOCKED with no WAIT."}
+  ],
+  "completedWork": {"acknowledgments":6,"eventResearch":21,"reviews":4,"checkpointedEvents":21},
+  "remainingWork": {"events":0,"reviews":0,"merge":"completed by coordinator only","publication":"pending final validation and staged publisher"},
+  "recordedAt": "2026-11-04T16:58:36.000Z"
 }
