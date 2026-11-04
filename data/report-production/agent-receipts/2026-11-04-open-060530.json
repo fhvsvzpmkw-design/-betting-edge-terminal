@@ -13,8 +13,8 @@
     "availableSelections": 126,
     "events": 21
   },
-  "mode": "AGENTS_READY",
-  "reason": "All four complete-event researchers and both critical reviewers acknowledged their exact read-only bindings within the 60-second startup bound.",
+  "mode": "AGENTS_PARTIAL",
+  "reason": "All six workers acknowledged, but this candidate was stopped before returned research because its draft timestamp preceded controller snapshot acceptance. No substantive result was merged.",
   "workers": [
     {"role":"complete-event researcher","id":"/root/researcher_1","assignmentIds":["72909336","72909338","73719516","73719518","70898988","70918978"],"boundary":"read-only; coordinator-supplied prices only; no shared edits; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null},
     {"role":"complete-event researcher","id":"/root/researcher_2","assignmentIds":["72909340","72909342","73719520","73719522","73719524"],"boundary":"read-only; coordinator-supplied prices only; no shared edits; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null},
@@ -27,8 +27,8 @@
     {"pool":"4 researchers + 2 reviewers","reason":"The queue contains 21 complete events and 126 selections across NBA, NCAAF and NHL, so the normal full Main pool is useful without duplicate ownership.","expectedQualityBenefit":"Complete market-family coverage, current personnel review, forecast applicability, Support/Contrary, History Fit and two disjoint critical-review lanes.","releaseCondition":"Each researcher returns its complete-event queue or a precise source-specific shortfall; reviewers return their disjoint corrections or no-material-correction finding."},
     {"priority":"Guy early shortlist","reason":"Guy's current NHL board identified all four NHL events, with Los Angeles Kings the only positive model-vs-book edge row; those events were placed first in researcher queues 1 and 2.","expectedQualityBenefit":"Early opposing-case and personnel scrutiny of the saved NHL shortlist.","releaseCondition":"All four NHL events receive complete market-family review and the Kings case is explicitly reconciled against exact Pinnacle and model limitations."}
   ],
-  "qualityFindings": [],
+  "qualityFindings": [{"type":"ABORTED_BINDING","impact":"Controller exact-benchmark comparisons were unavailable because snapshot acceptance followed the 06:05:30 draft timestamp. A new actual-time candidate was started and remotely verified."}],
   "completedWork": {"startupAcknowledgments":6,"eventResearchReturned":0,"eventsCompleted":0,"criticalReviewsReturned":0},
-  "remainingWork": {"events":21,"selections":126,"researcherQueues":4,"reviewerQueues":2,"note":"Delegated research has not started; startup acknowledgment only."},
-  "recordedAt": "2026-11-04T13:12:57.700Z"
+  "remainingWork": {"events":21,"selections":126,"researcherQueues":4,"reviewerQueues":2,"note":"Superseded by executionRunId 2026-11-04-open-061600; no substantive research returned on this binding."},
+  "recordedAt": "2026-11-04T13:17:11.860Z"
 }
