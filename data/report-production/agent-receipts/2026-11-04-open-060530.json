@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-open-0600",
+  "executionRunId": "2026-11-04-open-060530",
+  "workBinding": {
+    "candidateId": "2026-11-04T06:05:30.000-07:00|1",
+    "feedBlobSha": "2f3c00d66ac490f2775600257ef34577fb6fd7be",
+    "checkpointPath": "data/report-production/checkpoints/2026-11-04-open-060530.json",
+    "checkpointBlobShaAtAssignment": "400ea94f8a4a192cbafa94f66a328ac988338bbf",
+    "checkpointRevisionAtAssignment": 1,
+    "availableSelections": 126,
+    "events": 21
+  },
+  "mode": "AGENTS_READY",
+  "reason": "All four complete-event researchers and both critical reviewers acknowledged their exact read-only bindings within the 60-second startup bound.",
+  "workers": [
+    {"role":"complete-event researcher","id":"/root/researcher_1","assignmentIds":["72909336","72909338","73719516","73719518","70898988","70918978"],"boundary":"read-only; coordinator-supplied prices only; no shared edits; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_2","assignmentIds":["72909340","72909342","73719520","73719522","73719524"],"boundary":"read-only; coordinator-supplied prices only; no shared edits; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_3","assignmentIds":["70894866","73719526","73719528","73719530","73719532"],"boundary":"read-only; coordinator-supplied prices only; no shared edits; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_4","assignmentIds":["73719534","73719536","73719538","73719540","73719542"],"boundary":"read-only; coordinator-supplied prices only; no shared edits; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_1","assignmentIds":["researcher_1 returns","researcher_3 returns"],"boundary":"read-only review findings/corrections only; no shared edits; no odds collection; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_2","assignmentIds":["researcher_2 returns","researcher_4 returns"],"boundary":"read-only review findings/corrections only; no shared edits; no odds collection; no agent spawning","launchObservedAt":"2026-11-04T13:11:59.475Z","acknowledgmentObservedBy":"2026-11-04T13:12:57.700Z","returnObservedAt":null,"state":"ACKNOWLEDGED","error":null}
+  ],
+  "scalingDecisions": [
+    {"pool":"4 researchers + 2 reviewers","reason":"The queue contains 21 complete events and 126 selections across NBA, NCAAF and NHL, so the normal full Main pool is useful without duplicate ownership.","expectedQualityBenefit":"Complete market-family coverage, current personnel review, forecast applicability, Support/Contrary, History Fit and two disjoint critical-review lanes.","releaseCondition":"Each researcher returns its complete-event queue or a precise source-specific shortfall; reviewers return their disjoint corrections or no-material-correction finding."},
+    {"priority":"Guy early shortlist","reason":"Guy's current NHL board identified all four NHL events, with Los Angeles Kings the only positive model-vs-book edge row; those events were placed first in researcher queues 1 and 2.","expectedQualityBenefit":"Early opposing-case and personnel scrutiny of the saved NHL shortlist.","releaseCondition":"All four NHL events receive complete market-family review and the Kings case is explicitly reconciled against exact Pinnacle and model limitations."}
+  ],
+  "qualityFindings": [],
+  "completedWork": {"startupAcknowledgments":6,"eventResearchReturned":0,"eventsCompleted":0,"criticalReviewsReturned":0},
+  "remainingWork": {"events":21,"selections":126,"researcherQueues":4,"reviewerQueues":2,"note":"Delegated research has not started; startup acknowledgment only."},
+  "recordedAt": "2026-11-04T13:12:57.700Z"
+}
