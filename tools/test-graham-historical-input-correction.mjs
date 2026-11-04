@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {historicalInputCorrection,correctionDigest,HISTORICAL_CORRECTION,verifiedCorrectionPublication} from './graham-historical-input-correction.mjs';
@@ -59,8 +60,11 @@ const reviewedFixture=()=>{
 };
 test('verified current baseline review preserves historical completion certification',()=>{const x=reviewedFixture();assert.ok(verifiedCorrectionPublication(x.power,x.input));});
 test('multiple durable disjoint reviews preserve historical completion certification',()=>{
- const power=JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json'));
- const staging=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json'));
+ // Both rating reviews and the applied correction coexist at this revision.
+ const revision='2c99730566c88641fbbebe02cf7e2e02a194e0ce';
+ const snapshot=path=>JSON.parse(execFileSync('git',['show',`${revision}:${path}`],{encoding:'utf8',maxBuffer:16*1024*1024}));
+ const power=snapshot('data/walters/nfl-power-ratings-ledger.json');
+ const staging=snapshot('data/walters/nfl/carried-rating-audit-staging.json');
  assert.equal(verifiedCorrectionPublication(power,staging),true);
 });
 test('unbound event after current review cannot certify historical publication',()=>{const x=reviewedFixture(),t=x.power.teams.find(t=>t.abbr==='A');t.history.push({...t.history.at(-1),auditId:'unbound-extra',sequence:99,fromRating:t.currentRating,delta:0,toRating:t.currentRating});assert.equal(verifiedCorrectionPublication(x.power,x.input),false);});
