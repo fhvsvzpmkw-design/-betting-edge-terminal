@@ -2,7 +2,7 @@
   "schema": 1,
   "candidateId": "2026-11-04T08:17:16.000-07:00|2",
   "group": "main",
-  "state": "STARTUP_ACKNOWLEDGED",
+  "state": "RETURNS_COMPLETE",
   "feedBlobSha": "47818b9e2002c38d9ffb781e430a6ec70f4d9f87",
   "checkpoint": {
     "path": "data/report-production/checkpoints/2026-11-04-main-081716.json",
@@ -58,8 +58,133 @@
     "ackBoundSeconds": 60,
     "result": "SUCCESS"
   },
-  "returns": [],
-  "corrections": [],
-  "findings": [],
-  "final": null
+  "returns": [
+    {
+      "agentId": "/root/researcher_1",
+      "role": "complete-event researcher 1",
+      "state": "RETURNED",
+      "events": [
+        "72909336",
+        "72909338",
+        "72909340",
+        "72909342",
+        "70898988",
+        "70918978"
+      ],
+      "finding": "Six NHL/NCAAF events completed; no BET. LA Kings and other directional candidates remained zero-stake only because sharp-market opposition, projected goalies, exact-line gaps or personnel shortfalls prevented promotion."
+    },
+    {
+      "agentId": "/root/researcher_2",
+      "role": "complete-event researcher 2",
+      "state": "RETURNED",
+      "events": [
+        "70894866",
+        "73719516",
+        "73719518",
+        "73719520",
+        "73719522"
+      ],
+      "finding": "Five events completed; no BET. Detroit -2.5 was the sole provisional researcher LEAN, but the coordinator retained PASS because support was not an independently calibrated exact-selection fair."
+    },
+    {
+      "agentId": "/root/researcher_3",
+      "role": "complete-event researcher 3",
+      "state": "RETURNED",
+      "events": [
+        "73719524",
+        "73719526",
+        "73719528",
+        "73719530",
+        "73719532"
+      ],
+      "finding": "Five NBA events completed; no BET. Candidate LEANs were limited by worse-than-Pinnacle execution, line mismatch, conflicting models, current official-status gaps or absent calibrated cover/total probabilities."
+    },
+    {
+      "agentId": "/root/researcher_4",
+      "role": "complete-event researcher 4",
+      "state": "RETURNED",
+      "events": [
+        "73719534",
+        "73719536",
+        "73719538",
+        "73719540",
+        "73719542"
+      ],
+      "finding": "Five NBA events completed; no BET. Nine provisional directional LEANs were identified and then held at PASS after opposing exact market evidence, personnel uncertainty and model disagreement were applied."
+    },
+    {
+      "agentId": "/root/reviewer_1",
+      "role": "critical reviewer 1",
+      "state": "RETURNED",
+      "scope": "fresh-feed identity, prior-Open inheritance and Guy/LA Kings",
+      "finding": "Rejected inherited NOP, Ball State, OKC and CMU LEANs; required fresh MIA-LAC reasoning after ESPN moved 11.2 points; maintained LA Kings rejection and zero stake."
+    },
+    {
+      "agentId": "/root/reviewer_2",
+      "role": "critical reviewer 2",
+      "state": "RETURNED",
+      "scope": "forecast applicability, exact evidence identity, personnel and settlement",
+      "finding": "Confirmed that none of 74 current captured forecast points established an independent uncertainty-adjusted BET bound; identified the 14 exact-spread reference gaps and current QB/goalie limitations."
+    }
+  ],
+  "corrections": [
+    {
+      "kind": "DECISION_DOWNGRADE",
+      "selections": [
+        "New Orleans Pelicans ML",
+        "Ball State ML",
+        "Oklahoma City ML and -3.5",
+        "Central Michigan ML"
+      ],
+      "reason": "Fresh price/reference identity, opposing Pinnacle probability and unresolved personnel removed inherited support."
+    },
+    {
+      "kind": "FRESH_FORECAST_REBUILD",
+      "selection": "LA Clippers ML / Miami ML",
+      "reason": "Fresh ESPN shifted 11.2 probability points from the earlier Open capture; current evidence was rebuilt and remained PASS."
+    },
+    {
+      "kind": "GUY_SHORTLIST_REJECTION",
+      "selection": "Los Angeles Kings ML",
+      "reason": "MoneyPuck 63.082% exceeded the executable break-even only modestly, while Pinnacle 60.025%, projected goalies and unrepriced personnel opposed; no Guy call was staged."
+    },
+    {
+      "kind": "SOURCE_SEMANTICS",
+      "reason": "BetBetter score projections were retained as context only; no cover/total probability or uncertainty was inferred."
+    }
+  ],
+  "findings": [
+    {
+      "kind": "TEAM_EXECUTION",
+      "configuredWorkers": 6,
+      "launchedWorkers": 6,
+      "returnedWorkers": 6,
+      "acknowledgmentResult": "SUCCESS_WITHIN_60_SECONDS"
+    },
+    {
+      "kind": "ANALYSIS",
+      "eventsReviewed": 21,
+      "availableSelections": 126,
+      "completedAssessments": 112,
+      "documentedShortfalls": 14,
+      "bets": 0,
+      "leans": 0,
+      "waits": 0,
+      "passes": 112
+    },
+    {
+      "kind": "FORECASTS",
+      "records": 132,
+      "revalidated": 132,
+      "current": 74,
+      "staleSuperseded": 58,
+      "limitation": "No captured point supplied an independently calibrated conservative wager bound."
+    },
+    {
+      "kind": "PERSONNEL",
+      "finding": "Current official NCAAF team sources were checked to named quarterback-specific shortfalls; all NHL goalies remained projected and forecastRepricedForGoalie was false."
+    }
+  ],
+  "final": null,
+  "updatedAt": "2026-11-04T15:34:50.000Z"
 }
