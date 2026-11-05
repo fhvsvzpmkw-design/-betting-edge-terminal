@@ -133,7 +133,9 @@ jobs:
           const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
           assert.equal(staging.state,'APPLIED');assert.equal(staging.marketViewed,false);
           assert.equal(active.schema,1);assert.equal(active.state,'ACTIVE');assert.equal(active.authority,'GRAHAM_WEEK_ROLLOVER');
-          assert.equal(active.season,staging.season);assert.equal(active.week,staging.targetWeek);
+          assert.equal(active.season,staging.season);
+          if(staging.auditType==='WALTERS_WEEKLY_90_10')assert.ok(staging.targetWeek<=active.week);
+          else assert.equal(active.week,staging.targetWeek);
           assert.deepEqual(power.weekly90_10,staging.result.receipt);
           assert.equal(power.weekly90_10.sourceWeek,staging.targetWeek-1);assert.equal(power.weekly90_10.targetWeek,staging.targetWeek);
           const changed=new Set(staging.result.ratingChanges.map(c=>c.team));
@@ -192,7 +194,9 @@ jobs:
           const s=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json'));
           const a=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json'));
           assert.equal(s.state,'APPLIED');assert.equal(s.marketViewed,false);
-          assert.equal(a.season,s.season);assert.equal(a.week,['WALTERS_WEEKLY_90_10','WALTERS_HISTORICAL_INPUT_CORRECTION'].includes(s.auditType)?s.targetWeek:s.week);
+          assert.equal(a.season,s.season);
+          if(s.auditType==='WALTERS_WEEKLY_90_10')assert.ok(s.targetWeek<=a.week);
+          else assert.equal(a.week,s.auditType==='WALTERS_HISTORICAL_INPUT_CORRECTION'?s.targetWeek:s.week);
           if(['WALTERS_WEEKLY_90_10','WALTERS_HISTORICAL_INPUT_CORRECTION'].includes(s.auditType))assert.deepEqual(JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json')).weekly90_10,s.result.receipt);
           NODE
           done

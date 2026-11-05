@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {createWeeklyEvidenceVerifier,WEEKLY_EVIDENCE_FROM,loadWeeklyEvidence,boundJson,gitBlob} from './graham-weekly-evidence.mjs';
 import {historicalInputCorrection,HISTORICAL_CORRECTION} from './graham-historical-input-correction.mjs';
-import {resolveGrahamActiveWeek,grahamWeekPaths} from './graham-active-week.mjs';
+import {resolveGrahamActiveWeek,grahamWeekPaths,weeklyLearningSourceWeek} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
 
 const ROOT=process.cwd();
@@ -78,7 +78,7 @@ function latePriorWeekHandoff(g,ledgerTeams,byTeam,input,observed,kickoff){
 function weeklyUpdate(input,power,active,prior){
   const verifyGameEvidence=createWeeklyEvidenceVerifier(ROOT,input);
   const formulas=['BW-R016','BW-R017','BW-R018'];
-  if(input.season!==active.season||input.targetWeek!==active.week||input.sourceWeek!==active.week-1||active.week<2)fail('WEEKLY_WEEK_MISMATCH');
+  if(input.season!==active.season||active.week<2||input.sourceWeek!==weeklyLearningSourceWeek(active,power)||input.targetWeek!==input.sourceWeek+1)fail('WEEKLY_WEEK_MISMATCH');
   if(!formulas.every(x=>input.formulaIds?.includes(x)))fail('FORMULA_IDS_INVALID');
   if(prior.season!==active.season||prior.week!==input.sourceWeek||!Array.isArray(prior.games)||!prior.games.length)fail('PRIOR_WEEK_SCHEDULE_INVALID');
   if(power.season!==active.season||!Array.isArray(power.teams)||power.teams.length!==32||new Set(power.teams.map(t=>t.abbr)).size!==32)fail('POWER_LEDGER_INVALID');
@@ -203,7 +203,9 @@ if(process.argv[2]==='--self-test'){
   test('prior history survives recovery receipt',()=>{const x=fixture();run(x);x.input={...x.input,auditId:'test-2',resume:true,games:[]};run(x);assert.equal(x.power.weekly90_10.attempts.length,2);});
   test('intervening carried rating fails only affected game',()=>{const x=fixture();x.power.teams[0].currentRating=11;x.power.teams[0].history.push({type:'DURABLE',sequence:1,toRating:11,effectiveAt:'2026-09-15T08:00:00-07:00'});const r=run(x);assert.equal(r.ratingChanges.length,2);assert.match(r.blockedGames[0].reasons[0],/INTERVENING/);assert.equal(x.power.teams[0].currentRating,11);});
   const delayedFixture=()=>{
-    const x=fixture();x.active.week=3;x.prior.week=2;x.input.sourceWeek=2;x.input.targetWeek=3;x.input.priorWeekCompletion.week=2;x.input.effectiveAt='2026-09-17T10:00:00-07:00';
+    const x=fixture();x.active.week=3;
+    x.power.weekly90_10={season:2026,sourceWeek:1,targetWeek:2,state:'COMPLETE',marketViewed:false,gamesProcessed:2,gamesUpdated:2,teamsUpdated:4,blockedGames:[]};
+    x.prior.week=2;x.input.sourceWeek=2;x.input.targetWeek=3;x.input.priorWeekCompletion.week=2;x.input.effectiveAt='2026-09-17T10:00:00-07:00';
     x.prior.games.forEach((p,i)=>{const key=`2026-W02-${p.away}-${p.home}`;p.gameKey=key;p.startTimePacific='2026-09-16T10:00:00-07:00';x.input.games[i].gameKey=key;x.input.games[i].gameDayEvidence.gameKey=key;x.input.games[i].gameDayEvidence.sourceWeek=2;x.input.games[i].gameDayEvidence.teams.forEach(t=>t.sourceRefs=['data/walters/nfl/2026/week-02-personnel-ledger.json']);x.input.priorWeekCompletion.finals[i].gameKey=key;});
     for(const g of x.input.games){
       const es=[g.away,g.home].map((abbr,i)=>{
@@ -246,7 +248,18 @@ if(process.argv[2]==='--self-test'){
   test('one-sided history never double-updates opponent',()=>{const x=fixture();run(x);x.power.teams[0].history.pop();const before=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'test-2',resume:true,games:[]};const r=run(x);assert.match(r.blockedGames[0].reasons[0],/ONE_SIDED/);assert.equal(JSON.stringify(x.power.teams),before);});
   test('invalid game identity rejected',()=>{const x=fixture();x.input.games[0].away='Z';assert.throws(()=>run(x),/INVALID_OR_DUPLICATE_GAME/);});
   test('incomplete prior week rejected',()=>{const x=fixture();x.input.priorWeekCompletion.finals[0].state='PENDING';assert.throws(()=>run(x),/FINAL_IDENTITY_UNVERIFIED/);});
-  test('wrong active week rejected',()=>{const x=fixture();x.active.week=3;assert.throws(()=>run(x),/WEEKLY_WEEK_MISMATCH/);});
+  test('an unfinished source week survives a later active week',()=>{
+    const x=fixture();
+    const ready=x.input.games.shift();
+    assert.equal(run(x).state,'PARTIAL_BLOCKED');
+    x.active.week=3;
+    x.input={...x.input,auditId:'late-source',resume:true,games:[ready]};
+    const result=run(x);
+    assert.equal(result.state,'COMPLETE');
+    assert.equal(result.ratingChanges.length,2);
+    assert.equal(result.receipt.targetWeek,2);
+  });
+  test('future learning cannot skip the cursor',()=>{const x=fixture();x.input.sourceWeek=2;x.input.targetWeek=3;x.active.week=3;assert.throws(()=>run(x),/WEEKLY_WEEK_MISMATCH/);});
   test('unsupported injury evidence blocks paired teams',()=>{const x=fixture();delete x.input.games[0].gameDayEvidence;const r=run(x);assert.equal(r.ratingChanges.length,2);assert.equal(x.power.teams[0].history.length,1);assert.equal(x.power.teams[1].history.length,1);});
   test('unresolved venue blocks paired teams',()=>{const x=fixture();x.prior.games[0].homeFieldVenueClass='UNRESOLVED';assert.equal(run(x).ratingChanges.length,2);});
   test('score mismatch blocks paired teams',()=>{const x=fixture();x.input.games[0].teams[0].scoreMargin=6;assert.equal(run(x).ratingChanges.length,2);});
@@ -285,8 +298,17 @@ if(input.auditType===HISTORICAL_CORRECTION){
 if(input.auditType==='WALTERS_WEEKLY_90_10'){
   if(Date.parse(input.effectiveAt)<Date.parse(WEEKLY_EVIDENCE_FROM))fail('NEW_WEEKLY_ATTEMPT_CANNOT_PREDATE_EVIDENCE_AUTHORITY');
   const active=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});
-  const priorPaths=grahamWeekPaths(active.season,active.week-1,{root:ROOT});
-  const power=read(POWER),before=JSON.stringify(power),prior=read(priorPaths.absolute.currentNumbers);
+  const power=read(POWER),before=JSON.stringify(power);
+  const sourceWeek=weeklyLearningSourceWeek(active,power);
+  if(input.sourceWeek!==sourceWeek||input.targetWeek!==sourceWeek+1)fail('WEEKLY_WEEK_MISMATCH');
+  const prior=read(grahamWeekPaths(active.season,sourceWeek,{root:ROOT}).absolute.currentNumbers);
+  if(power.weekly90_10 && power.weekly90_10.sourceWeek!==sourceWeek){
+    const board=read(active.absolutePaths.currentNumbers);
+    const ratings=new Map(power.teams.map(team=>[team.abbr,team.currentRating]));
+    if(board.games.some(game=>Date.parse(game.startTimePacific)>Date.parse(input.effectiveAt)&&
+      (game.ratingCarryForward?.awayRating!==ratings.get(game.away)||
+       game.ratingCarryForward?.homeRating!==ratings.get(game.home))))fail('PREVIOUS_RATING_BASE_REFRESH_REQUIRED');
+  }
   const result=weeklyUpdate(input,power,active,prior);
   const after=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});
   if(JSON.stringify(after.manifest)!==JSON.stringify(active.manifest))fail('ACTIVE_WEEK_CHANGED_DURING_AUDIT');

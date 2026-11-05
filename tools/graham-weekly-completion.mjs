@@ -9,15 +9,16 @@ import {HISTORICAL_CORRECTION,verifiedCorrectionPublication} from './graham-hist
 export function weeklyCompletion({active,board,power,staging,effectiveAt=new Date().toISOString()}){
  if(!Number.isFinite(Date.parse(effectiveAt)))throw Error('WEEKLY_COMPLETION_TIME_INVALID');
  const problems=[],receipt=power.weekly90_10;
+ const currentReceipt=receipt?.season===active.season&&receipt.sourceWeek===active.week-1&&receipt.targetWeek===active.week;
  const identityMatches=board.season===active.season&&board.week===active.week;
  if(!identityMatches)problems.push({code:'ACTIVE_BOARD_IDENTITY'});
  if(!baselineComplete(board.baselineStatus))problems.push({code:'INITIAL_BASELINE_INCOMPLETE'});
- if(receipt?.season!==active.season||receipt?.sourceWeek!==active.week-1||receipt?.targetWeek!==active.week||receipt.state!=='COMPLETE'||receipt.marketViewed!==false||receipt.blockedGames?.length||receipt.gamesUpdated!==receipt.gamesProcessed||receipt.teamsUpdated!==receipt.gamesProcessed*2)problems.push({code:'WEEKLY_RATINGS_INCOMPLETE',gamesUpdated:receipt?.gamesUpdated??0,gamesExpected:receipt?.gamesProcessed??null});
+ if(!currentReceipt||receipt.state!=='COMPLETE'||receipt.marketViewed!==false||receipt.blockedGames?.length||receipt.gamesUpdated!==receipt.gamesProcessed||receipt.teamsUpdated!==receipt.gamesProcessed*2)problems.push({code:'WEEKLY_RATINGS_INCOMPLETE',gamesUpdated:receipt?.gamesUpdated??0,gamesExpected:receipt?.gamesProcessed??null});
  if(staging.state!=='APPLIED'||(!['WALTERS_WEEKLY_90_10',HISTORICAL_CORRECTION].includes(staging.auditType))||(staging.auditType===HISTORICAL_CORRECTION&&!verifiedCorrectionPublication(power,staging))||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))problems.push({code:'WEEKLY_PUBLICATION_UNVERIFIED'});
  const teams=new Map(power.teams.map(t=>[t.abbr,t])),unpropagatedGames=[],currentUnresolvedGames=[],frozenStartedGames=[],frozenIssuedGameLimitations=[];
  for(const g of board.games){
   const a=teams.get(g.away),h=teams.get(g.home);
-  const ratingStale=!a||!h||g.ratingCarryForward?.awayRating!==a.currentRating||g.ratingCarryForward?.homeRating!==h.currentRating||!Number.isFinite(g.neutralBaseHome)||Math.abs(g.neutralBaseHome-(a.currentRating-h.currentRating))>1e-8||g.weeklyRatingInput?.appliedToFair!==true||(receipt?.state==='COMPLETE'&&g.weeklyRatingInput?.state!=='COMPLETE');
+  const ratingStale=!a||!h||g.ratingCarryForward?.awayRating!==a.currentRating||g.ratingCarryForward?.homeRating!==h.currentRating||!Number.isFinite(g.neutralBaseHome)||Math.abs(g.neutralBaseHome-(a.currentRating-h.currentRating))>1e-8||g.weeklyRatingInput?.appliedToFair!==true||(currentReceipt&&receipt.state==='COMPLETE'&&g.weeklyRatingInput?.state!=='COMPLETE');
   const numericUnresolved=Boolean(g.personnelUnresolvedCases?.length||g.personnelBlockedGroups?.length||String(g.qbPerformanceStatus).startsWith('FAIL_CLOSED')||!Number.isFinite(g.grahamExactFairHome));
   const limitation={gameKey:g.gameKey,personnelCases:g.personnelUnresolvedCases?.map(c=>c.caseKey)||[],blockedGroups:g.personnelBlockedGroups||[],qbStatus:g.qbPerformanceStatus};
   if(Number.isFinite(Date.parse(g.startTimePacific))&&Date.parse(g.startTimePacific)<=Date.parse(effectiveAt)){
@@ -36,7 +37,7 @@ export function weeklyCompletion({active,board,power,staging,effectiveAt=new Dat
  const componentState=codes=>identityMatches&&!problems.some(p=>codes.includes(p.code))?'COMPLETE':'INCOMPLETE';
  const components={
   initialBaseline:{state:componentState(['INITIAL_BASELINE_INCOMPLETE']),owner:'TUESDAY_BASELINE'},
-  historicalLearning:{state:componentState(['WEEKLY_RATINGS_INCOMPLETE','WEEKLY_PUBLICATION_UNVERIFIED']),owner:'GRAHAM_WALTERS_90_10',sourceWeek:active.week-1,targetWeek:active.week,gamesApplied:receipt?.gamesUpdated??0,gamesExpected:receipt?.gamesProcessed??null,blockedGames:receipt?.blockedGames||[],publicationVerified:!problems.some(p=>p.code==='WEEKLY_PUBLICATION_UNVERIFIED')},
+  historicalLearning:{state:componentState(['WEEKLY_RATINGS_INCOMPLETE','WEEKLY_PUBLICATION_UNVERIFIED']),owner:'GRAHAM_WALTERS_90_10',sourceWeek:active.week-1,targetWeek:active.week,gamesApplied:currentReceipt?receipt.gamesUpdated??0:0,gamesExpected:currentReceipt?receipt.gamesProcessed??null:null,blockedGames:currentReceipt?receipt.blockedGames||[]:[],publicationVerified:!problems.some(p=>p.code==='WEEKLY_PUBLICATION_UNVERIFIED')},
   ratingPropagation:{state:componentState(['FAIR_RATING_INPUT_STALE']),owner:'GRAHAM_RATING_BASE_REFRESH',gamesVerified:board.games.length-frozenStartedGames.length-unpropagatedGames.length,gamesExpected:board.games.length-frozenStartedGames.length,unpropagatedGames},
   currentAvailability:{state:componentState(['CURRENT_NUMERIC_INPUTS_UNRESOLVED']),owner:'CURRENT_WEEK_RESEARCH_AND_PRODUCTION',gamesExpected:board.games.length-frozenStartedGames.length,unresolvedGames:currentUnresolvedGames}
  };
@@ -44,15 +45,14 @@ export function weeklyCompletion({active,board,power,staging,effectiveAt=new Dat
 }
 export function rolloverLearningHandoff(inputs){
  const {active}=inputs;
- if(active.week===1)return {schema:1,season:active.season,week:active.week,state:'NOT_APPLICABLE',sourceWeek:null,marketViewed:false};
  const status=weeklyCompletion(inputs),{historicalLearning,ratingPropagation}=status.components;
  const final=inputs.activeFinals;
- const closedSlate=final?.state==='COMPLETE'&&final.gamesVerified===inputs.board.games.length&&final.gamesExpected===inputs.board.games.length;
+ const closedSlate=inputs.board.season===active.season&&inputs.board.week===active.week&&inputs.board.games.length>0&&final?.state==='COMPLETE'&&final.gamesVerified===inputs.board.games.length&&final.gamesExpected===inputs.board.games.length;
  // A completed week's published game predictions stay frozen. New-week bases
  // consume the verified rating ledger directly; recalculating last week's
  // display after kickoff is neither required nor evidence of a timely fair.
- return {schema:1,season:active.season,week:active.week,sourceWeek:active.week-1,
-  state:historicalLearning.state==='COMPLETE'&&(closedSlate||ratingPropagation.gamesExpected>0&&ratingPropagation.state==='COMPLETE')?'COMPLETE':'BLOCKED',
+ return {schema:1,season:active.season,week:active.week,sourceWeek:active.week-1||null,
+  state:closedSlate?'COMPLETE':'BLOCKED',
   historicalLearning,ratingPropagation,closedSlate,priorDisplayRefreshRequired:!closedSlate,marketViewed:false};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){

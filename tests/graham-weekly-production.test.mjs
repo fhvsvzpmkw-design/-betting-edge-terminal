@@ -45,7 +45,24 @@ test('older history arithmetic is checked with the existing Walters calculator',
 test('started game predictions and their timestamps remain byte-for-byte frozen',()=>{const f=fixture();f.board.games.forEach(g=>g.startTimePacific='2026-10-18T20:00:00Z');const r=refreshRatingBases(f);assert.deepEqual(r.board,f.board);assert.equal(r.frozenStartedGames.length,2);assert.equal(r.changed,false);});
 test('late learning cannot retroactively certify an issued partial baseline',()=>{const f=fixture();f.board.games.forEach(g=>g.startTimePacific='2026-10-18T20:00:00Z');f.board.baselineStatus='CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10';f.board.state='INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED';assert.deepEqual(refreshRatingBases(f).board,f.board);});
 test('a closed slate consumes the verified ledger without rewriting the old display',()=>{const f=fixture(),before=copy(f.board),h=rolloverLearningHandoff({...f,activeFinals:{state:'COMPLETE',gamesVerified:2,gamesExpected:2}});assert.equal(h.state,'COMPLETE');assert.equal(h.priorDisplayRefreshRequired,false);assert.deepEqual(f.board,before);});
-test('completed games never excuse unfinished historical learning',()=>{const f=fixture();f.power.weekly90_10.state='PARTIAL_BLOCKED';assert.equal(rolloverLearningHandoff({...f,activeFinals:{state:'COMPLETE',gamesVerified:2,gamesExpected:2}}).state,'BLOCKED');});
+test('a final Week 8 opens Week 9 with 6 of 14 Week 7 pairs applied',()=>{
+ const f=fixture();
+ f.active.week=f.board.week=8;
+ f.board.games=Array.from({length:14},()=>copy(f.board.games[0]));
+ Object.assign(f.power.weekly90_10,{sourceWeek:7,targetWeek:8,state:'PARTIAL_BLOCKED',gamesProcessed:14,gamesUpdated:6,teamsUpdated:12});
+ f.staging.result.receipt=copy(f.power.weekly90_10);
+ const activeFinals={state:'COMPLETE',gamesVerified:14,gamesExpected:14};
+ const handoff=rolloverLearningHandoff({...f,activeFinals});
+ assert.equal(handoff.state,'COMPLETE');
+ assert.equal(handoff.historicalLearning.gamesApplied,6);
+ assert.equal(handoff.historicalLearning.state,'INCOMPLETE');
+ const queue=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals});
+ assert.equal(queue.rollover.nextAction,'RUN_WEEK_ROLLOVER');
+ f.active.week=f.board.week=9;
+ const next=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals:{state:'UNVERIFIED'}});
+ assert.equal(next.historicalSourceWeek,7);
+ assert.equal(next.completion.components.historicalLearning.gamesApplied,0);
+});
 test('readiness explicitly reports the missing next week and cannot issue numbers',()=>{const f=fixture();const q=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals:{state:'COMPLETE',gamesVerified:2,gamesExpected:2}});assert.equal(q.rollover.required,true);assert.equal(q.rollover.nextWeek,6);assert.equal(q.state,'BLOCKED');assert.equal(q.numericAuthority,false);assert.match(q.customerMessage,/has not been published/);assert.equal(q.processProblems.some(p=>p.code==='EARLIER_PUBLISHED_BATCHES_NOT_PROPAGATED'),false);});
-test('pending current baseline recovery is independent of unfinished learning and rollover',()=>{const f=fixture();f.power.weekly90_10.state='PARTIAL_BLOCKED';const q=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals:{state:'UNVERIFIED',gamesVerified:0,gamesExpected:2}});assert.equal(q.currentBaseline.required,true);assert.equal(q.currentBaseline.nextAction,'RUN_ACTIVE_BASELINE_RECOVERY');assert.equal(q.currentBaseline.historicalLearningBlocksReview,false);assert.equal(q.currentBaseline.requiresSeparateResearchRuntime,true);assert.equal(q.rollover.required,false);assert.equal(q.state,'BLOCKED');assert.equal(q.completion.components.historicalLearning.state,'INCOMPLETE');assert.ok(q.processProblems.some(p=>p.code==='INITIAL_BASELINE_RECOVERY_REQUIRED'));});
+test('pending current baseline recovery is independent of unfinished learning and rollover',()=>{const f=fixture();f.power.weekly90_10.state='PARTIAL_BLOCKED';const q=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals:{state:'UNVERIFIED',gamesVerified:0,gamesExpected:2}});assert.equal(q.currentBaseline.required,true);assert.equal(q.currentBaseline.nextAction,'RUN_ACTIVE_BASELINE_RECOVERY');assert.equal(q.currentBaseline.historicalLearningBlocksReview,false);assert.equal(q.currentBaseline.requiresSeparateResearchRuntime,true);assert.equal(q.rollover.required,false);assert.equal(q.state,'CURRENT_WITH_LIMITATIONS');assert.equal(q.completion.components.historicalLearning.state,'INCOMPLETE');assert.ok(q.processProblems.some(p=>p.code==='INITIAL_BASELINE_RECOVERY_REQUIRED'));});
 console.log(`GRAHAM WEEKLY PRODUCTION: ${count} PASS`);

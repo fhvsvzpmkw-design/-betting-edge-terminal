@@ -1,6 +1,6 @@
 # Graham Week Rollover Authority
 
-October 20 handoff correction: follow `GRAHAM_WEEKLY_PRODUCTION.md`. When the active slate has a verified exact final-facts record, consume the current carried-rating ledger directly after earlier learning is COMPLETE and applied/read back. Its old game predictions must remain as originally issued; post-kickoff refresh of that old display is not an activation prerequisite. Run the updated `--rollover-handoff --strict` check. It retains the complete earlier-learning gate and verifies actual final-slate completion separately. No provisional or unsupported rating becomes a completed input through this amendment.
+November 4 publication rule. Open the next week once the active slate's exact final facts and the latest published 32-team rating ledger are verified. The first board uses those source-bound ratings and marks incomplete learning and current availability explicitly. Historical 90/10 stays in its own chronological queue inside the same workflow.
 
 - Authority version: 1.0
 - Status: OPERATIONAL
@@ -10,9 +10,9 @@ Read and apply `GRAHAM_SCHEDULED_TASK_AUTHORITY.md` first. Its lifecycle and sou
 
 ## Preserved task-specific operating instructions
 
-OCTOBER 7 UNFINISHED EARLIER-LEARNING HANDOFF GATE. Before activating another week, inspect the power-rating ledger's receipt for sourceWeek=activeWeek-1 and targetWeek=activeWeek, together with matching APPLIED staging and the active board's carried bases. For active Week 2 onward, that earlier-slate receipt must be COMPLETE, paired for the exact preserved slate, and remotely verified as propagated. If it is missing, partial, mismatched or unpropagated, preserve the active manifest and report ROLLOVER BLOCKED — UNFINISHED EARLIER LEARNING, with exact source/target weeks and unfinished games or publication action. The existing 90/10 owner resolves that dependency. Do not require the newly completed active slate's update before its own rollover: its learning still applies only after the next week is activated. Current-week unresolved live availability does not stand in for the earlier-learning check. Preserve older background receipts without silently rebasing them. This user-authorized gate supersedes the older instruction that final scores alone permit activation.
+PUBLISH THE CURRENT WEEK FIRST. The supported board is due on the live Private Line by Tuesday at 5 p.m. Pacific. Verify the existing ledger bytes and each rating's provenance, current schedule, H4, QB production and fair decomposition. Disclose carried inputs and hold only the game whose required inputs prevent a supported number. Preserve every original pregame publication and grade. The 90/10 owner retains the oldest pending source/target pair when the active week advances.
 
-Run `node tools/graham-weekly-completion.mjs --rollover-handoff --strict` against current main before any activation write. A failed exit blocks activation. The check ignores current-week live availability and initial-baseline readiness; those keep their own owners and do not authorize skipping the earlier-learning dependency. Week 1 has no earlier regular-season learning and returns NOT_APPLICABLE.
+Run `node tools/graham-weekly-completion.mjs --rollover-handoff --strict` on current main before writing. It verifies the final slate gate and reports the historical and propagation statuses separately. After activating, verify the QB production run, the exact terminal and the deployed feed via the independent readback. If publication is stale, the existing coordinator resumes the current publication rather than activating another week.
 
 Perform Graham Mercer's mechanical NFL weekly rollover in GitHub repo fhvsvzpmkw-design/-betting-edge-terminal, but apply the ACTIVE-WEEK COMPLETION GATE before changing anything.
 

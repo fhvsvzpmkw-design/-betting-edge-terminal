@@ -70,25 +70,40 @@ export function resolveGrahamActiveWeek({root=process.cwd(),manifestPath=null,re
   };
 }
 
-// Resolve the current completed-game work before opening dated recovery material.
+export function weeklyLearningSourceWeek(active, power) {
+  if (active.week < 2) return null;
+  const receipt = power.weekly90_10;
+  if (!receipt || (receipt.season ?? power.season) !== active.season) return 1;
+  const sourceWeek = receipt.sourceWeek;
+  if (!Number.isInteger(sourceWeek) || sourceWeek < 1 || sourceWeek >= active.week ||
+      receipt.targetWeek !== sourceWeek + 1) throw Error('WEEKLY_LEARNING_CURSOR_INVALID');
+  const complete = receipt.state === 'COMPLETE' && receipt.marketViewed === false &&
+    Number.isInteger(receipt.gamesProcessed) && receipt.gamesProcessed > 0 &&
+    receipt.gamesUpdated === receipt.gamesProcessed && receipt.teamsUpdated === receipt.gamesProcessed * 2 &&
+    Array.isArray(receipt.blockedGames) && receipt.blockedGames.length === 0;
+  return Math.min(active.week - 1, sourceWeek + Number(complete));
+}
+
+// Resolve the oldest pending completed-game work before opening dated recovery material.
 // This is read-only discovery: it neither validates numerical inputs nor authorizes a write.
 export function weeklyRecoveryContext({root=process.cwd(),manifestPath=null}={}) {
   const list=x=>Array.isArray(x)?x:[];
   const fail=message=>{throw Error(message);};
   const active=resolveGrahamActiveWeek({root,manifestPath});
-  const base={schema:1,season:active.season,targetWeek:active.week,marketViewed:false,
+  const base={schema:1,season:active.season,activeWeek:active.week,marketViewed:false,
     activeManifestPath:active.manifestPath,currentWeekPaths:active.paths,
     initialBaselineOwner:'TUESDAY_BASELINE',
     baselineRule:'An initial current-week baseline is required independently of new 90/10 updates. A later rating change requires a separate governed refresh.'};
-  if(active.week===1)return {...base,state:'NOT_APPLICABLE',sourceWeek:null,evidencePathsNewestFirst:[]};
-  const sourceWeek=active.week-1,prior=grahamWeekPaths(active.season,sourceWeek,{root});
+  if(active.week===1)return {...base,state:'NOT_APPLICABLE',sourceWeek:null,targetWeek:null,evidencePathsNewestFirst:[]};
   const read=relative=>JSON.parse(fs.readFileSync(path.join(root,relative),'utf8'));
-  const priorBoard=read(prior.relative.currentNumbers);
-  if(priorBoard.season!==active.season||priorBoard.week!==sourceWeek)fail('RECOVERY_PRIOR_WEEK_IDENTITY');
   const power=read('data/walters/nfl-power-ratings-ledger.json');
   if(power.season!==active.season)fail('RECOVERY_RATING_SEASON_IDENTITY');
+  const sourceWeek=weeklyLearningSourceWeek(active,power),targetWeek=sourceWeek+1;
+  const prior=grahamWeekPaths(active.season,sourceWeek,{root});
+  const priorBoard=read(prior.relative.currentNumbers);
+  if(priorBoard.season!==active.season||priorBoard.week!==sourceWeek)fail('RECOVERY_PRIOR_WEEK_IDENTITY');
   const receipt=power.weekly90_10||null;
-  const matches=receipt&&receipt.sourceWeek===sourceWeek&&receipt.targetWeek===active.week&&
+  const matches=receipt&&receipt.sourceWeek===sourceWeek&&receipt.targetWeek===targetWeek&&
     (receipt.season==null||receipt.season===active.season);
   const summarize=x=>({season:x.season??power.season,sourceWeek:x.sourceWeek,targetWeek:x.targetWeek,
     state:x.state,gamesUpdated:x.gamesUpdated??null,teamsUpdated:x.teamsUpdated??null,
@@ -113,12 +128,12 @@ export function weeklyRecoveryContext({root=process.cwd(),manifestPath=null}={})
     }
   }
   bundles.sort((a,b)=>Date.parse(b.recordedAt)-Date.parse(a.recordedAt)||a.path.localeCompare(b.path));
-  return {...base,state:discoveryErrors.length?'EVIDENCE_DISCOVERY_BLOCKED':'CONTEXT_RESOLVED',sourceWeek,
+  return {...base,state:discoveryErrors.length?'EVIDENCE_DISCOVERY_BLOCKED':'CONTEXT_RESOLVED',sourceWeek,targetWeek,
     priorWeekPaths:prior.relative,receiptState:matches?receipt.state:'MISSING_MATCHING_RECEIPT',
     currentReceipt:matches?summarize(receipt):null,
     olderUnresolvedReceipts:receipts.filter(x=>x.sourceWeek<sourceWeek&&x.state==='PARTIAL_BLOCKED').map(summarize),
     evidenceDirectory:directory,evidencePathsNewestFirst:bundles.map(b=>b.path),discoveryErrors,
-    evidenceRule:'Reuse additive current-source-week bundles together. Older unresolved receipts are preserved background, not the active assignment. Discovery is not numerical approval.'};
+    evidenceRule:'Reuse additive evidence for this source week. Older archived exceptions remain visible for governed correction. Discovery identifies work for the existing numerical validator.'};
 }
 
 function parseCli(argv){

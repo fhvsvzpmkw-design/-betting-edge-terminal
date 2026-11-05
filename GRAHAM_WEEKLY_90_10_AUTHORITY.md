@@ -1,6 +1,6 @@
 # Graham weekly 90/10 authority
 
-October 20 production coordination: `GRAHAM_WEEKLY_PRODUCTION.md` replaces the fragmented task-to-task recovery handoff and supersedes the old four-run cadence with hourly Vancouver checks by this existing automation. A verified complete queue with no newly final game is a quick no-op. The existing automation first executes this historical-learning authority, then may continue as the separately governed rollover/initial-baseline coordinator when eligible. Each phase retains its own writer, source and runtime boundaries. Use `tools/graham-weekly-readiness.mjs` for the exact current queue and explicitly escalate unchanged six-hour blockers. Do not wait for a later Tuesday after a dependency clears. All numerical and evidence requirements below remain in force; completion still requires validated paired inputs and actual publication.
+November 4 publication amendment. Follow `GRAHAM_WEEKLY_PRODUCTION.md`. The active board and historical source/target weeks advance independently. In each pass, address the current publication and baseline first. Keep the oldest unfinished weekly receipt in the learning queue while the board advances. Continue existing market-free evidence and chronological validation.
 
 Version 1.9 — verified chronological closeout, 2026-10-09.
 
@@ -38,7 +38,7 @@ For incomplete games, persist precise team/player/input blockers and the next so
 
 Report three separate outcomes: historical learning applied/expected games, published ratings propagated to the current board, and current-week personnel/QB readiness. Current-week injury news cannot block a supported historical 90/10 transaction. Historical completion cannot certify live availability. After publication, verify the automatic separate rating-base refresh and terminal readback; repair a failed handoff through its existing owner, without creating another task or calculator.
 
-At the next rollover, unfinished learning from the week preceding the active week must be resolved before advancing again. The newly completed active slate needs prepared evidence, not an already applied update before its own rollover. This prevents another week from hiding a known unresolved dependency while preserving the existing rollover-then-learning order. See the explicit handoff gate in `GRAHAM_WEEK_ROLLOVER_AUTHORITY.md`.
+At rollover, retain all unfinished historical work under its original source week. The next board uses the verified carried ledger. After the current learning receipt is complete and published rating bases are synchronized, advance learning by one source week.
 
 ## v1.7 — required completion and retry handoff
 
@@ -92,7 +92,7 @@ The evaluator reserves all chain occupants against duplicate replacement credit,
 
 ## Active recovery routing clarification
 
-Before dated evidence selection, run `node tools/graham-active-week.mjs --weekly-recovery-context`. Resolve targetWeek from the existing active-week authority and sourceWeek=targetWeek-1. Use the returned current-source-week evidence paths newest first, reusing earlier additive bundles for that same week. Discovery is not numerical validation; preserve and resolve any discovery errors before numerical work. A dated recovery example below never overrides the resolved source week. Older unresolved receipts remain preserved background and are investigated only for a specific identified dependency. Do not create a new rating attempt merely to repeat an unchanged blocked receipt.
+Before dated evidence selection, run `node tools/graham-active-week.mjs --weekly-recovery-context`. Its `activeWeek` identifies the live board and its `sourceWeek` and `targetWeek` bind the learning attempt. Read the returned source-week evidence paths newest first and preserve additive evidence. Discovery is separate from numerical validation.
 
 Initial current-week baseline construction is separate from a subsequent rating-driven refresh. Zero new 90/10 updates does not cancel an initial baseline. If the baseline has already completed, preserve that result; a later supported rating update requires a separate governed refresh. This clarification changes no formula, numerical permission, task schedule or publication ownership. The approved replacement convention, historical binding amendment and preserved original authority below retain their existing precedence.
 
@@ -128,9 +128,9 @@ PR validation uses proposed code and never publishes ratings. Only non-PR workfl
 
 Run Graham Mercer's source-exact Walters weekly NFL power-rating update in GitHub repo fhvsvzpmkw-design/-betting-edge-terminal on authoritative branch main. This is a PRE-BASELINE task and must finish before the Tuesday 11:00 Graham Baseline. Preserve the existing Tuesday 10:00 America/Vancouver schedule. This task owns completed-game rating learning only, not current-week fair construction.
 
-ACTIVE-WEEK AUTHORITY FIRST. Read data/walters/nfl/active-week.json and tools/graham-active-week.mjs. Require schema=1, state=ACTIVE and authority=GRAHAM_WEEK_ROLLOVER. Resolve the current active week only through that manifest/resolver. Do not infer the week from the calendar, filenames, market data or memory. This task never advances the week. If the active week is unresolved, preserve all ratings and report WALTERS 90/10 BLOCKED — ACTIVE WEEK UNRESOLVED.
+ACTIVE AND LEARNING AUTHORITIES. Resolve the active board only through `data/walters/nfl/active-week.json`. Resolve the learning pair from `tools/graham-active-week.mjs --weekly-recovery-context`. The weekly updater never advances the active manifest.
 
-ROLLOVER/PREVIOUS-WEEK GATE. This task applies only after the prior NFL week has completed and rollover activated the next week. For active Week 1 with no completed prior 2026 regular-season week, make no rating changes and report NOT APPLICABLE. For Week 2 onward, require the immediately preceding regular-season week to be complete. Resolve preserved prior-week paths through grahamWeekPaths in tools/graham-active-week.mjs. Use the preserved prior-week schedule/current-numbers and authoritative final results. Never assume sixteen games; match the actual preserved regular-season slate including bye weeks. If completion or exact identity cannot be verified, preserve affected ratings rather than guessing.
+SOURCE SLATE GATE. Require exact verified finals and immutable game identities from the resolved learning source week. Its target is the next chronological week and may precede the current active board. Keep the carried-rating ledger bound to the original source/target pair.
 
 WALTERS SOURCE-LOCKED METHOD — MANDATORY. Load the ChatGPT File Library Walters package, including walters-full-analysis-v1.0.md, the verified/clean Chapters 21–22 transcription and walters-rule-registry-v0.1.json when available. Treat BW-R016/BW-R017/BW-R018 and pages 259–262 as source authority. Use exactly:
 TGPL_T = score_margin_T + opponent_old_rating + team_injury_loss - opponent_injury_loss - team_location_advantage
@@ -157,7 +157,7 @@ Before ending a partial run, make one targeted reconciliation pass when newly su
 
 BOUNDARIES. Do not calculate current-week fair spreads, apply current-week personnel/QB/game factors, consult ESPN FPI, Pinnacle, Bet365, DraftKings or any sportsbook, or issue a BET. The weekly workflow may publish only the power-rating ledger and its existing staging/audit result; active-week board, research, personnel and manifest must remain unchanged. No new production framework or rating file.
 
-READBACK. After workflow SUCCESS, re-read active-week.json and the power-rating ledger from remote main. Require the same active authority/week, exact source/target weeks, correct cumulative receipt, correct newly appended event inputs/arithmetic and preserved successful prior events, seeds and unrelated team fields. Re-read the exact APPLIED staging result and verify its receipt matches the ledger. Never describe an unverified write as complete. Report COMPLETE or PARTIAL_BLOCKED, new versus already-applied games/teams, largest NEW upgrades/downgrades, explicit blocked games and actionable reasons. If no new game resolved, say zero additional ratings updated, not full recovery complete.
+READBACK. After workflow success, verify the active manifest, exact resolved source/target pair, cumulative receipt, paired arithmetic, APPLIED staging and append-only history on remote main. The existing rating refresh forwards the verified changes into unstarted active games. Check the live board separately.
 
 ## Historical input correction and forward replay — October 20
 

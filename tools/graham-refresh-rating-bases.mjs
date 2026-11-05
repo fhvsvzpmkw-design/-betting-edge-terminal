@@ -26,8 +26,9 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
   const baselinePending=!baselineComplete(board.baselineStatus);
   const receipt=power.weekly90_10;
   const correction=staging.auditType===HISTORICAL_CORRECTION;
-  if(staging.state!=='APPLIED'||(!correction&&staging.auditType!=='WALTERS_WEEKLY_90_10')||(correction&&!verifiedCorrectionPublication(power,staging))||staging.marketViewed!==false||receipt?.marketViewed!==false||receipt.sourceWeek!==active.week-1||receipt.targetWeek!==active.week||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))fail('APPLIED_WEEKLY_RECEIPT_REQUIRED');
+  if(staging.state!=='APPLIED'||(!correction&&staging.auditType!=='WALTERS_WEEKLY_90_10')||(correction&&!verifiedCorrectionPublication(power,staging))||staging.marketViewed!==false||receipt?.marketViewed!==false||receipt.sourceWeek!==receipt.targetWeek-1||receipt.targetWeek>active.week||(correction&&receipt.targetWeek!==active.week)||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))fail('APPLIED_WEEKLY_RECEIPT_REQUIRED');
   if(!Number.isFinite(Date.parse(effectiveAt))||Date.parse(effectiveAt)<Date.parse(staging.appliedAt)||!/^[0-9a-f]{40}$/.test(powerBlobSha))fail('SOURCE_OR_TIME_INVALID');
+  const currentWeekLearning=receipt.targetWeek===active.week;
   const changed=new Map((staging.result.ratingChanges||[]).map(c=>[c.team,c]));
   const byTeam=new Map(power.teams.map(t=>[t.abbr,t]));
   const result=structuredClone(board),games=[],frozenStartedGames=[];
@@ -98,13 +99,13 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
     if(!withheld)g.grahamAsOf=effectiveAt;
     if(!withheld&&g.qbPerformanceStatus==='OPERATIONAL_SCOPED_APPLIED')g.qbPerformanceBaseExactFairHome=round(g.grahamExactFairHome-g.qbPerformancePointsToHomeSpread);
     g.ratingCarryForward={...g.ratingCarryForward,awayRating:away.currentRating,homeRating:home.currentRating,sourceBlobSha:powerBlobSha,sourceUpdatedAt:power.updatedAt,marketViewed:false};
-    const blocked=new Set(receipt.blockedGames.flatMap(x=>[x.away,x.home]));
-    g.weeklyRatingInput={...g.weeklyRatingInput,state:receipt.state,sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,awayCurrentRating:away.currentRating,homeCurrentRating:home.currentRating,awayUpdateState:blocked.has(g.away)?'PRESERVED_BLOCKED':'UPDATED',homeUpdateState:blocked.has(g.home)?'PRESERVED_BLOCKED':'UPDATED',blockedTeams:[g.away,g.home].filter(t=>blocked.has(t)),sourceBlobSha:powerBlobSha,appliedToFair:true,applicationStatus:'APPLIED',marketViewed:false};
+    const blocked=new Set(currentWeekLearning?receipt.blockedGames.flatMap(x=>[x.away,x.home]):[g.away,g.home]);
+    g.weeklyRatingInput={...g.weeklyRatingInput,state:currentWeekLearning?receipt.state:'PARTIAL_BLOCKED',sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,awayCurrentRating:away.currentRating,homeCurrentRating:home.currentRating,awayUpdateState:blocked.has(g.away)?'PRESERVED_BLOCKED':'UPDATED',homeUpdateState:blocked.has(g.home)?'PRESERVED_BLOCKED':'UPDATED',blockedTeams:[g.away,g.home].filter(t=>blocked.has(t)),sourceBlobSha:powerBlobSha,appliedToFair:true,applicationStatus:'APPLIED',marketViewed:false};
     if(!withheld)g.informationStatus=baselinePending?'PUBLISHED_RATING_BASE_SYNCED_BASELINE_PENDING':'WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE';
     g.sourceRefs=[...new Set([...g.sourceRefs,'data/walters/nfl/carried-rating-audit-staging.json'])];
     games.push({gameKey:g.gameKey,neutralDelta:delta,before,after:{neutralBaseHome:neutral,exactFairHome:g.grahamExactFairHome,displayedFairHome:g.grahamFairHome}});
   }
-  if(receipt.state==='COMPLETE'){
+  if(currentWeekLearning&&receipt.state==='COMPLETE'){
     const finals=staging.priorWeekCompletion?.finals;
     if(receipt.blockedGames.length||!Array.isArray(finals)||!finals.length||new Set(finals.map(g=>g.gameKey)).size!==finals.length||receipt.gamesProcessed!==finals.length||receipt.gamesUpdated!==finals.length||receipt.teamsUpdated!==finals.length*2)fail('COMPLETE_RECEIPT_COVERAGE_INVALID');
     for(const g of result.games.filter(g=>!frozenStartedGames.includes(g.gameKey))){
