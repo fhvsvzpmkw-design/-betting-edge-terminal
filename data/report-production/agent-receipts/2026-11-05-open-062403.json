@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-06:00-open-2026-11-05",
+  "executionRunId": "2026-11-05T06:24:03.000-07:00|1",
+  "workBinding": {
+    "candidateId": "2026-11-05T06:24:03.000-07:00|1",
+    "feedBlobSha": "369ff43c526aec130a20861107b10d606cbf094b",
+    "checkpointPath": "data/report-production/checkpoints/2026-11-05-open-061421.json",
+    "assignmentRevision": 2,
+    "finalMergedRevision": 20,
+    "bindingNote": "Workers acknowledged the same run at 06:18:11 PT revision 2; the coordinator later retimed the unfrozen run for truthful issuance while preserving the exact feed, source board and assignments."
+  },
+  "mode": "AGENTS_READY",
+  "reason": "The broad 06:00 profile used two disjoint complete-event researchers and one independent reviewer for a 17-event, 102-selection slate.",
+  "workers": [
+    {
+      "id": "/root/researcher_1",
+      "role": "complete-event-researcher",
+      "readOnly": true,
+      "freshContextBoundary": "Exact candidate/feed/checkpoint acknowledgment preceded research; no shared mutation or child delegation.",
+      "assignmentIds": ["72909344", "72909346", "72909348", "72909350", "72909352", "72909354", "72909356", "72909358", "72909360"],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "observedClockWindow": {"after": "2026-11-05T13:15:33.358Z", "before": "2026-11-05T13:24:03.867Z"},
+      "clockLimitation": "The collaboration runtime exposed ordered returns but not message timestamps; exact child clocks are not invented.",
+      "state": "RETURNED",
+      "completedEvents": 9,
+      "completedSelections": 54,
+      "error": null
+    },
+    {
+      "id": "/root/researcher_2",
+      "role": "complete-event-researcher",
+      "readOnly": true,
+      "freshContextBoundary": "Exact candidate/feed/checkpoint acknowledgment preceded research; no shared mutation or child delegation.",
+      "assignmentIds": ["72909362", "72909364", "70898990", "70924426", "70898992", "71515980", "73719544", "73719546"],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "observedClockWindow": {"after": "2026-11-05T13:15:33.358Z", "before": "2026-11-05T13:24:03.867Z"},
+      "clockLimitation": "The collaboration runtime exposed ordered returns but not message timestamps; exact child clocks are not invented.",
+      "state": "RETURNED",
+      "completedEvents": 8,
+      "completedSelections": 48,
+      "error": null
+    },
+    {
+      "id": "/root/reviewer_1",
+      "role": "independent-critical-reviewer",
+      "readOnly": true,
+      "freshContextBoundary": "Exact candidate/feed/checkpoint acknowledgment preceded review; no shared mutation or child delegation.",
+      "assignmentIds": ["guy-shortlist:72909358", "guy-shortlist:72909346", "guy-shortlist:72909344", "cross-slate-challenge"],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "observedClockWindow": {"after": "2026-11-05T13:15:33.358Z", "before": "2026-11-05T13:24:03.867Z"},
+      "clockLimitation": "The collaboration runtime exposed ordered returns but not message timestamps; exact child clocks are not invented.",
+      "state": "RETURNED",
+      "completedReviews": 4,
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_ROUTINE_BROAD_POOL",
+      "workers": 3,
+      "question": "Cover the full 17-event slate, Guy's early NHL shortlist and one independent opposing-case review.",
+      "expectedQualityBenefit": "Complete-event market-family coverage plus an independent check on consequential apparent edges and source conflicts.",
+      "releaseCondition": "All assigned events and the independent challenge returned; no expansion was needed."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "All three Guy shortlist prices were worse than the exact Pinnacle reference and all relevant goalies were only projected; no Guy call cleared.",
+      "impact": "The coordinator rejected an apparent MoneyPuck-driven upgrade and retained zero-stake outcomes."
+    },
+    {
+      "finding": "Jacksonville-Baltimore had a first-start quarterback dependency and a Graham fair with partial weekly-rating and low-sample QB inputs; Boston-Pittsburgh Over 6.5 had only a 0.158-point market comparison and contrary score context.",
+      "impact": "The NFL spreads remain documented exact-contract/Graham shortfalls and the NHL total remains PASS rather than LEAN or BET."
+    }
+  ],
+  "completedWork": {
+    "eventsResearched": 17,
+    "selectionsAssessed": 102,
+    "independentReviews": 4,
+    "workerReturns": 3,
+    "coordinatorMergedEvents": 17,
+    "coordinatorDecisionCounts": {"BET": 0, "LEAN": 0, "WAIT": 0, "PASS": 90, "BLOCKED": 12},
+    "startupSaveState": "NOT_SEPARATELY_SAVED; this final receipt preserves the observed startup/acknowledgment bounds and all returns."
+  },
+  "remainingWork": [
+    "Six NCAAF, four NBA and two NFL spread selections retain exact-contract fair/reference shortfalls.",
+    "The two NFL spreads additionally retain the named Graham weekly-rating/QB calibration limitations."
+  ],
+  "recordedAt": "2026-11-05T13:27:00.000Z"
+}
