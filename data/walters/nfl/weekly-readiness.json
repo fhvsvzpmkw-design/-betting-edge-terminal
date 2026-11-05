@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 9,
-  "generatedAt": "2026-11-05T03:12:00.595Z",
+  "generatedAt": "2026-11-05T03:33:23.408Z",
   "state": "CURRENT_WITH_LIMITATIONS",
   "counts": {
     "historicalApplied": 6,
     "historicalExpected": 14,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 8,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 7,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 0,
     "ratingBasesBehind": 0,
@@ -50,7 +50,7 @@
         "gamesApplied": 0,
         "gamesExpected": null,
         "blockedGames": [],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "COMPLETE",
@@ -74,6 +74,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 6,
         "gamesExpected": 14
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       }
     ],
     "marketViewed": false
@@ -88,6 +91,63 @@
     "instruction": "Check for a live competing baseline runtime, then execute the full current-information baseline under the existing partial-weekly-input policy. Do not wait for historical learning or next-week rollover; preserve unresolved weekly and numerical inputs."
   },
   "historicalGames": [
+    {
+      "gameKey": "2026-W07-TB-CAR",
+      "away": "TB",
+      "home": "CAR",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-tb-car-source-confirmed-scratches.json",
+        "blobSha": "9e934d0cb97bb437fc3e05c6f7dd263a414f3147",
+        "recordedAt": "2026-11-05T03:29:18.209Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE_OFFICIAL",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "READY_FOR_BOUND_EVALUATOR",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-tb-car-source-confirmed-scratches.json"
+        },
+        "finalInactiveReserveAndElevationInventories": {
+          "state": "COMPLETE_SOURCE_BOUND_PAIRED",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-tb-car-source-confirmed-scratches.json"
+        },
+        "pairedParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+        },
+        "quarterbackParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+        },
+        "specialistParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+        },
+        "officialInGameInjuryReporting": {
+          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE; UNPRINTED INITIAL_BOUNDARIES_REMAIN_EXPLICIT",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+        }
+      },
+      "blockers": [],
+      "firstSeenAt": "2026-10-21T22:04:30.000Z",
+      "lastEvidenceAt": "2026-11-05T03:29:18.209Z",
+      "unchangedSince": "2026-11-05T03:29:18.209Z",
+      "stalled": false,
+      "fingerprint": "1ad4cbca7b27e842ecf5cb28c4c61fa32d5a82853e4eef8a93900a284b0fe1c6",
+      "followUp": null,
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
+    },
     {
       "gameKey": "2026-W07-NYG-HOU",
       "away": "NYG",
@@ -194,95 +254,82 @@
       "lastEvidenceAt": "2026-11-04T00:22:50Z",
       "unchangedSince": "2026-11-04T00:22:50Z",
       "stalled": true,
-      "fingerprint": "bd9b8166994e4a3fe637c2872330cb54623349ec775408d13e9e4f3dfd20abd2",
+      "fingerprint": "db9cd7f00a69c96eace4d010c040377d8073b29f3c18ed91e1264da7665e70b5",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Verify Newsome’s ordinary and actual outside/slot roles with signed final lineup; bind eligible disjoint actual/role-depth relief. Verify Nubin’s one snap or another eligible safety, and classify Mbow/R. Reed/Sills.",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
-      "gameKey": "2026-W07-TB-CAR",
-      "away": "TB",
-      "home": "CAR",
+      "gameKey": "2026-W07-PIT-NO",
+      "away": "PIT",
+      "home": "NO",
       "state": "RECONCILE",
       "workClass": "AVAILABLE_WORK",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-tb-car-targeted-reconciliation.json",
-        "blobSha": "c49e33032044cd25b0c9b75d5620165de9da3078",
-        "recordedAt": "2026-11-04T00:23:02Z"
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json",
+        "blobSha": "0dad30a474aec7dd2e7b56b8dc45d217710f993b",
+        "recordedAt": "2026-11-04T00:22:41.705Z"
       },
       "checklist": {
         "verifiedFinalResult": {
           "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         },
         "frozenKickoffRatingsAndH4": {
           "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         },
         "pairedGameDayInjuryLoss": {
           "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         },
         "finalInactiveReserveAndElevationInventories": {
-          "state": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS_WITH_ELEVATION_CATEGORY_LIMITATION_EXPLICIT",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "state": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         },
         "pairedParticipation": {
           "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         },
         "quarterbackParticipation": {
           "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         },
         "specialistParticipation": {
           "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         },
         "officialInGameInjuryReporting": {
-          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE; UNPRINTED INITIAL_BOUNDARIES_REMAIN_EXPLICIT",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json"
+          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE_BOUNDARIES_STILL_UNRESOLVED",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
         }
       },
       "blockers": [
         {
-          "code": "EVALUATOR_ARCHIVED_NON_INJURY_CLOSURE_REQUIRED",
-          "team": "CAR",
-          "player": "A.J. Dillon",
-          "caseKey": "2026-W07-CAR-A-J-Dillon",
-          "finding": "Exact frozen Dillon identity EA 20917 at 0.2; archived ACTIVE_FULL contradicts official gamebook and both club inactive lists. Official Bucs report lists Phillips as the injury inactive; Dillon had full practice each day and no final injury designation. No established loss due to injury. The evaluator requires retention of every archived case and disallows coverage exclusion for an archived identity; it has no appropriate archived healthy-scratch route.",
-          "nextAction": "Use an explicitly authorized evaluator method that retains the old case, requires official non-injury inactive evidence, closes injury loss at zero, and never labels Dillon as an active participant or roster exit.",
-          "sourceIds": [
-            "tb-car-gamebook",
-            "tb-inactive",
-            "car-inactive",
-            "tb-injury"
-          ]
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "All available official inactive, reserve, elevation, starter, substitute, DNP, quarterback and specialist evidence is assembled. Remaining cases require immutable-value or governed expected-role/replacement allocation decisions: PIT Joseph-Day, Echols, Heidenreich and Terell Smith; NO Saldiveri, Ruiz, Shepherd, Tyree Wilson, Mike Reid and Treyton Welch. Missing values are not zero, and special-teams-only activity does not establish a defensive replacement effect.",
+          "footballImpact": "Open cases span offensive-line continuity, defensive-line/edge rotations and secondary or reserve depth; premature estimates could duplicate duties or fabricate roles.",
+          "nextAction": "Use the existing immutable registry and approved labelled estimates where eligible; apply one-for-one or distinct-cluster safeguards to the official gamebook participants, and route only the residual source/method decisions to the existing owners.",
+          "owner": "GRAHAM_WALTERS_90_10"
         },
         {
-          "code": "ARCHIVED_NON_INJURY_STATUS_RECONCILIATION",
-          "team": "CAR",
-          "player": "Ja'Tavion Sanders",
-          "caseKey": "2026-W07-CAR-Ja-Tavion-Sanders",
-          "finding": "Official final inactive records classify the unavailable Carolina players and identify Phillips as the injury inactive. Sanders was inactive without a game injury designation; frozen healthy value is zero, but the archived status should be retained and corrected accurately.",
-          "nextAction": "Include Sanders in the same source-confirmed archive-preserving non-injury status review; do not label him active or silently conflate a healthy scratch with an injury absence.",
-          "sourceIds": [
-            "tb-car-gamebook",
-            "tb-inactive",
-            "car-inactive",
-            "tb-injury"
-          ]
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Justin Reid’s departure has an official Q2 0:43 latest boundary and distinct Howden relief. Donaldson’s exact approved EA binding is available; calibrated zero avoids assuming an exit time. These are independent case inputs and have not been merged with both full team sections.",
+          "nextAction": "Carry the verified Reid and Donaldson facts into the two complete candidate teams and reconcile the remaining archived replacement roles.",
+          "owner": "GRAHAM_WALTERS_90_10"
         }
       ],
-      "firstSeenAt": "2026-10-21T22:04:30.000Z",
-      "lastEvidenceAt": "2026-11-04T00:23:02Z",
-      "unchangedSince": "2026-11-04T00:23:02Z",
+      "firstSeenAt": "2026-10-25T17:06:23.081Z",
+      "lastEvidenceAt": "2026-11-04T00:22:41.705Z",
+      "unchangedSince": "2026-11-04T00:22:41.705Z",
       "stalled": true,
-      "fingerprint": "6fa7f085f1fc269677aa383c191c4fab8f899b37081f10ca0e3aae9c9cce9fd0",
+      "fingerprint": "c7e05f406369a4603a1d82c50578c21fd51f14312d19c90fe2b4185ed638d59c",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Use an explicitly authorized evaluator method that retains the old case, requires official non-injury inactive evidence, closes injury loss at zero, and never labels Dillon as an active participant or roster exit.",
+      "nextAction": "Carry the verified Reid and Donaldson facts into the two complete candidate teams and reconcile the remaining archived replacement roles.",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
@@ -376,7 +423,8 @@
       "lastEvidenceAt": "2026-11-04T00:22:50Z",
       "unchangedSince": "2026-11-04T00:22:50Z",
       "stalled": true,
-      "fingerprint": "31202265f7d1d92da6927ab8496f5e048565991d7c0056870122e0d824af8f54",
+      "fingerprint": "ed7048cbb6465f6025f01d1382433d9ad1f1e6eaf4449a2dbd14e3e6da7f4e5c",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Confirm a separate Brents corner shift or distinct available role from club/participation (and classify Dial injury vs healthy inactive). If capacity exhausted, explicitly enumerate active CB candidates and common or already allocated roles.",
@@ -499,7 +547,8 @@
       "lastEvidenceAt": "2026-11-04T00:22:50Z",
       "unchangedSince": "2026-11-04T00:22:50Z",
       "stalled": true,
-      "fingerprint": "265aea3bceb7acf37dfd5bc992db3abcdfc2d418dffb204fb519ccc51acbdebf",
+      "fingerprint": "50a25a6f9b4bf4cd4b064dd89bd7737b4847e49625c550fbca670945f1f533bf",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Identify actual nickel and whether a retained outside starter moved, then assess a disjoint vacancy/chain with Hobbs and Stout; do not invent a direct Jones-to-Hobbs slot replacement.",
@@ -576,10 +625,75 @@
       "lastEvidenceAt": "2026-11-04T00:28:20.798784Z",
       "unchangedSince": "2026-11-04T00:28:20.798784Z",
       "stalled": true,
-      "fingerprint": "ffa7c609e7e8bc5dbcf6fabfeb283b3bd3c26420545a07b75718cfa5a3fee997",
+      "fingerprint": "0feaae3c046cc96c6febaf82fbeefc94d5868b7e2685faffb956ea5656c958b4",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Locate game-specific substitution/alignments or a governed role-capacity method that preserves the healthy rotation and accounts for Roach’s separate interruption; do not assume Uwazurike replaced Allen.",
+      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+    },
+    {
+      "gameKey": "2026-W07-KC-SEA",
+      "away": "KC",
+      "home": "SEA",
+      "state": "RECONCILE",
+      "workClass": "TARGETED_RECONCILIATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-kc-sea-inactive-and-bolton-followup.json",
+        "blobSha": "2bbc3b593a9e37236ff1dd5c39faed1798e608ec",
+        "recordedAt": "2026-11-04T00:42:50.982Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE_OFFICIAL",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        },
+        "finalInactiveReserveAndElevationInventories": {
+          "state": "COMPLETE_SOURCE_BOUND",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        },
+        "pairedParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        },
+        "quarterbackParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        },
+        "specialistParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        },
+        "officialInGameInjuryReporting": {
+          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE; UNPRINTED INITIAL BOUNDARIES REMAIN EXPLICIT",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
+        }
+      },
+      "blockers": [
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Bolton missed the Q3 10:46 play. Cochrane made the joint tackle and is listed as Bolton’s backup, but also started his normal third-linebacker role. The play result and photograph do not establish whether Cochrane added the middle assignment or retained his ordinary duty. Shaheed’s added receiver and return responsibilities also require one explicit disjoint allocation between Horton and Kupp.",
+          "nextAction": "Obtain the defensive alignment or direct assignment evidence for Q3 10:46. Assemble the separately supported Cross and new calibrated-zero inactive cases and reconcile Shaheed’s combined role in both complete team sections.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ],
+      "firstSeenAt": "2026-10-26T04:09:24.166Z",
+      "lastEvidenceAt": "2026-11-04T00:42:50.982Z",
+      "unchangedSince": "2026-11-04T00:42:50.982Z",
+      "stalled": true,
+      "fingerprint": "efe8b583b5be6936e330e4ec0a3af70774d954a371b8353a32b72e66c1ebce3d",
+      "followUp": null,
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "Obtain the defensive alignment or direct assignment evidence for Q3 10:46. Assemble the separately supported Cross and new calibrated-zero inactive cases and reconcile Shaheed’s combined role in both complete team sections.",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
@@ -587,7 +701,7 @@
       "away": "DAL",
       "home": "PHI",
       "state": "RECONCILE",
-      "workClass": "AVAILABLE_WORK",
+      "workClass": "WAITING_SOURCE_OR_METHOD",
       "latestEvidence": {
         "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-dal-phi-targeted-reconciliation.json",
         "blobSha": "2ae5dbfcaa4f43061465c84f447964e5a7fede36",
@@ -654,143 +768,15 @@
       "lastEvidenceAt": "2026-11-04T00:30:45.361701Z",
       "unchangedSince": "2026-11-04T00:30:45.361701Z",
       "stalled": true,
-      "fingerprint": "55c4313248a94cb83aade9f2c98b3635066bd933a4b443570e56c950dd73c77a",
+      "fingerprint": "ccfcfbcbced0584c9012f52a52bfd41e000e3b7a4e3648b92b8ae088a1d6485d",
+      "followUp": {
+        "state": "WAITING_SOURCE_OR_METHOD",
+        "reason": "CHRONOLOGY_REQUIRES_GOVERNED_RESOLUTION",
+        "resumeWhen": "New source facts or an approved method changes the recorded blocker."
+      },
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Preserve current review and open a separately governed chronology/rebase route if authorized. No hand-written rating adjustment.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W07-PIT-NO",
-      "away": "PIT",
-      "home": "NO",
-      "state": "RECONCILE",
-      "workClass": "TARGETED_RECONCILIATION",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json",
-        "blobSha": "0dad30a474aec7dd2e7b56b8dc45d217710f993b",
-        "recordedAt": "2026-11-04T00:22:41.705Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        },
-        "finalInactiveReserveAndElevationInventories": {
-          "state": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        },
-        "pairedParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        },
-        "quarterbackParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        },
-        "specialistParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        },
-        "officialInGameInjuryReporting": {
-          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE_BOUNDARIES_STILL_UNRESOLVED",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "All available official inactive, reserve, elevation, starter, substitute, DNP, quarterback and specialist evidence is assembled. Remaining cases require immutable-value or governed expected-role/replacement allocation decisions: PIT Joseph-Day, Echols, Heidenreich and Terell Smith; NO Saldiveri, Ruiz, Shepherd, Tyree Wilson, Mike Reid and Treyton Welch. Missing values are not zero, and special-teams-only activity does not establish a defensive replacement effect.",
-          "footballImpact": "Open cases span offensive-line continuity, defensive-line/edge rotations and secondary or reserve depth; premature estimates could duplicate duties or fabricate roles.",
-          "nextAction": "Use the existing immutable registry and approved labelled estimates where eligible; apply one-for-one or distinct-cluster safeguards to the official gamebook participants, and route only the residual source/method decisions to the existing owners.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Justin Reid’s departure has an official Q2 0:43 latest boundary and distinct Howden relief. Donaldson’s exact approved EA binding is available; calibrated zero avoids assuming an exit time. These are independent case inputs and have not been merged with both full team sections.",
-          "nextAction": "Carry the verified Reid and Donaldson facts into the two complete candidate teams and reconcile the remaining archived replacement roles.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-25T17:06:23.081Z",
-      "lastEvidenceAt": "2026-11-04T00:22:41.705Z",
-      "unchangedSince": "2026-11-04T00:22:41.705Z",
-      "stalled": true,
-      "fingerprint": "9390d5ec55274bd3e38e2f8200ea420c79c1a62d20b990285f76d2fcfcae3443",
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Use the existing immutable registry and approved labelled estimates where eligible; apply one-for-one or distinct-cluster safeguards to the official gamebook participants, and route only the residual source/method decisions to the existing owners.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W07-KC-SEA",
-      "away": "KC",
-      "home": "SEA",
-      "state": "RECONCILE",
-      "workClass": "TARGETED_RECONCILIATION",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-kc-sea-inactive-and-bolton-followup.json",
-        "blobSha": "2bbc3b593a9e37236ff1dd5c39faed1798e608ec",
-        "recordedAt": "2026-11-04T00:42:50.982Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        },
-        "finalInactiveReserveAndElevationInventories": {
-          "state": "COMPLETE_SOURCE_BOUND",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        },
-        "pairedParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        },
-        "quarterbackParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        },
-        "specialistParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        },
-        "officialInGameInjuryReporting": {
-          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE; UNPRINTED INITIAL BOUNDARIES REMAIN EXPLICIT",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Bolton missed the Q3 10:46 play. Cochrane made the joint tackle and is listed as Bolton’s backup, but also started his normal third-linebacker role. The play result and photograph do not establish whether Cochrane added the middle assignment or retained his ordinary duty. Shaheed’s added receiver and return responsibilities also require one explicit disjoint allocation between Horton and Kupp.",
-          "nextAction": "Obtain the defensive alignment or direct assignment evidence for Q3 10:46. Assemble the separately supported Cross and new calibrated-zero inactive cases and reconcile Shaheed’s combined role in both complete team sections.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-26T04:09:24.166Z",
-      "lastEvidenceAt": "2026-11-04T00:42:50.982Z",
-      "unchangedSince": "2026-11-04T00:42:50.982Z",
-      "stalled": true,
-      "fingerprint": "165c663e607a4494f534416f1b6a1b2929c638e425b2f7551e3eb4f55d4b8066",
-      "receiptBlockerSuperseded": true,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Obtain the defensive alignment or direct assignment evidence for Q3 10:46. Assemble the separately supported Cross and new calibrated-zero inactive cases and reconcile Shaheed’s combined role in both complete team sections.",
+      "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
@@ -848,7 +834,8 @@
       "lastEvidenceAt": "2026-11-04T00:24:08.535Z",
       "unchangedSince": "2026-11-04T00:24:08.535Z",
       "stalled": false,
-      "fingerprint": "ac373d034a49e2124661e226aaa863f4eac21d730404388c01d250dc18e7607d",
+      "fingerprint": "1d6ab5d2dc3e0981605775e38f8fe834bae6b9a45e3942baefed3ef6199bcb4c",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "PRESERVE_PAIRED_HISTORY",
@@ -909,7 +896,8 @@
       "lastEvidenceAt": "2026-10-23T05:10:00.000Z",
       "unchangedSince": "2026-10-23T05:10:00.000Z",
       "stalled": false,
-      "fingerprint": "16528f0b4bf36004b7ce34f6cc82004df295e805ae56e91decef4e194050553e",
+      "fingerprint": "a0306db48b6b7a91f31a27e14a58722b9331a582b0c9680a9a3c7f5de760dacf",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "PRESERVE_PAIRED_HISTORY",
@@ -970,7 +958,8 @@
       "lastEvidenceAt": "2026-11-04T00:24:58.195Z",
       "unchangedSince": "2026-11-04T00:24:58.195Z",
       "stalled": false,
-      "fingerprint": "20ca058c2a717b2096884aea8f7cdd914cea5aa7d9d3823cc22551b7330ae34d",
+      "fingerprint": "bf7a6f7e85969020e84aa7243ce7d638f20e26b026effe9b5c38fa49a679b6b4",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "PRESERVE_PAIRED_HISTORY",
@@ -1031,7 +1020,8 @@
       "lastEvidenceAt": "2026-11-04T00:28:04.751Z",
       "unchangedSince": "2026-11-04T00:28:04.751Z",
       "stalled": false,
-      "fingerprint": "449e55a128e1a41deddd900b1b9795b5fd0f310dc24a6e91897fd2fbdd89b8bb",
+      "fingerprint": "e8b68814f652d6cdf7ed9f57b24d3e8e8b704fc75edfa7486a280acdcbcfc1cf",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "PRESERVE_PAIRED_HISTORY",
@@ -1092,7 +1082,8 @@
       "lastEvidenceAt": "2026-11-04T00:37:15.534Z",
       "unchangedSince": "2026-11-04T00:37:15.534Z",
       "stalled": false,
-      "fingerprint": "266a18549068f09c51f21f882d0dbab5e9632272cd345a64866adad1c18346a2",
+      "fingerprint": "2439e9fa06385c5d23e8af8522749bfb46c867599be34b9088390271d951b57b",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "PRESERVE_PAIRED_HISTORY",
@@ -1153,7 +1144,8 @@
       "lastEvidenceAt": "2026-11-04T00:21:28.026Z",
       "unchangedSince": "2026-11-04T00:21:28.026Z",
       "stalled": false,
-      "fingerprint": "726ee3c29a8ac17c5103263180fdcea9fc1f6729abc967690c7af0edf314d8fc",
+      "fingerprint": "53c695a7480588622cc313ffec3cf6d0ef8187f0973c1aa49ce5810aa41637c3",
+      "followUp": null,
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "PRESERVE_PAIRED_HISTORY",
@@ -1166,13 +1158,12 @@
       "code": "STALLED_HISTORICAL_RECOVERY",
       "games": [
         "2026-W07-NYG-HOU",
-        "2026-W07-TB-CAR",
+        "2026-W07-PIT-NO",
         "2026-W07-MIA-NYJ",
         "2026-W07-SF-ATL",
         "2026-W07-DEN-ARI",
-        "2026-W07-DAL-PHI",
-        "2026-W07-PIT-NO",
-        "2026-W07-KC-SEA"
+        "2026-W07-KC-SEA",
+        "2026-W07-DAL-PHI"
       ]
     },
     {
@@ -1188,7 +1179,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-09-current-numbers.json": "94a5ed7ba15482f1dfe7e09357adf8a94d4ef094",
     "data/walters/nfl-power-ratings-ledger.json": "f1be521ec4760752732b2da121d3c3594f89dcc1",
-    "data/walters/nfl/carried-rating-audit-staging.json": "ba8fa76b59f2840c7f13b107bd7ffa9c9f56cad8",
+    "data/walters/nfl/carried-rating-audit-staging.json": "39c63a19f18323a54d7e3c8793e5fb16eaed080a",
     "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-current-open-inputs.json": "e4f223e4d3a5eebeb382b4bd052dcf9eb42d78df",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json": "82d2a67a14f58ea21b9174f8d9622ac78e9d7a9d",
@@ -1244,6 +1235,7 @@
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-kc-sea-inactive-and-bolton-followup.json": "2bbc3b593a9e37236ff1dd5c39faed1798e608ec",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-lar-lv-targeted-reconciliation.json": "578f85664dd751e51c1a0455d1a18e8e1b5a5af3",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json": "0dad30a474aec7dd2e7b56b8dc45d217710f993b",
-    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-tb-car-targeted-reconciliation.json": "c49e33032044cd25b0c9b75d5620165de9da3078"
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-tb-car-targeted-reconciliation.json": "c49e33032044cd25b0c9b75d5620165de9da3078",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-tb-car-source-confirmed-scratches.json": "9e934d0cb97bb437fc3e05c6f7dd263a414f3147"
   }
 }
