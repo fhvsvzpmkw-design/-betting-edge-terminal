@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-18:15",
+  "executionRunId": null,
+  "workBinding": {
+    "candidateId": "2026-11-04T18:30:15.000-07:00|5",
+    "feedBlobSha": "88d159e5cb126b07169e6865b90900f28c9ff1ce",
+    "checkpoint": "data/report-production/checkpoints/2026-11-04-late-1815-183015.json",
+    "checkpointRevision": 1,
+    "operatingRevision": "2026-11-01.AdaptiveResearchAgents"
+  },
+  "mode": "AGENTS_RUNNING",
+  "reason": "Seven complete-event queues and the NHL/Guy and exact-contract challenge questions justified the configured four researchers and two critical reviewers. All six existing threads returned exact-bound acknowledgments inside the 60-second startup window.",
+  "workers": [
+    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719534","73719536"],"acknowledgment":"BOUND","state":"RUNNING"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719538","73719540"],"acknowledgment":"BOUND","state":"RUNNING"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["72909340","72909342","guy-shortlist"],"acknowledgment":"BOUND","state":"RUNNING"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719542"],"acknowledgment":"BOUND","state":"RUNNING"},
+    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["nhl-and-guy-opposing-case-review"],"acknowledgment":"BOUND","state":"RUNNING"},
+    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-price-line-and-completeness-audit"],"acknowledgment":"BOUND","state":"RUNNING"}
+  ],
+  "scalingDecisions": [{"decision":"NORMAL_POOL","workers":6,"reason":"Seven events, 42 selections and 26 captured-forecast applicability reviews require complete-event parallelism plus two independent challenges.","expectedQualityBenefit":"Source-backed Support/Contrary, History Fit, exact identity, personnel/goalie depth and Guy shortlist review.","releaseCondition":"All assigned events and both critical reviews return or record an actual source-specific failure."}],
+  "qualityFindings": [],
+  "completedWork": {"acknowledgments":6,"eventResearch":0,"reviews":0,"checkpointedEvents":0},
+  "remainingWork": {"events":7,"reviews":2,"merge":"coordinator only","publication":"NOT_ISSUED"},
+  "recordedAt": "2026-11-05T01:32:00.000Z"
+}
