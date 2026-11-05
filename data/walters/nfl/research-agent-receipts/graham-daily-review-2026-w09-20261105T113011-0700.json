@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "DAILY_REVIEW",
+  "executionRunId": "graham-daily-review-2026-w09-20261105T113011-0700",
+  "workBinding": {
+    "phase": "ACTIVE_WEEK_DAILY_REVIEW",
+    "authoritativeOwnerCommit": "eb4b52b7d5fa9cefb1c58ad3c49a69f028995ec8",
+    "activeSeason": 2026,
+    "activeWeek": 9,
+    "runtimeId": "graham-daily-review-2026-w09-20261105T113011-0700",
+    "activeManifestBlobSha": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "baselineResearchLedgerBlobSha": "d57fcb7112639eb254e0b2ff0069cf3af31d1305",
+    "currentBoardBlobSha": "b88927edcaa6f976906aa717798692f5583911e0",
+    "priorVerifiedRunEventId": "graham-tuesday-baseline-2026-w09-20261104T200422-0800",
+    "verifiedCoverageEnd": "2026-11-05T04:17:54.238Z",
+    "acceptedEvidenceEnd": "2026-11-05T18:42:17.824Z",
+    "marketViewed": false
+  },
+  "mode": "AGENTS_PARTIAL",
+  "reason": "Two fresh-context researchers and one independent reviewer were launched. Researcher A returned clean coverage for eight games. Researcher B reported automatic market-bearing search-result exposure; its entire return was rejected. The clean reviewer independently re-covered those seven games from exact official URLs and challenged the two proposed additive findings.",
+  "workers": [
+    {
+      "role": "SOURCE_RESEARCHER",
+      "actualId": "/root/daily_review_research_a",
+      "boundary": "fresh-context; official NFL/team sources only; market-free; read-only; no shared writes; no delegation",
+      "assignments": [
+        "JAX-BAL",
+        "CIN-ATL",
+        "DEN-CAR",
+        "DAL-IND",
+        "NYJ-KC",
+        "DET-MIA",
+        "CLE-NO",
+        "NYG-PHI"
+      ],
+      "launchObservedAt": "2026-11-05T11:33:47-07:00",
+      "acknowledgmentObservedAt": null,
+      "acknowledgmentObservation": "Acknowledged within the 60-second bound; the exact coordinator clock was not exposed.",
+      "sourceObservationWindow": "2026-11-05T18:34:52Z/2026-11-05T18:36:51Z",
+      "returnObservedAt": null,
+      "returnObservation": "Returned clean before the reviewer assignment; the exact coordinator receipt clock was not exposed.",
+      "state": "RETURNED_CLEAN",
+      "error": null,
+      "completedGames": 8,
+      "acceptedGames": 8
+    },
+    {
+      "role": "SOURCE_RESEARCHER",
+      "actualId": "/root/daily_review_research_b",
+      "boundary": "fresh-context; official NFL/team sources only; market-free; read-only; no shared writes; no delegation",
+      "assignments": [
+        "LAR-WAS",
+        "HOU-LAC",
+        "LV-SF",
+        "GB-NE",
+        "ARI-SEA",
+        "TB-CHI",
+        "BUF-MIN"
+      ],
+      "launchObservedAt": "2026-11-05T11:33:47-07:00",
+      "acknowledgmentObservedAt": null,
+      "acknowledgmentObservation": "Acknowledged within the 60-second bound; the exact coordinator clock was not exposed.",
+      "sourceObservationWindow": "2026-11-05T18:35:24Z/2026-11-05T18:38:26Z",
+      "returnObservedAt": null,
+      "returnObservation": "Returned before independent re-review; the exact coordinator receipt clock was not exposed.",
+      "state": "STOPPED_CONTAMINATION_RETURN_REJECTED",
+      "error": "A broad search result automatically rendered market-bearing text. No finding from this worker was accepted or merged."
+    },
+    {
+      "role": "INDEPENDENT_REVIEWER_AND_CLEAN_RECOVERY",
+      "actualId": "/root/daily_review_reviewer",
+      "boundary": "fresh-context; exact official URLs only; market-free; read-only; no shared writes; no delegation",
+      "assignments": [
+        "Independent clean coverage of the seven rejected games",
+        "Critical review of CIN-ATL Thursday participation",
+        "Critical review of New Orleans kicker assignment"
+      ],
+      "launchObservedAt": "2026-11-05T11:33:47-07:00",
+      "acknowledgmentObservedAt": null,
+      "acknowledgmentObservation": "Acknowledged within the 60-second bound; the exact coordinator clock was not exposed.",
+      "sourceObservationWindow": "2026-11-05T18:40:18.976Z/2026-11-05T18:42:17.824Z",
+      "returnObservedAt": "2026-11-05T11:43:00-07:00",
+      "state": "RETURNED_CLEAN",
+      "error": null,
+      "reviewedGames": 15,
+      "independentlyRecoveredGames": 7
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "selectedPool": {
+        "researchers": 2,
+        "reviewers": 1
+      },
+      "launched": 3,
+      "namedQuestion": "What official post-baseline Week 9 availability, starter, practice, status or role evidence materially changed before the Thursday Daily Review?",
+      "expectedQualityBenefit": "Disjoint game ownership plus an independent identity, source-clock, replacement-duty and double-count challenge.",
+      "releaseCondition": "Return clean source-bound coverage; stop any contaminated lane and preserve exact remaining gaps."
+    },
+    {
+      "selectedPool": {
+        "researchers": 0,
+        "reviewers": 1
+      },
+      "launched": 0,
+      "namedQuestion": "Can the clean reviewer independently recover the contaminated seven-game lane from exact official URLs without broad search?",
+      "expectedQualityBenefit": "Preserve market isolation while avoiding an unreviewed seven-game gap.",
+      "releaseCondition": "Return exact official-page findings or explicit unavailable-source gaps. No replacement worker was needed."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "CIN-ATL Thursday participation and New Orleans' intended Charlie Smyth kicker assignment were genuinely additive after the verified baseline cutoff.",
+      "impact": "Both are recorded as current information only; neither supplies final availability, complete role allocation or governed numerical authority."
+    },
+    {
+      "finding": "Cross-posted official reports contain unresolved mismatches: GB-NE labels Keisean Nixon's injury differently, ARI-SEA omits Jacoby Brissett on one side, and Rams-side Week 9 data was unavailable from the exact supplied pages.",
+      "impact": "Do not normalize, infer or double count; retain these as explicit next-review gaps."
+    }
+  ],
+  "completedWork": [
+    "One clean researcher completed eight game reviews.",
+    "The independent reviewer cleanly recovered the seven rejected games and challenged the two additive findings.",
+    "All 15 active Week 9 games were covered through accepted market-free evidence; two non-numeric updates were accepted and the current board was preserved."
+  ],
+  "remainingWork": [
+    "JAX-BAL official inactive lists and unresolved Tuten, Walker, Randall and Wiggins decisions.",
+    "Thursday/Friday reports and final statuses across Sunday games; BUF-MIN first Monday-game rows.",
+    "Resolve CLE and MIN quarterback availability; confirm Seattle Lock health and successor ordering.",
+    "Resolve Rams-side report, Nixon injury-label conflict, Brissett omission and exact specialist/replacement allocations.",
+    "Keep Week 8-to-9 historical learning partial and the older Week 7 independent queue separate from current publication."
+  ],
+  "recordedAt": "2026-11-05T11:43:29-07:00"
+}
