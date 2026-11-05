@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-11-05T04:25:43.000Z",
+  "lastAppliedAt": "2026-11-05T23:53:03.877Z",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -898,9 +898,17 @@
     {
       "team": "MIN",
       "teamName": "Minnesota",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "MURRAY_HAMSTRING_MONDAY_REPORT_NOT_FILED",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "17543",
+        "gsisId": "00-0032950",
+        "playerName": "Carson Wentz",
+        "candidateValue": 6.35,
+        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+        "confidence": "LOW",
+        "evidenceDropbacks": 209
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "20430",
@@ -909,21 +917,24 @@
         "priorValue": 8.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 6.35,
       "embeddedBaselineQbValue": 8.25,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
+      "teamQbDelta": -1.9,
+      "gameContributionEligible": true,
       "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Minnesota's Kyler Murray has an unresolved hamstring issue and the Monday-game Week 9 injury report was not yet filed at the review cutoff. Preserve the last approved fair pending official starter availability.",
+        "researchFinding": "Minnesota's official Week 9 update states Kyler Murray is out for Monday against Buffalo, Carson Wentz will start, and Max Brosmer will back up. Apply only Wentz's frozen approved candidate through the existing QB calculator; preserve the embedded Kyler Murray baseline and all non-QB layers.",
         "sourceRefs": [
-          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-monday-nov-2"
+          "https://www.vikings.com/news/bills-injury-report-week-9-2026-nfl-season",
+          "https://www.vikings.com/news/quarterback-carson-wentz-monday-night-bills",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-11-05T04:25:43.000Z",
+      "lastUpdatedAt": "2026-11-05T23:53:03.877Z",
       "marketViewed": false,
-      "failClosedCode": "CURRENT_STARTER_AVAILABILITY_UNRESOLVED"
+      "failClosedCode": null,
+      "priorEstimate": null
     },
     {
       "team": "NE",
@@ -1463,7 +1474,8 @@
     "graham-week7-saturday-delta-qb-20261024T235430Z",
     "graham-tuesday-baseline-2026-w08-20261027T112200-0700-qb-01",
     "graham-daily-review-2026-w08-20261030T113155-0700-qb-01",
-    "graham-tuesday-baseline-2026-w09-20261104T200422-0800-qb-01"
+    "graham-tuesday-baseline-2026-w09-20261104T200422-0800-qb-01",
+    "graham-delta-1645-2026-w09-20261105T164124-0700-qb-01"
   ],
   "bindingUpdates": [
     {
@@ -1859,6 +1871,15 @@
         "MIN"
       ],
       "sourceTask": "TUESDAY_BASELINE",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-delta-1645-2026-w09-20261105T164124-0700-qb-01",
+      "effectiveAt": "2026-11-05T23:53:03.877Z",
+      "teams": [
+        "MIN"
+      ],
+      "sourceTask": "DELTA_1645",
       "marketViewed": false
     }
   ],
