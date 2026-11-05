@@ -3,27 +3,42 @@
   "policyId": "research-agent-groups-v2",
   "group": "main",
   "taskId": "main-18:15",
-  "executionRunId": null,
+  "executionRunId": "2026-11-04T18:59:30.000-07:00|5",
   "workBinding": {
-    "candidateId": "2026-11-04T18:30:15.000-07:00|5",
+    "candidateId": "2026-11-04T18:59:30.000-07:00|5",
     "feedBlobSha": "88d159e5cb126b07169e6865b90900f28c9ff1ce",
     "checkpoint": "data/report-production/checkpoints/2026-11-04-late-1815-183015.json",
-    "checkpointRevision": 1,
+    "checkpointRevision": 62,
     "operatingRevision": "2026-11-01.AdaptiveResearchAgents"
   },
-  "mode": "AGENTS_RUNNING",
-  "reason": "Seven complete-event queues and the NHL/Guy and exact-contract challenge questions justified the configured four researchers and two critical reviewers. All six existing threads returned exact-bound acknowledgments inside the 60-second startup window.",
+  "mode": "AGENTS_COMPLETE",
+  "reason": "Seven complete-event queues and exact-contract challenge questions justified four researchers and two critical reviewers. All six existing threads acknowledged inside the 60-second startup bound and returned substantive work.",
   "workers": [
-    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719534","73719536"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719538","73719540"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["72909340","72909342","guy-shortlist"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719542"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["nhl-and-guy-opposing-case-review"],"acknowledgment":"BOUND","state":"RUNNING"},
-    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-price-line-and-completeness-audit"],"acknowledgment":"BOUND","state":"RUNNING"}
+    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719534","73719536"],"acknowledgment":"BOUND","state":"RETURNED","returnedWork":"Toronto-Denver and Portland-Phoenix event research, official personnel status, Support/Contrary and exact-market limitations."},
+    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719538","73719540"],"acknowledgment":"BOUND","state":"RETURNED","returnedWork":"Dallas-San Antonio and Lakers-Sacramento research, personnel status, model disagreement and price-bound assessment."},
+    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["72909340","72909342","guy-shortlist"],"acknowledgment":"BOUND","state":"RETURNED","returnedWork":"Both NHL events, confirmed goalies, personnel, Support/Contrary and Guy shortlist review; shortlist was empty."},
+    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719542"],"acknowledgment":"BOUND","state":"RETURNED","returnedWork":"Miami-Clippers complete-event and personnel research with exact-market limitations."},
+    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["nhl-and-guy-opposing-case-review"],"acknowledgment":"BOUND","state":"RETURNED","returnedWork":"Opposing-case review confirmed no favorable exact comparison, corrected NHL puck-line presentation and rejected unsupported directional upgrades."},
+    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-price-line-and-completeness-audit"],"acknowledgment":"BOUND","state":"RETURNED","returnedWork":"Exact-price and completeness audit confirmed the four spread blockers and all-pass route; a proposed alternate-total quote was rejected because it was outside the governed primary inventory."}
   ],
-  "scalingDecisions": [{"decision":"NORMAL_POOL","workers":6,"reason":"Seven events, 42 selections and 26 captured-forecast applicability reviews require complete-event parallelism plus two independent challenges.","expectedQualityBenefit":"Source-backed Support/Contrary, History Fit, exact identity, personnel/goalie depth and Guy shortlist review.","releaseCondition":"All assigned events and both critical reviews return or record an actual source-specific failure."}],
-  "qualityFindings": [],
-  "completedWork": {"acknowledgments":6,"eventResearch":0,"reviews":0,"checkpointedEvents":0},
-  "remainingWork": {"events":7,"reviews":2,"merge":"coordinator only","publication":"NOT_ISSUED"},
-  "recordedAt": "2026-11-05T01:32:00.000Z"
+  "scalingDecisions": [
+    {"decision":"NORMAL_POOL","workers":6,"reason":"Seven events, 42 selections and 26 captured-forecast applicability reviews required complete-event parallelism plus two independent challenges.","expectedQualityBenefit":"Source-backed Support/Contrary, History Fit, exact identity, personnel/goalie depth and Guy shortlist review.","releaseCondition":"SATISFIED"}
+  ],
+  "qualityFindings": [
+    "All 38 evaluated selections were PASS after exact executable-price comparison; no BET, LEAN or WAIT survived review.",
+    "Toronto-Denver and Portland-Phoenix each retained both spread sides as evidence-blocked because no exact same-contract Pinnacle pair or independent calibrated exact fair was available.",
+    "NHL away puck-line display orientation and Core market class were corrected without changing the bound selection keys.",
+    "All 26 captured forecasts were revalidated for the final report time and retained only as context; none supplied a fresh exact fair or BET bound.",
+    "Card-evidence identity, market coverage, and moneyline/spread/total movement lineage were repaired and passed all publication gates.",
+    "Guy's governed shortlist was empty, so no submission was made."
+  ],
+  "decisionCorrections": [
+    {"issue":"NHL puck-line labeling and Core market classification","resolution":"Corrected presentation to San Jose +1.5, Los Angeles -1.5, Calgary +1.5 and Seattle -1.5 while preserving exact raw selection identity."},
+    {"issue":"Reviewer alternate-total best-price proposal","resolution":"Rejected because the proposed FanDuel same-line quotes were not present in the governed primary inventory; retained exact controlled-inventory quotes."},
+    {"issue":"Initial prepared draft lacked selection-scoped card evidence","resolution":"Restored the complete pre-prepare draft and added exact mirrored card evidence plus a 42-selection coverage audit; no cards or sources were dropped."}
+  ],
+  "completedWork": {"acknowledgments":6,"eventResearch":7,"reviews":2,"checkpointedEvents":7,"forecastReviews":26,"decisions":{"BET":0,"LEAN":0,"WAIT":0,"PASS":38}},
+  "remainingWork": {"events":0,"reviews":0,"producerUnfinished":0,"documentedSourceShortfalls":4,"merge":"coordinator only","publication":"DURABLY_VERIFIED"},
+  "publication": {"workflowRunId":41951978797,"workflowConclusion":"success","reportPath":"data/history/runs/2026-11-04/late-185930.json","sidecarPath":"data/history/research-fit/2026-11-04/late-185930.json","reportBlobSha":"3b2fec8ee51324af30e54865ca64d38f87080d15","sidecarBlobSha":"2239fe1e6a5219b5f0efb5245f3a3be9127dc04e"},
+  "recordedAt": "2026-11-05T02:14:19.831Z"
 }
