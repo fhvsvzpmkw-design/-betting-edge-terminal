@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "TUESDAY_BASELINE",
+  "executionRunId": "graham-tuesday-baseline-2026-w09-20261104T200422-0800",
+  "workBinding": {
+    "phase": "ACTIVE_BASELINE_RECOVERY",
+    "authoritativeOwnerCommit": "7326e8dd1aba7a69ba1e827e82c0aeed0784fc01",
+    "activeSeason": 2026,
+    "activeWeek": 9,
+    "runtimeId": "graham-tuesday-baseline-2026-w09-20261104T200422-0800",
+    "activeManifestBlobSha": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "originalBoardBlobSha": "9646d2783ab8c582a8e1ea939876c359d97f4f09",
+    "originalResearchLedgerBlobSha": "ee9418db80fd65f16aa02c114b1168f3abbab559",
+    "carriedLedgerBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "marketViewed": false
+  },
+  "mode": "AGENTS_PARTIAL",
+  "reason": "One clean replacement researcher completed 16 teams and the independent reviewer completed the 32-team challenge. Three source lanes stopped on prohibited market/fantasy content before usable findings, and the final league-page lane stopped on an embedded odds marker. Their content was rejected; the clean researcher and clean reviewer evidence was retained.",
+  "workers": [
+    {
+      "role": "SOURCE_RESEARCHER",
+      "actualId": "/root/w9_baseline_research_a",
+      "boundary": "fresh-context; source-only; read-only; no shared writes",
+      "state": "STOPPED_CONTAMINATION",
+      "error": "Unexpected DraftKings Network, Covers and PlayDecoded search results; no findings accepted."
+    },
+    {
+      "role": "SOURCE_RESEARCHER",
+      "actualId": "/root/w9_baseline_research_b",
+      "boundary": "fresh-context; source-only; read-only; no shared writes",
+      "state": "STOPPED_CONTAMINATION",
+      "error": "Unexpected sportsbook-style spread and DraftKings Network search result; no findings accepted."
+    },
+    {
+      "role": "SOURCE_RESEARCHER_REPLACEMENT",
+      "actualId": "/root/w9_baseline_research_a2",
+      "boundary": "fresh-context; direct official sources; read-only; no shared writes",
+      "state": "RETURNED_CLEAN",
+      "error": null,
+      "completedTeams": 16,
+      "acceptedTeams": [
+        "ARI",
+        "ATL",
+        "BAL",
+        "BUF",
+        "CAR",
+        "CHI",
+        "CIN",
+        "CLE",
+        "DAL",
+        "DEN",
+        "DET",
+        "GB",
+        "HOU",
+        "IND",
+        "JAX",
+        "KC"
+      ]
+    },
+    {
+      "role": "SOURCE_RESEARCHER_REPLACEMENT",
+      "actualId": "/root/w9_baseline_research_b2",
+      "boundary": "fresh-context; direct official sources; read-only; no shared writes",
+      "state": "STOPPED_CONTAMINATION",
+      "error": "Official Rams news index exposed adjacent DraftKings fantasy sponsorship; no findings accepted."
+    },
+    {
+      "role": "SOURCE_RESEARCHER_FINAL_REPLACEMENT",
+      "actualId": "/root/w9_baseline_research_b3",
+      "boundary": "fresh-context; exact NFL injury URL and clean repository sources only; read-only; no shared writes",
+      "state": "STOPPED_PROHIBITED_EMBED",
+      "error": "NFL injury page source contained an AvailableOdds decision iframe; no injury rows or findings accepted."
+    },
+    {
+      "role": "INDEPENDENT_REVIEWER",
+      "actualId": "/root/w9_baseline_reviewer",
+      "boundary": "fresh-context; market-free; read-only; no shared writes",
+      "state": "RETURNED_CLEAN",
+      "error": null,
+      "reviewedTeams": 32,
+      "reviewedGames": 15
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "selectedPool": {
+        "researchers": 2,
+        "reviewers": 1
+      },
+      "launched": 6,
+      "namedQuestion": "Can a complete Week 9 current-information review recover the pending baseline and identify stale QB/personnel bindings without market input?",
+      "expectedQualityBenefit": "Disjoint source ownership plus independent identity, replacement, coverage and double-count challenge.",
+      "releaseCondition": "Return full source-bound coverage or stop immediately on prohibited content. Replacements end at the six-launch cap."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "Four published Week 9 QB bindings were stale: ARI Minshew, BAL Fagnano, PHI Milton and SEA Lock are the confirmed named starters; CLE and MIN remain unresolved.",
+      "impact": "Requires governed QB reconciliation and fail-closed treatment before final customer-number certification."
+    },
+    {
+      "finding": "The Week 9 ledger rollover provenance preserves its original activation snapshot while the current carried ledger has advanced to a Week 8-to-9 PARTIAL_BLOCKED receipt with only CAR-GB applied.",
+      "impact": "Prevents falsely claiming complete Week 8 learning or rebinding the immutable rollover snapshot."
+    }
+  ],
+  "completedWork": [
+    "One clean source researcher completed 16 current-team reviews.",
+    "One clean independent reviewer challenged all 32 teams and all 15 games.",
+    "The coordinator assembled 30 active-team findings, two bye-team findings and 15 exact reviewed fair bindings with no hand-calculated changes."
+  ],
+  "remainingWork": [
+    "Verify and bind the completion receipt, then close the runtime and execute baseline recovery.",
+    "Route four confirmed QB changes through QB production; keep CLE and MIN fail closed until official resolution.",
+    "Process final designations/inactives and supported personnel replacements through their existing owners.",
+    "Keep 13 blocked Week 8 historical games with the independent learning queue."
+  ],
+  "recordedAt": "2026-11-05T04:17:54.238Z"
+}
