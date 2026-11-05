@@ -5,13 +5,15 @@
   "taskId": "main-evening-15:15",
   "executionRunId": "2026-11-05-evening-1515-152137",
   "workBinding": {
-    "candidateId": "2026-11-05T15:21:37-07:00|4",
+    "candidateId": "2026-11-05T15:41:06-07:00|4",
     "feedBlobSha": "ee45a42558f013f4526db655c8a616d1e727d08c",
-    "checkpointPath": "data/report-production/checkpoints/2026-11-05-evening-1515-152137.json",
-    "checkpointRevision": 1
+    "checkpointPath": "data/report-production/checkpoints/2026-11-05-evening-1515-current-152516.json",
+    "checkpointRevision": 42,
+    "sourceCheckpointPath": "data/report-production/checkpoints/2026-11-05-evening-1515-152137.json",
+    "sourceCheckpointRevision": 1
   },
-  "mode": "AGENTS_READY",
-  "reason": "17-event broad slate; routine 15:15 pool sized to two disjoint complete-event researchers and one independent reviewer.",
+  "mode": "AGENT_RETURNS_RECORDED",
+  "reason": "17-event broad slate; routine 15:15 pool sized to two disjoint complete-event researchers and one independent reviewer, then one researcher was reused for the governed Guy top-three comparison.",
   "workers": [
     {
       "role": "complete-event researcher",
@@ -25,12 +27,14 @@
         "72909354",
         "72909356",
         "72909358",
-        "72909360"
+        "72909360",
+        "GUY_TOP_THREE"
       ],
       "boundary": "read-only; no shared writes; no spawning",
       "launchObservedAt": "2026-11-05T22:24:27.502Z",
       "acknowledgedAt": "2026-11-05T22:24:27.502Z",
-      "state": "RUNNING"
+      "state": "RETURNED",
+      "returnSummary": "Completed nine NHL event reviews and the Dallas/New York Rangers/Montreal Guy matrix. NHL retail comparisons were uniformly worse than the exact Pinnacle reference; Guy's Montreal case was the only shortlisted side above the retail break-even rate in both current MoneyPuck and Dimers checks, with Utah's stronger underlying process retained as contrary evidence."
     },
     {
       "role": "complete-event researcher",
@@ -48,7 +52,8 @@
       "boundary": "read-only; no shared writes; no spawning",
       "launchObservedAt": "2026-11-05T22:24:27.502Z",
       "acknowledgedAt": "2026-11-05T22:24:27.502Z",
-      "state": "RUNNING"
+      "state": "RETURNED",
+      "returnSummary": "Completed eight event reviews, current personnel/QB checks and exact-price challenges. Proposed UTSA and Miami moneyline opinions were retained as research findings but not imported because their captured points did not satisfy the candidate's structural forecast-binding requirements. Resolved the Jacksonville-Baltimore spread as PASS after the official Ravens starter and injury update and rejection of the stale low-confidence Graham outlier."
     },
     {
       "role": "independent reviewer",
@@ -61,7 +66,8 @@
       "boundary": "read-only; no shared writes; no spawning",
       "launchObservedAt": "2026-11-05T22:24:27.502Z",
       "acknowledgedAt": "2026-11-05T22:24:27.502Z",
-      "state": "RUNNING"
+      "state": "RETURNED",
+      "returnSummary": "Independently challenged the blocker map, NHL evidence limits, report timing and Guy shortlist. Confirmed eight exact-reference gaps and identified Dallas's worse retail price, injuries, goalie change and travel as the strongest opposing case to the early top model edge."
     }
   ],
   "scalingDecisions": [
@@ -69,16 +75,48 @@
       "decision": "USE_ROUTINE_MAX_3",
       "namedQuestion": "Revalidate all 17 current events and independently challenge Guy/actionable outcomes",
       "expectedQualityBenefit": "Complete-event ownership plus independent opposing-case review before imminent starts",
-      "releaseCondition": "Assigned queues/reviews returned or source windows close"
+      "releaseCondition": "Assigned queues/reviews returned or source windows close",
+      "result": "All three workers returned; no expansion was necessary."
     }
   ],
-  "qualityFindings": [],
-  "completedWork": [],
-  "remainingWork": [
-    "17 event reviews",
-    "64 forecast applicability reviews",
-    "fresh exact-price reconciliation",
-    "final independent review"
+  "qualityFindings": [
+    "All 54 NHL selections remained PASS under the exact-price VigScope rules; the current retail comparison was worse than Pinnacle for each assessed NHL contract.",
+    "Exact paired Pinnacle identity was unavailable only for the six South Carolina State-Howard contracts and the two Orlando-Phoenix spread contracts.",
+    "The Jacksonville-Baltimore official update confirmed Joe Fagnano as starter with Lamar Jackson and Tyler Huntley out; Graham's carried Week 8 ratings and low-confidence frozen quarterback prior were rejected for origination.",
+    "Researcher zero-stake opinions on UTSA and Miami were not promoted because the current candidate lacked the required structural forecast binding for those proposed LEANs.",
+    "Guy selected Montreal moneyline +102 after a three-candidate review; Pinnacle disagreement, Montreal injuries, confirmed-goalie repricing uncertainty and Utah's stronger underlying five-on-five process remain explicit contrary evidence."
   ],
-  "recordedAt": "2026-11-05T22:24:27.502Z"
+  "completedWork": [
+    "17 of 17 complete-event reviews saved",
+    "128 of 128 forecast-review bindings present with zero pending",
+    "94 selections evaluated as PASS",
+    "8 selection-specific source shortfalls documented",
+    "15 candidate diagnostics passed",
+    "Guy research staging published through its governed workflow"
+  ],
+  "decisionCorrections": [
+    "Advanced the unfrozen candidate to an issuance time after all saved event reviews and re-bound current applicability without altering source clocks.",
+    "Corrected the exact blocker map to eight contracts rather than treating the broader source-review queue as unfinished analysis.",
+    "Replaced stale Jacksonville-Baltimore Graham identifiers with the current record set and dispositioned the outlier as REJECTED context.",
+    "Kept unsupported worker LEAN proposals out of the report rather than manufacturing forecast bindings."
+  ],
+  "finalAssessment": {
+    "state": "READY_TO_FREEZE",
+    "bets": 0,
+    "leans": 0,
+    "waits": 0,
+    "passes": 94,
+    "available": 102,
+    "evaluated": 94,
+    "blocked": 8,
+    "producerUnfinished": 0,
+    "riskDollars": 0
+  },
+  "remainingWork": [
+    "freeze the validated candidate",
+    "stage through the single publisher",
+    "confirm durable report and checkpoint readback",
+    "save the final publication receipt"
+  ],
+  "recordedAt": "2026-11-05T22:57:30.000Z"
 }
