@@ -44,7 +44,6 @@ function sandbox() {
     activePaths.board,
     activePaths.research,
     activePaths.market,
-    activePaths.personnel,
     'data/walters/nfl/2026/week-01-research-ledger.json',
     'data/walters/nfl/2026/week-01-daily-market-ledger.json',
     'data/walters/nfl/2026/week-01-personnel-ledger.json',
@@ -67,6 +66,7 @@ function sandbox() {
     ...Object.values(contract.sourceAuthority).map(item => item.path),
     ...Object.keys(audit.protectedArtifactSha256After),
   ];
+  if (fs.existsSync(path.join(ROOT, activePaths.personnel))) files.push(activePaths.personnel);
   for (const relative of new Set(files)) copy(root, relative);
   return root;
 }
@@ -76,6 +76,18 @@ function run(root, args, expectedStatus = 0) {
   assert.equal(result.status, expectedStatus, `${result.stdout}\n${result.stderr}`);
   return result;
 }
+
+test('a new active week reconciles before its first personnel batch', () => {
+  const root = sandbox();
+  try {
+    const personnel = path.join(root, activePaths.personnel);
+    fs.rmSync(personnel, {force: true});
+    run(root, ['--reconcile']);
+    const result = spawnSync(process.execPath, [VALIDATOR], {cwd: root, encoding: 'utf8'});
+    assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+    assert.equal(fs.existsSync(personnel), false);
+  } finally { fs.rmSync(root, {recursive: true, force: true}); }
+});
 
 const CONTRACT_PATH = 'data/walters/nfl/qb-production/production-contract-v1.json';
 const PRODUCTION_PATH = 'data/walters/nfl/qb-production-current.json';
