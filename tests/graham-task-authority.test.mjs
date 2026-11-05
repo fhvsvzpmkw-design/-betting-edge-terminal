@@ -11,8 +11,14 @@ for(const task of before.filter(t=>t.title!=='Graham 16:45 Delta')) {
   // Authorized amendments can be inserted between preserved instructions.
   // Retain every original paragraph without requiring the old whole prompt
   // to remain one uninterrupted block forever.
-  for(const paragraph of task.prompt.split(/\n\s*\n/).filter(p=>p.trim()))
+  for(const paragraph of task.prompt.split(/\n\s*\n/).filter(p=>p.trim())) {
+    if(binding.taskKey==='TUESDAY_BASELINE'&&paragraph.startsWith('If weekly90_10 state=COMPLETE, use the resulting currentRating values')) {
+      assert.match(current,/Start with the latest verified carried ledger/);
+      assert.match(current,/For a partial, missing or older receipt, retain its published ratings, disclose carry-forward and continue the full current-information review/);
+      continue;
+    }
     assert.ok(current.includes(paragraph),'preserve every prior task-specific instruction during migration: '+binding.taskKey);
+  }
 }
 const aligned=before.map(t=>({...t,prompt:buildGrahamTaskPrompt(authority.registry.tasks.find(x=>x.automationId===t.id),authority.registry)}));
 assert.equal(validateLiveGrahamTasks(aligned,authority).length,5);
