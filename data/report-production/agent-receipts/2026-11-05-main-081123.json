@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-2026-11-05-0800",
+  "executionRunId": null,
+  "workBinding": {
+    "candidateId": "2026-11-05T08:11:23.000-07:00|2",
+    "slot": "main",
+    "canonicalSlot": 2,
+    "feedBlobSha": "b1ce2b9cbae18d363a452bc8b10c0ec377f5d655",
+    "feedGeneratedAt": "2026-11-05T15:02:46.177Z",
+    "pinnacleObserverBlobSha": "5a133f8db0b334fab75353fd4142454e9d271f51",
+    "pinnacleGeneratedAt": "2026-11-05T15:02:47.702Z",
+    "guyBoardBlobSha": "1326450d63cf8bada43c4193b412d695c7a29b60",
+    "guyBoardAsOf": "2026-11-05T15:04:59.057Z",
+    "initialCheckpointBlobSha": "93278e0799548df557ddc74a1f72d5f4fe17002b",
+    "completedEventCheckpointBlobSha": "ab9f30b9deff75fa795f7ba5f26a4ab0a6ffa824"
+  },
+  "mode": "TARGETED_REVIEW",
+  "reason": "The 08:00 update profile began coordinator-only. A single independent reviewer was added for a material Guy goalie/model conflict and changed third candidate after the full current inventory screen.",
+  "workers": [
+    {
+      "role": "independent_reviewer",
+      "actualId": "/root/reviewer_1",
+      "readOnlyBoundary": true,
+      "freshContextBoundary": "Bound read-only to the exact current feed, observer, Guy board and controller checkpoint; no writes, staging, merging or child agents.",
+      "assignmentId": "guy-0800-top-three-critical-review",
+      "bindings": {
+        "candidateId": "2026-11-05T08:11:23.000-07:00|2",
+        "events": ["72909358", "72909344", "72909354"]
+      },
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "clockLimitation": "The collaboration interface exposed returned messages but not coordinator-side delivery timestamps; no timestamps were invented. The returned source check was 2026-11-05T15:12:38Z.",
+      "acknowledgmentState": "EXACT_BINDING_ACKNOWLEDGED",
+      "state": "RETURNED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "START_ZERO_WORKERS",
+      "reason": "08:00 update profile; coordinator screened the complete 102-selection inventory first."
+    },
+    {
+      "decision": "LAUNCH_ONE_TARGETED_REVIEWER",
+      "namedQuestion": "Do projected/conflicting goalies, lineup uncertainty and exact Pinnacle opposition invalidate any of Guy's Dallas, Montreal or Rangers shortlist cases?",
+      "expectedQualityBenefit": "Independent challenge of a consequential editorial call and the strongest opposing hockey case.",
+      "releaseCondition": "Return a source-clock-aware ruling on all three candidates and any concrete identity correction.",
+      "result": "RETURNED; no expansion required."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "All three Guy candidates were rejected for a governed call and retained as Main PASS/0u: each had projected or conflicting goalie identity and an unfavorable exact Pinnacle comparison.",
+      "decisionImpact": "No Guy staging submission was made; no Main BET or LEAN was promoted."
+    },
+    {
+      "finding": "Dallas' pinned board projected Jake Oettinger, but the official Stars game-day guide expected Casey DeSmith; Miro Heiskanen also remained day-to-day.",
+      "decisionImpact": "Corrected the crease assumption and preserved Dallas as a zero-stake PASS pending confirmed starters and lineup resolution."
+    }
+  ],
+  "completedWork": {
+    "workersLaunched": 1,
+    "workersAcknowledged": 1,
+    "workersReturned": 1,
+    "eventsReviewedByCoordinator": 17,
+    "selectionsAssessed": 102,
+    "evaluatedSelections": 90,
+    "documentedSourceShortfalls": 12,
+    "forecastApplicabilityReviews": 64,
+    "guyCandidatesReviewed": 3,
+    "decisions": {"BET": 0, "LEAN": 0, "WAIT": 0, "PASS": 90}
+  },
+  "remainingWork": {
+    "producerUnfinishedSelections": 0,
+    "documentedSourceShortfalls": 12,
+    "sourceShortfallFamilies": [
+      "NBA spreads: 4",
+      "NCAAF contracts at event 70924426: 4",
+      "NFL spreads: 2",
+      "NHL puck lines: 2"
+    ],
+    "publication": "PENDING_PREPARATION_FREEZE_STAGE_PUBLISH_READBACK",
+    "guy": "NO_QUALIFIED_CALL; projected/conflicting goalie and lineup evidence remains decision-sensitive."
+  },
+  "recordedAt": "2026-11-05T15:14:30.000Z"
+}
