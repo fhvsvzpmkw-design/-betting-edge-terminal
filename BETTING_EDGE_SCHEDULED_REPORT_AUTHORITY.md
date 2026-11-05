@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-11-01.AdaptiveResearchAgents
+**Operating revision:** 2026-11-04.MainAgentUsageBudget
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -14,11 +14,13 @@ For reports at/after `2026-09-27T12:00:00-07:00`, this edition controls producer
 
 ## Operating precedence
 
-### Research agent groups — November 1 quality and adaptive deployment
+### Research agent groups — November 4 usage budget
 
-Use [docs/REPORT_RESEARCH_AGENTS.md](docs/REPORT_RESEARCH_AGENTS.md) and [the group policy](data/research-agents/policy.json) inside every existing Main run. This is explicit delegation and bounded coordinator expansion authority: normally four complete-event researchers, two critical reviewers and this producer as coordinator, with the useful pool sized to the actual queue. After normal intake and the remotely verified initial checkpoint, obtain the selected pool's exact-bound read-only acknowledgments within 60 seconds. Reuse those workers for real research. Only the coordinator may add/reassign help for a named research gap, conflict or opposing case, without another permission request, up to six open workers in the actual runtime. Workers never spawn agents.
+Use [docs/REPORT_RESEARCH_AGENTS.md](docs/REPORT_RESEARCH_AGENTS.md) and [the group policy](data/research-agents/policy.json) in every Main run. After normal intake and the remotely verified initial checkpoint, resolve the staffing profile by the canonical Vancouver slot. At 06:00 and 15:15, use up to two complete-event researchers and one critical reviewer on routine slates. At 08:00, 09:30 and 18:15, the coordinator screens the full current inventory and revalidates eligible prior observations against the current sources and exact prices. Start with zero workers and assign up to one specialist or independent reviewer routinely for a consequential change or unresolved case. Apply the guide's rules for original clocks, changed assumptions and current exact-contract assessments. Keep Guy's early review in the existing sequence.
 
-Prioritize deeper verified findings, Support/Contrary, applicable History Fit, consequential PASS/WAIT reasoning and Guy's early shortlist review. A smaller useful pool or partial startup must be recorded honestly; missing tools, capacity or individual workers select the guide's partial/fallback coordinator loop. This supersedes D-046's all-six-or-fallback startup requirement and optional-only activity recording. Attempt a durable informational activity receipt at startup, meaningful returns and final delivery, including actual IDs, scaling reasons and adopted/rejected findings. A duplicate/already-published retry reads the matching original receipt; absent evidence means UNVERIFIED agent use. Configuration, startup, returned work, corrected decisions and durable publication remain separate facts.
+Only the coordinator may add or reassign a worker. Beyond the routine cumulative launch limit, require a documented consequential gap, independent challenge or unusually large time-sensitive queue. Reuse existing workers for follow-ups and cap Main at six total launches per run and six open workers. Obtain each selected worker's exact-bound read-only acknowledgment within the guide's 60-second bound. Workers cannot delegate.
+
+Prioritize deeper verified findings, Support/Contrary, applicable History Fit, consequential PASS/WAIT reasoning and Guy's early shortlist review. A smaller useful pool or partial startup must be recorded honestly; missing tools, capacity or individual workers select the guide's partial/fallback coordinator loop. This supersedes D-046's all-six-or-fallback startup requirement and optional-only activity recording. For substantive delegated work or a startup failure, attempt the existing durable informational activity receipt at startup, meaningful returns when available and final delivery, including actual IDs, scaling reasons and adopted/rejected findings. For substantive coordinator-only Main work, attempt a single final receipt recording zero workers. A duplicate/already-published retry reads the matching original receipt; absent evidence means UNVERIFIED agent use. Configuration, startup, returned work, corrected decisions and durable publication remain separate facts.
 
 Only the coordinator merges evidence through current expected-revision checkpoints and stages; the existing publisher retains History ownership. Worker failure, reviewer delay or receipt-save failure is not a new report-wide veto. Keep existing analytical gates, price/source clocks, current Guy handoff, independent Graham context, schedules, odds budgets and partial-publication/continuation behavior. The receipt remains metadata in the existing agent-receipts area, never numerical clearance, a new queue or a publication gate.
 
