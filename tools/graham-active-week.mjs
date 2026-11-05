@@ -70,23 +70,58 @@ export function resolveGrahamActiveWeek({root=process.cwd(),manifestPath=null,re
   };
 }
 
-export function weeklyLearningSourceWeek(active, power) {
+export function weeklyReceiptsBySourceWeek(power, season) {
+  const receipts = new Map();
+  const pending = power.weekly90_10 ? [power.weekly90_10] : [];
+  while (pending.length) {
+    const receipt = pending.shift();
+    if (!receipt) continue;
+    if ((receipt.season ?? power.season ?? season) === season && !receipts.has(receipt.sourceWeek)) {
+      receipts.set(receipt.sourceWeek, receipt);
+    }
+    if (Array.isArray(receipt.previousReceipts)) pending.push(...receipt.previousReceipts);
+  }
+  return receipts;
+}
+
+function validWeeklyReceipt(receipt, sourceWeek) {
+  if (!receipt || receipt.sourceWeek !== sourceWeek || receipt.targetWeek !== sourceWeek + 1 ||
+      receipt.marketViewed !== false || !Number.isInteger(receipt.gamesProcessed) ||
+      receipt.gamesProcessed < 1 || receipt.gamesProcessed > 16 || !Number.isInteger(receipt.gamesUpdated) ||
+      receipt.gamesUpdated < 0 || receipt.teamsUpdated !== receipt.gamesUpdated * 2 ||
+      !Array.isArray(receipt.blockedGames) || receipt.gamesUpdated + receipt.blockedGames.length !== receipt.gamesProcessed ||
+      receipt.state !== (receipt.blockedGames.length ? 'PARTIAL_BLOCKED' : 'COMPLETE')) return false;
+  const teams = receipt.blockedGames.flatMap(game => [game.away, game.home]);
+  return teams.every(team => typeof team === 'string' && team.length > 0) && new Set(teams).size === teams.length;
+}
+
+export function weeklyLearningSourceWeek(active, power, receipts = weeklyReceiptsBySourceWeek(power, active.season)) {
   if (active.week < 2) return null;
-  const receipt = power.weekly90_10;
-  if (!receipt || (receipt.season ?? power.season) !== active.season) return 1;
-  const sourceWeek = receipt.sourceWeek;
-  if (!Number.isInteger(sourceWeek) || sourceWeek < 1 || sourceWeek >= active.week ||
-      receipt.targetWeek !== sourceWeek + 1) throw Error('WEEKLY_LEARNING_CURSOR_INVALID');
-  const complete = receipt.state === 'COMPLETE' && receipt.marketViewed === false &&
-    Number.isInteger(receipt.gamesProcessed) && receipt.gamesProcessed > 0 &&
-    receipt.gamesUpdated === receipt.gamesProcessed && receipt.teamsUpdated === receipt.gamesProcessed * 2 &&
-    Array.isArray(receipt.blockedGames) && receipt.blockedGames.length === 0;
-  return Math.min(active.week - 1, sourceWeek + Number(complete));
+  const latest = power.weekly90_10;
+  const start = power.weeklyLearningStart?.season === active.season ?
+    power.weeklyLearningStart.sourceWeek :
+    latest && (latest.season ?? power.season ?? active.season) === active.season ? latest.sourceWeek : 1;
+  if (!Number.isInteger(start) || start < 1 || start >= active.week) throw Error('WEEKLY_LEARNING_CURSOR_INVALID');
+  for (let week = start; week < active.week - 1; week++) {
+    const receipt = receipts.get(week);
+    if (!validWeeklyReceipt(receipt, week) || receipt.state !== 'COMPLETE') return week;
+  }
+  return active.week - 1;
+}
+
+export function weeklyGameDependencyWeeks(receipts, oldest, sourceWeek, game) {
+  const blocking = [];
+  for (let week = oldest; week < sourceWeek; week++) {
+    const receipt = receipts.get(week);
+    if (!validWeeklyReceipt(receipt, week) || receipt.blockedGames.some(pair =>
+      [pair.away, pair.home].includes(game.away) || [pair.away, pair.home].includes(game.home))) blocking.push(week);
+  }
+  return blocking;
 }
 
 // Resolve the oldest pending completed-game work before opening dated recovery material.
 // This is read-only discovery: it neither validates numerical inputs nor authorizes a write.
-export function weeklyRecoveryContext({root=process.cwd(),manifestPath=null}={}) {
+export function weeklyRecoveryContext({root=process.cwd(),manifestPath=null,sourceWeek:requestedSourceWeek=null}={}) {
   const list=x=>Array.isArray(x)?x:[];
   const fail=message=>{throw Error(message);};
   const active=resolveGrahamActiveWeek({root,manifestPath});
@@ -98,19 +133,19 @@ export function weeklyRecoveryContext({root=process.cwd(),manifestPath=null}={})
   const read=relative=>JSON.parse(fs.readFileSync(path.join(root,relative),'utf8'));
   const power=read('data/walters/nfl-power-ratings-ledger.json');
   if(power.season!==active.season)fail('RECOVERY_RATING_SEASON_IDENTITY');
-  const sourceWeek=weeklyLearningSourceWeek(active,power),targetWeek=sourceWeek+1;
+  const receipts=weeklyReceiptsBySourceWeek(power,active.season);
+  const oldestSourceWeek=weeklyLearningSourceWeek(active,power,receipts);
+  const sourceWeek=requestedSourceWeek??oldestSourceWeek,targetWeek=sourceWeek+1;
+  if(!Number.isInteger(sourceWeek)||sourceWeek<oldestSourceWeek||sourceWeek>=active.week)fail('RECOVERY_SOURCE_WEEK_OUTSIDE_WINDOW');
   const prior=grahamWeekPaths(active.season,sourceWeek,{root});
   const priorBoard=read(prior.relative.currentNumbers);
   if(priorBoard.season!==active.season||priorBoard.week!==sourceWeek)fail('RECOVERY_PRIOR_WEEK_IDENTITY');
-  const receipt=power.weekly90_10||null;
+  const receipt=receipts.get(sourceWeek)??null;
   const matches=receipt&&receipt.sourceWeek===sourceWeek&&receipt.targetWeek===targetWeek&&
     (receipt.season==null||receipt.season===active.season);
   const summarize=x=>({season:x.season??power.season,sourceWeek:x.sourceWeek,targetWeek:x.targetWeek,
     state:x.state,gamesUpdated:x.gamesUpdated??null,teamsUpdated:x.teamsUpdated??null,
     blockedGameKeys:list(x.blockedGames).map(g=>g.gameKey)});
-  const receipts=[];
-  const visit=x=>{if(x){receipts.push(x);for(const old of list(x.previousReceipts))visit(old);}};
-  visit(receipt);
   const directory=`data/walters/nfl/${active.season}/${prior.weekTag}-weekly-evidence`;
   const bundles=[],discoveryErrors=[];
   if(fs.existsSync(path.join(root,directory))){
@@ -128,10 +163,11 @@ export function weeklyRecoveryContext({root=process.cwd(),manifestPath=null}={})
     }
   }
   bundles.sort((a,b)=>Date.parse(b.recordedAt)-Date.parse(a.recordedAt)||a.path.localeCompare(b.path));
-  return {...base,state:discoveryErrors.length?'EVIDENCE_DISCOVERY_BLOCKED':'CONTEXT_RESOLVED',sourceWeek,targetWeek,
+  return {...base,state:discoveryErrors.length?'EVIDENCE_DISCOVERY_BLOCKED':'CONTEXT_RESOLVED',sourceWeek,targetWeek,oldestSourceWeek,
+    independentGames:priorBoard.games?.filter(game=>!weeklyGameDependencyWeeks(receipts,oldestSourceWeek,sourceWeek,game).length).map(game=>game.gameKey)??[],
     priorWeekPaths:prior.relative,receiptState:matches?receipt.state:'MISSING_MATCHING_RECEIPT',
     currentReceipt:matches?summarize(receipt):null,
-    olderUnresolvedReceipts:receipts.filter(x=>x.sourceWeek<sourceWeek&&x.state==='PARTIAL_BLOCKED').map(summarize),
+    olderUnresolvedReceipts:[...receipts.values()].filter(x=>x.sourceWeek<sourceWeek&&x.state==='PARTIAL_BLOCKED').map(summarize),
     evidenceDirectory:directory,evidencePathsNewestFirst:bundles.map(b=>b.path),discoveryErrors,
     evidenceRule:'Reuse additive evidence for this source week. Older archived exceptions remain visible for governed correction. Discovery identifies work for the existing numerical validator.'};
 }
@@ -141,6 +177,7 @@ function parseCli(argv){
   for(let i=0;i<argv.length;i++){
     const a=argv[i];
     if(a==='--weekly-recovery-context'){out.weeklyRecovery=true;continue}
+    if(a==='--source-week'){out.sourceWeek=int(argv[++i]);if(out.sourceWeek===null)throw Error('Invalid source week');continue}
     if(a==='--json'){out.json=true;continue}
     if(a==='--no-require-files'){out.requireFiles=false;continue}
     if(a==='--manifest'){out.manifestPath=argv[++i];continue}
@@ -157,11 +194,12 @@ function main(){
   const args=parseCli(process.argv.slice(2));
   if(args.weeklyRecovery){
     if(args.requireFiles===false||args.previewWeek!=null||args.previewSeason!=null||args.pathKey)throw Error('Weekly recovery context requires validated active files and cannot be combined with preview/path');
-    const context=weeklyRecoveryContext({manifestPath:args.manifestPath});
+    const context=weeklyRecoveryContext({manifestPath:args.manifestPath,sourceWeek:args.sourceWeek});
     console.log(JSON.stringify(context,null,2));
     if(context.state==='EVIDENCE_DISCOVERY_BLOCKED')process.exitCode=1;
     return;
   }
+  if(args.sourceWeek!=null)throw Error('--source-week requires --weekly-recovery-context');
   if(args.previewSeason!=null||args.previewWeek!=null){
     const preview=grahamWeekPaths(args.previewSeason,args.previewWeek);
     console.log(JSON.stringify(preview,null,2));

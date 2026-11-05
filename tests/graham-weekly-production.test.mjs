@@ -82,4 +82,17 @@ test('one exhausted targeted pass waits, a copied timestamp cannot restart it, a
  assert.equal(reopened.workClass,'AVAILABLE_WORK');
  assert.equal(reopened.followUp,null);
 });
+test('readiness surfaces a saved later pair while keeping the earlier queue open',()=>{
+ const f=fixture();
+ f.active.week=f.board.week=6;
+ const receipt=f.power.weekly90_10;
+ Object.assign(receipt,{state:'PARTIAL_BLOCKED',gamesUpdated:1,teamsUpdated:2,blockedGames:[{away:'A',home:'B',gameKey:'2026-W04-A-B'}]});
+ const laterGames=[{gameKey:'2026-W05-A-B',away:'A',home:'B'},{gameKey:'2026-W05-C-D',away:'C',home:'D'}];
+ const q=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals:{state:'UNVERIFIED'},laterSources:[{sourceWeek:5,board:{games:laterGames},
+  evidence:[{path:'later.json',recordedAt:now,games:laterGames.map(g=>({...g,state:'READY'}))}]}]});
+ assert.equal(q.historicalSourceWeek,4);
+ assert.equal(q.independentLearning[0].readyIndependentGames,1);
+ assert.deepEqual(q.independentLearning[0].games.find(g=>g.away==='A').blockingSourceWeeks,[4]);
+ assert.deepEqual(q.independentLearning[0].games.find(g=>g.away==='C').blockingSourceWeeks,[]);
+});
 console.log(`GRAHAM WEEKLY PRODUCTION: ${count} PASS`);

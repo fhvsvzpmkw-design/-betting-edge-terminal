@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
-import {resolveGrahamActiveWeek,grahamWeekPaths,weeklyLearningSourceWeek} from './graham-active-week.mjs';
+import {resolveGrahamActiveWeek,grahamWeekPaths,weeklyLearningSourceWeek,weeklyReceiptsBySourceWeek,weeklyGameDependencyWeeks} from './graham-active-week.mjs';
 import {weeklyCompletion} from './graham-weekly-completion.mjs';
 import {loadFinalSlate} from './graham-final-slate.mjs';
 import {writeGrahamPublication} from './graham-publication.mjs';
@@ -19,8 +19,8 @@ const chronologyCodes=new Set(['PAIRED_HISTORY_CONFLICT','PHI_INTERVENING_GRAHAM
 const assemblyCodes=new Set(['AVAILABLE_EVIDENCE_NOT_RECONCILED','EVALUATOR_ARCHIVED_NON_INJURY_CLOSURE_REQUIRED','ARCHIVED_NON_INJURY_STATUS_RECONCILIATION']);
 
 // Read-only projection. It cannot approve an estimate, set a rating or activate a week.
-export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effectiveAt,previous=[]}){
-  const receipt=power.weekly90_10;
+export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effectiveAt,previous=[],receipts=weeklyReceiptsBySourceWeek(power,season)}){
+  const receipt=receipts.get(sourceWeek);
   const matches=receipt?.season===season&&receipt.sourceWeek===sourceWeek&&receipt.targetWeek===sourceWeek+1;
   const rows=[];
   for(const game of schedule){
@@ -86,14 +86,24 @@ export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effecti
   return rows.sort((a,b)=>rank[a.workClass]-rank[b.workClass]||Number(b.stalled)-Number(a.stalled)||Date.parse(a.firstSeenAt)-Date.parse(b.firstSeenAt)||a.gameKey.localeCompare(b.gameKey));
 }
 
-export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,activeEvidence=[],activeFinals,effectiveAt,previous=null}){
+export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,activeEvidence=[],activeFinals,effectiveAt,previous=null,laterSources=[]}){
   if(board.season!==active.season||board.week!==active.week||!Number.isFinite(Date.parse(effectiveAt)))throw Error('READINESS_ACTIVE_IDENTITY_OR_TIME');
   const completion=weeklyCompletion({active,board,power,staging,effectiveAt});
-  const historicalSourceWeek=weeklyLearningSourceWeek(active,power);
+  const receipts=weeklyReceiptsBySourceWeek(power,active.season);
+  const historicalSourceWeek=weeklyLearningSourceWeek(active,power,receipts);
   const previousSourceWeek=previous?.historicalSourceWeek??(previous?.activeWeek-1);
   const previousHistorical=previousSourceWeek===historicalSourceWeek?previous?.historicalGames:
     previous?.activeWeek===historicalSourceWeek?previous.activeWeekPreparation:[];
-  const historical=historicalSourceWeek===null?[]:recoveryQueue({season:active.season,sourceWeek:historicalSourceWeek,schedule:prior.games,power,evidence,effectiveAt,previous:previousHistorical});
+  const historical=historicalSourceWeek===null?[]:recoveryQueue({season:active.season,sourceWeek:historicalSourceWeek,schedule:prior.games,power,evidence,effectiveAt,previous:previousHistorical,receipts});
+  const independentLearning=laterSources.map(({sourceWeek,board,evidence:weekEvidence})=>{
+    const previousWeek=previous?.independentLearning?.find(w=>w.sourceWeek===sourceWeek);
+    const games=recoveryQueue({season:active.season,sourceWeek,schedule:board.games,power,evidence:weekEvidence,effectiveAt,previous:previousWeek?.games,receipts}).map(game=>{
+      const blockingSourceWeeks=weeklyGameDependencyWeeks(receipts,historicalSourceWeek,sourceWeek,game);
+      return {...game,blockingSourceWeeks};
+    });
+    return {sourceWeek,targetWeek:sourceWeek+1,games,independentGames:games.filter(g=>!g.blockingSourceWeeks.length).length,
+      readyIndependentGames:games.filter(g=>!g.blockingSourceWeeks.length&&g.state==='VALIDATE_AND_PUBLISH').length};
+  });
   const preparation=recoveryQueue({season:active.season,sourceWeek:active.week,schedule:board.games.filter(g=>Date.parse(g.startTimePacific)<Date.parse(effectiveAt)),power,evidence:activeEvidence,effectiveAt,previous:previous?.activeWeek===active.week?previous.activeWeekPreparation:[]});
   const pendingRatings=board.games.filter(g=>{
     const t=new Map(power.teams.map(t=>[t.abbr,t.currentRating]));
@@ -123,7 +133,7 @@ export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,
     state:nextWeekRequired?'BLOCKED':completion.state==='COMPLETE'?'VERIFIED_CURRENT':board.games.some(g=>Number.isFinite(g.grahamFairHome))?'CURRENT_WITH_LIMITATIONS':'BLOCKED',counts,historicalSourceWeek,
     rollover:{required:nextWeekRequired,nextWeek:nextWeekRequired?active.week+1:null,activeFinals,blockers:[],
       nextAction:nextWeekRequired?'RUN_WEEK_ROLLOVER':'PREPARE_EVIDENCE_AS_GAMES_FINISH'},
-    completion,currentBaseline,historicalGames:historical,activeWeekPreparation:preparation,processProblems:problems,
+    completion,currentBaseline,historicalGames:historical,independentLearning,activeWeekPreparation:preparation,processProblems:problems,
     customerMessage:nextWeekRequired?`Week ${active.week+1} has not been published. Historical rating updates: ${counts.historicalApplied}/${counts.historicalExpected}; completed Week ${active.week} evidence ready: ${counts.activeWeekEvidenceReady}/${counts.activeWeekEvidenceExpected}.`:
       `Week ${active.week}: ${counts.initialBaseline==='COMPLETE'?'baseline verified':'initial baseline pending'}. ${historicalSourceWeek===null?'':`Week ${historicalSourceWeek} historical rating updates ${counts.historicalApplied}/${counts.historicalExpected}.`}`,
     marketViewed:false,numericAuthority:false,completionRule:'A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.'};
@@ -147,7 +157,11 @@ export function loadWeeklyReadiness({root=process.cwd(),effectiveAt=new Date().t
     return result;
   };
   const oldPath=path.join(root,READINESS_PATH),previous=fs.existsSync(oldPath)?JSON.parse(fs.readFileSync(oldPath)):null;
-  const result=buildWeeklyReadiness({active,board,power,staging,prior,evidence:sourceWeek===null?[]:evidenceFor(sourceWeek),activeEvidence:evidenceFor(active.week),
+  const laterSources=[];
+  if(sourceWeek!==null)for(let week=sourceWeek+1;week<active.week;week++){
+    laterSources.push({sourceWeek:week,board:read(grahamWeekPaths(active.season,week,{root}).relative.currentNumbers),evidence:evidenceFor(week)});
+  }
+  const result=buildWeeklyReadiness({active,board,power,staging,prior,laterSources,evidence:sourceWeek===null?[]:evidenceFor(sourceWeek),activeEvidence:evidenceFor(active.week),
     activeFinals:loadFinalSlate({root,board,effectiveAt}),effectiveAt,previous});
   result.inputBlobs=bindings;
   return result;

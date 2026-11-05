@@ -18,6 +18,10 @@ The existing Graham Walters 90/10 automation is the weekly-production coordinato
 
 Read current `main`, resolve the active manifest, and run `node tools/graham-weekly-readiness.mjs`. Its persistent output, `data/walters/nfl/weekly-readiness.json`, is a read-only work queue, not permission to manufacture an input. It records the latest evidence for every game, preserves resolved checklist fields, distinguishes a saved READY declaration from a validated/applied pair, and identifies stalled work. Recheck the actual bytes rather than trusting a dated queue.
 
+## Check earlier learning by game
+
+Use the oldest source week for its own open work. The readiness output also lists later completed slates in `independentLearning`. A game with an empty `blockingSourceWeeks` may use its own final facts and evidence even while an older slate remains partial. Call `node tools/graham-active-week.mjs --weekly-recovery-context --source-week N` for its exact source-week bindings. Validate saved READY pairs first and publish supported games through the existing paired audit. A game whose team has an unresolved earlier update waits for that team. Keep older source receipts, current rating lineage and exact chronological handoffs visible.
+
 ## Stop after one targeted follow-up
 
 Apply this after the live current board and its baseline work. Validate READY pairs and assemble evidence already on file first. For each other actionable historical game, make one focused source check in a pass. Bind the named question and findings to the exact game and source. If that check leaves an unavailable fact or a method decision, record a dated additive BLOCKED game entry with `followUpDisposition: WAITING_SOURCE_OR_METHOD`, the precise remaining question, and what new evidence or approved method would reopen it. Preserve usable candidate team sections and source references. A known chronology conflict waits for the existing correction authority.

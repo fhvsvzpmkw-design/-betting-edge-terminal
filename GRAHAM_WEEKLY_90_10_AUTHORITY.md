@@ -4,6 +4,8 @@ November 4 publication amendment. Follow `GRAHAM_WEEKLY_PRODUCTION.md`. The acti
 
 Version 1.9 — verified chronological closeout, 2026-10-09.
 
+November 4 paired dependency amendment. The learning cursor tracks the oldest incomplete source for reporting. A later completed source may apply an evidence-ready game when each of its teams has no unresolved update in any earlier pending source week. Incomplete or invalid earlier receipts hold the game until their coverage is verified. `independentLearning` and the selected recovery context expose the eligible games. The ordinary updater enforces the same check and retains one current receipt per source week with all attempts and paired events. Reconcile the latest published rating bases before switching source weeks. The approved late preceding-week handoff remains mandatory when a verified prior event arrived after the later game's kickoff.
+
 November 4 historical follow-up amendment. Use the stopping rule in `GRAHAM_WEEKLY_PRODUCTION.md` and evaluate these two supported routes under `graham-historical-value-estimates-v1`.
 
 - `SOURCE_CONFIRMED_HEALTHY_SCRATCH` closes an archived non-injury inactive case in place. Retain its case key and frozen identity. Use `availabilityStatus: HEALTHY_SCRATCH` and `healthyScratch` with `inactive: true`, `noInjuryDesignation: true`, and two distinct official source IDs for the named gameday inactive list and the final injury-status assessment. Attach both to the case. Injury loss is zero and no replacement is assigned. Preserve original historical bytes.
