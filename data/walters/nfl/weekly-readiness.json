@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 9,
-  "generatedAt": "2026-11-05T03:56:04.134Z",
+  "generatedAt": "2026-11-05T04:26:25.541Z",
   "state": "CURRENT_WITH_LIMITATIONS",
   "counts": {
     "historicalApplied": 7,
@@ -13,7 +13,7 @@
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 0,
     "ratingBasesBehind": 0,
-    "initialBaseline": "INCOMPLETE"
+    "initialBaseline": "COMPLETE"
   },
   "historicalSourceWeek": 7,
   "rollover": {
@@ -39,7 +39,7 @@
     "frozenIssuedGameLimitations": [],
     "components": {
       "initialBaseline": {
-        "state": "INCOMPLETE",
+        "state": "COMPLETE",
         "owner": "TUESDAY_BASELINE"
       },
       "historicalLearning": {
@@ -186,9 +186,6 @@
     },
     "problems": [
       {
-        "code": "INITIAL_BASELINE_INCOMPLETE"
-      },
-      {
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 1,
         "gamesExpected": 14
@@ -197,13 +194,13 @@
     "marketViewed": false
   },
   "currentBaseline": {
-    "state": "INCOMPLETE",
+    "state": "COMPLETE",
     "owner": "TUESDAY_BASELINE",
-    "required": true,
-    "nextAction": "RUN_ACTIVE_BASELINE_RECOVERY",
+    "required": false,
+    "nextAction": "PRESERVE_VERIFIED_CURRENT_BASELINE",
     "historicalLearningBlocksReview": false,
     "requiresSeparateResearchRuntime": true,
-    "instruction": "Check for a live competing baseline runtime, then execute the full current-information baseline under the existing partial-weekly-input policy. Do not wait for historical learning or next-week rollover; preserve unresolved weekly and numerical inputs."
+    "instruction": "Retain the verified baseline and its original limitations."
   },
   "historicalGames": [
     {
@@ -2201,19 +2198,14 @@
         "2026-W07-KC-SEA",
         "2026-W07-DAL-PHI"
       ]
-    },
-    {
-      "code": "INITIAL_BASELINE_RECOVERY_REQUIRED",
-      "owner": "TUESDAY_BASELINE",
-      "nextAction": "RUN_ACTIVE_BASELINE_RECOVERY"
     }
   ],
-  "customerMessage": "Week 9: initial baseline pending. Week 7 historical rating updates 7/14.",
+  "customerMessage": "Week 9: baseline verified. Week 7 historical rating updates 7/14.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
   "inputBlobs": {
-    "data/walters/nfl/2026/week-09-current-numbers.json": "9646d2783ab8c582a8e1ea939876c359d97f4f09",
+    "data/walters/nfl/2026/week-09-current-numbers.json": "8a4aab990f77b47e3f0b7d4319b350bc34c9415c",
     "data/walters/nfl-power-ratings-ledger.json": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
     "data/walters/nfl/carried-rating-audit-staging.json": "e24c525dd5b0536b6eff6ace7752d48d316c8e77",
     "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
