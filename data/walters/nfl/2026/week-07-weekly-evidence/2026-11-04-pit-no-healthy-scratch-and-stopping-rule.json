@@ -1,0 +1,287 @@
+{
+  "schema": 1,
+  "scope": "PIT_NO_HEALTHY_SCRATCH_CLOSURE_AND_STOPPING_RULE",
+  "recordedAt": "2026-11-05T05:07:04Z",
+  "inputCommit": "721b9c9c47f57e27289a0336e236c44d8252ede6",
+  "repository": "fhvsvzpmkw-design/-betting-edge-terminal",
+  "season": 2026,
+  "sourceWeek": 7,
+  "targetWeek": 8,
+  "marketViewed": false,
+  "marketDataUsed": false,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
+    "data/walters/nfl-power-ratings-ledger.json": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json": "87fbc284b6e2997be6ed4abed22600250c7214d4",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json": "0dad30a474aec7dd2e7b56b8dc45d217710f993b"
+  },
+  "sources": [
+    {
+      "id": "pit-no-official-final-injury-status",
+      "kind": "OFFICIAL",
+      "url": "https://www.neworleanssaints.com/news/injury-report-pittsburgh-steelers-vs-new-orleans-saints-2026-nfl-week-7-friday",
+      "checkedAt": "2026-11-05T05:07:04Z",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The official Friday report names the complete final game-status set: Pittsburgh Skowronek and Echols out, Dowdle and Elliott questionable; New Orleans Ruiz and Shepherd questionable. Eli Heidenreich, Terell Smith, Mike Reid, Treyton Welch and Tyree Wilson have no injury designation."
+    },
+    {
+      "id": "pit-no-official-final-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.neworleanssaints.com/news/new-orleans-saints-inactives-pittsburgh-steelers-2026-nfl-week-7-gameday",
+      "checkedAt": "2026-11-05T05:07:04Z",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The official gameday list names Heidenreich, Terell Smith, Mike Reid, Treyton Welch and Tyree Wilson inactive, independently of the final injury-status page."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-PIT-NO",
+      "away": "PIT",
+      "home": "NO",
+      "state": "BLOCKED",
+      "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+      "sourceIds": [
+        "pit-no-official-final-injury-status",
+        "pit-no-official-final-inactives"
+      ],
+      "priorEvidence": [
+        {
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json",
+          "blobSha": "87fbc284b6e2997be6ed4abed22600250c7214d4",
+          "use": "Complete paired inactive, reserve, elevation, participation, DNP, QB, specialist and printed injury inventory."
+        },
+        {
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json",
+          "blobSha": "0dad30a474aec7dd2e7b56b8dc45d217710f993b",
+          "use": "Justin Reid bounded departure and Jordan Howden relief; CJ Donaldson official EA supplement and calibrated-zero closure."
+        }
+      ],
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "finalInactiveReserveAndElevationInventories": "COMPLETE_SOURCE_BOUND_PAIRED",
+        "pairedParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "quarterbackParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "specialistParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "officialInGameInjuryReporting": "COMPLETE_PRINTED_GAMEBOOK_AND_ADDITIVE_BOUNDARY_RECONCILIATION",
+        "pairedGameDayInjuryLoss": "BLOCKED_FIVE_ROLE_VALUE_CASES"
+      },
+      "candidateTeamSections": [
+        {
+          "team": "PIT",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTION",
+          "finalInactive": [
+            "Ben Skowronek",
+            "Drew Allar",
+            "Will Howard",
+            "Brandin Echols",
+            "Eli Heidenreich",
+            "Terell Smith"
+          ],
+          "reserveUnavailable": [
+            "Jack Driscoll",
+            "Gennings Dunker",
+            "Derrick Harmon",
+            "Sebastian Joseph-Day",
+            "Logan Lee",
+            "Michael Pittman Jr.",
+            "Roman Wilson",
+            "Donte Kent"
+          ],
+          "gameDayElevations": [
+            "Brandon Johnson",
+            "Brandon Smith"
+          ],
+          "resolvedCases": [
+            {
+              "caseKey": "2026-W07-PIT-Ben-Skowronek",
+              "resolution": "ZERO_CALIBRATED_LOSS"
+            },
+            {
+              "caseKey": "2026-W07-PIT-DeShon-Elliott",
+              "resolution": "RESOLVED_ACTIVE_SOURCE_BOUND"
+            },
+            {
+              "caseKey": "2026-W07-PIT-Eli-Heidenreich",
+              "resolution": "SOURCE_CONFIRMED_HEALTHY_SCRATCH",
+              "availabilityStatus": "HEALTHY_SCRATCH",
+              "healthyScratch": {
+                "inactive": true,
+                "noInjuryDesignation": true,
+                "inactiveSourceId": "pit-no-official-final-inactives",
+                "finalStatusSourceId": "pit-no-official-final-injury-status"
+              },
+              "sourceIds": [
+                "pit-no-official-final-inactives",
+                "pit-no-official-final-injury-status"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-PIT-Terell-Smith",
+              "resolution": "SOURCE_CONFIRMED_HEALTHY_SCRATCH",
+              "availabilityStatus": "HEALTHY_SCRATCH",
+              "healthyScratch": {
+                "inactive": true,
+                "noInjuryDesignation": true,
+                "inactiveSourceId": "pit-no-official-final-inactives",
+                "finalStatusSourceId": "pit-no-official-final-injury-status"
+              },
+              "sourceIds": [
+                "pit-no-official-final-inactives",
+                "pit-no-official-final-injury-status"
+              ]
+            }
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W07-PIT-Sebastian-Joseph-Day",
+              "exactMissingFact": "The bound gamebook participants do not establish a disjoint additional interior duty after both Derrick Harmon and Joseph-Day were unavailable.",
+              "footballImpact": "A second defensive-line absence can change interior rotation loss and cannot reuse Harmon's replacement credit.",
+              "reopenWhen": "A game-specific allocation or approved distinct-cluster method assigns additional duty among Rubio, Jobity and the other bound interior participants without duplication."
+            },
+            {
+              "caseKey": "2026-W07-PIT-Brandin-Echols",
+              "exactMissingFact": "Echols is officially out, but no source-bound expected defensive role or disjoint replacement share is assigned among the participating defensive backs.",
+              "footballImpact": "Cornerback availability may affect defensive-back strength; special-teams participation alone is insufficient.",
+              "reopenWhen": "A source-supported expected defensive role and one-for-one or committee allocation is available through the existing method."
+            }
+          ]
+        },
+        {
+          "team": "NO",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTION",
+          "finalInactive": [
+            "Zach Wilson",
+            "Mike Reid",
+            "Cesar Ruiz",
+            "Treyton Welch",
+            "Nathan Shepherd",
+            "John Ridgeway III",
+            "Tyree Wilson"
+          ],
+          "reserveUnavailable": [
+            "Kelvin Banks Jr.",
+            "Bryan Bresee",
+            "Ty Chandler",
+            "Travis Etienne Jr.",
+            "David Long Jr.",
+            "Moliki Matavao",
+            "Dillon Radunz",
+            "Rejzohn Wright",
+            "Jordyn Tyson",
+            "Nick Saldiveri",
+            "Mason Tipton"
+          ],
+          "gameDayElevations": [
+            "Easton Kilty",
+            "Cedric Tillman"
+          ],
+          "resolvedCases": [
+            {
+              "caseKey": "2026-W07-NO-John-Ridgeway-III",
+              "resolution": "ZERO_CALIBRATED_LOSS"
+            },
+            {
+              "caseKey": "2026-W07-NO-Martin-Emerson-Jr",
+              "resolution": "RESOLVED_ACTIVE_SOURCE_BOUND"
+            },
+            {
+              "caseKey": "2026-W07-NO-Justin-Reid-IN-GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE_PRIMARY_REPLACEMENT",
+              "evidencePath": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json"
+            },
+            {
+              "caseKey": "2026-W07-NO-CJ-Donaldson-IN-GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "evidencePath": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json"
+            },
+            {
+              "caseKey": "2026-W07-NO-Mike-Reid",
+              "resolution": "SOURCE_CONFIRMED_HEALTHY_SCRATCH",
+              "availabilityStatus": "HEALTHY_SCRATCH",
+              "healthyScratch": {
+                "inactive": true,
+                "noInjuryDesignation": true,
+                "inactiveSourceId": "pit-no-official-final-inactives",
+                "finalStatusSourceId": "pit-no-official-final-injury-status"
+              },
+              "sourceIds": [
+                "pit-no-official-final-inactives",
+                "pit-no-official-final-injury-status"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-NO-Treyton-Welch",
+              "resolution": "SOURCE_CONFIRMED_HEALTHY_SCRATCH",
+              "availabilityStatus": "HEALTHY_SCRATCH",
+              "healthyScratch": {
+                "inactive": true,
+                "noInjuryDesignation": true,
+                "inactiveSourceId": "pit-no-official-final-inactives",
+                "finalStatusSourceId": "pit-no-official-final-injury-status"
+              },
+              "sourceIds": [
+                "pit-no-official-final-inactives",
+                "pit-no-official-final-injury-status"
+              ]
+            },
+            {
+              "caseKey": "2026-W07-NO-Tyree-Wilson",
+              "resolution": "SOURCE_CONFIRMED_HEALTHY_SCRATCH",
+              "availabilityStatus": "HEALTHY_SCRATCH",
+              "healthyScratch": {
+                "inactive": true,
+                "noInjuryDesignation": true,
+                "inactiveSourceId": "pit-no-official-final-inactives",
+                "finalStatusSourceId": "pit-no-official-final-injury-status"
+              },
+              "sourceIds": [
+                "pit-no-official-final-inactives",
+                "pit-no-official-final-injury-status"
+              ]
+            }
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W07-NO-Nick-Saldiveri",
+              "exactMissingFact": "No immutable current-iteration identity/value or approved no-baseline-role decision is bound after Reserve/PUP status was established.",
+              "footballImpact": "Offensive-line depth cannot be valued by treating a missing identity as zero.",
+              "reopenWhen": "An eligible immutable/approved EA supplement binding or governed no-established-role decision becomes available."
+            },
+            {
+              "caseKey": "2026-W07-NO-Cesar-Ruiz",
+              "exactMissingFact": "Ruiz is officially inactive, but the gamebook-bound Jackson Wright/Will Sherman right-guard chain lacks immutable values and a disjoint allocation.",
+              "footballImpact": "Starting right-guard loss and offensive-line continuity may change paired injury loss.",
+              "reopenWhen": "The existing one-for-one or cluster method can bind immutable values and additional right-guard duty without duplicate credit."
+            },
+            {
+              "caseKey": "2026-W07-NO-Nathan-Shepherd",
+              "exactMissingFact": "Shepherd and listed backup John Ridgeway III are inactive; the participating interior line lacks source-bound disjoint additional shares.",
+              "footballImpact": "Interior defensive-line rotation and run-defense depth cannot be calculated without allocating distinct relief.",
+              "reopenWhen": "A game-specific role allocation or approved distinct-cluster method assigns the additional duty among Wooden, Broughton, Miller, Godchaux and Boyd without duplication."
+            }
+          ]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Five cases remain after applying the approved healthy-scratch route: PIT Sebastian Joseph-Day and Brandin Echols; NO Nick Saldiveri, Cesar Ruiz and Nathan Shepherd. Justin Reid and CJ Donaldson evidence is assembled, and Heidenreich, Terell Smith, Mike Reid, Treyton Welch and Tyree Wilson are now source-confirmed non-injury inactive closures.",
+          "footballImpact": "The remaining cases affect offensive-line continuity, interior defensive-line/edge rotation and cornerback depth. Missing values and overlapping baseline duties cannot be treated as zero or spent twice.",
+          "nextAction": "Wait for an eligible immutable value/no-established-role decision and source-bound disjoint role allocation, or an approved existing cluster method that satisfies the recorded reopen conditions.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This additive record advances five non-injury inactive cases only; it is not READY and does not authorize a rating write.",
+    "The prior official inventories and supported Reid/Donaldson findings remain bound by their original receipt blobs and are not rewritten.",
+    "No sportsbook, market price, fair selection or BET input was used."
+  ]
+}
