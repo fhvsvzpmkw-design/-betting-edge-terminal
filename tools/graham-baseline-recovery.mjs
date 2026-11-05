@@ -120,7 +120,12 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const boardBytes = fs.readFileSync(active.paths.currentNumbers), ledgerBytes = fs.readFileSync(active.paths.researchLedger);
   const powerPath = 'data/walters/nfl-power-ratings-ledger.json', powerBytes = fs.readFileSync(powerPath);
   const directory = active.paths.researchLedger.replace(/-research-ledger\.json$/,'-research-runtime');
-  const events = fs.readdirSync(directory).filter(name => name.endsWith('.json')).map(name => read(path.join(directory,name)));
+  // A newly activated week has no runtime directory until the baseline owner
+  // acquires its first RUN_STARTED event. Let the adapter report its governed
+  // no-review gate instead of failing on the filesystem layout.
+  const events = fs.existsSync(directory)
+    ? fs.readdirSync(directory).filter(name => name.endsWith('.json')).map(name => read(path.join(directory,name)))
+    : [];
   const ledger=JSON.parse(ledgerBytes),review=selectCompletedResearchReview({active,ledger,events});
   const reviewSha=events.find(event=>event.runEventId===review?.runEventId)?.completionReceipt?.ledgerBlobSha;
   const sourceLedgerBytes=reviewSha&&reviewSha!==blob(ledgerBytes)?execFileSync('git',['cat-file','blob',reviewSha],{maxBuffer:32*1024*1024}):null;
