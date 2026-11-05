@@ -17,6 +17,7 @@ const exact=x=>typeof x==='number'&&Number.isFinite(x);
 const norm=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 export const gitBlob=bytes=>createHash('sha1').update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest('hex');
 const round=x=>Number(x.toFixed(3));
+const MAX_BOUNDED_INJURY_LOSS_MILLI=500;
 export function specialistArchiveKeys(team,archived,registry){
   const keys=[];
   for(const c of list(team.specialistCases)){
@@ -140,6 +141,34 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             if(!Number.isFinite(at)||at>=Date.parse(game.startTimePacific)||at>Date.parse(bundle.recordedAt))fail('ROSTER_EXIT_BEFORE_KICKOFF_REQUIRED');
             if(exit.type==='TRADE'&&(!registry.players.some(p=>p.teamAbbr===exit.toTeam)||exit.toTeam===abbr))fail('ROSTER_EXIT_DESTINATION_REQUIRED');
             modelEstimate={modelId:c.modelId,method:c.resolution,classification:'SOURCE_CONFIRMED_NON_INJURY_CLOSURE',healthyValue:p.waltersPoints,replacementValue:null,injuryLoss:0,rawTeamContributionDelta:0,rosterExit:exit,limitation:'Dated pregame roster departure closes a stale archived injury case. This does not claim active availability, invent an injury replacement, change the carried rating for a trade or rewrite the original case.'};
+          }else if(c.resolution==='SOURCE_CONFIRMED_HEALTHY_SCRATCH'){
+            const scratch=c.healthyScratch;
+            if(bundle.estimationPolicy!=='graham-historical-value-estimates-v1'||!old||c.availabilityStatus!=='HEALTHY_SCRATCH'||
+              !scratch||scratch.inactive!==true||scratch.noInjuryDesignation!==true||list(c.replacements).length)fail('HEALTHY_SCRATCH_CLOSURE_REQUIRED');
+            const ids=[scratch.inactiveSourceId,scratch.finalStatusSourceId];
+            sourceCheck(ids,g.gameKey);
+            if(new Set(ids).size!==2||ids.some(id=>sources.get(id)?.kind!=='OFFICIAL')||ids.some(id=>!c.sourceIds.includes(id)))fail('HEALTHY_SCRATCH_OFFICIAL_SOURCES_REQUIRED');
+            modelEstimate={modelId:'graham-healthy-scratch-closure-v1',method:c.resolution,
+              classification:'SOURCE_CONFIRMED_NON_INJURY_CLOSURE',healthyValue:p.waltersPoints,replacementValue:null,
+              injuryLoss:0,rawTeamContributionDelta:0,healthyScratch:scratch};
+          }else if(c.resolution==='BOUNDED_BRIEF_ABSENCE'){
+            if(bundle.estimationPolicy!=='graham-historical-value-estimates-v1'||c.availabilityStatus!=='PARTIAL_GAME'||
+              p.valueStatus!=='CALIBRATED'||p.waltersPoints<0||c.baselineDoubleCountReviewed!==true||
+              c.noReportedContinuingImpairment!==true||!nonempty(c.roleRationale)||list(c.replacements).length||
+              !list(c.exposure?.unavailableIntervals).length||c.exposure?.unavailableSnapEstimate||c.exposure?.unavailableDurationEstimate||
+              cs.some(other=>other!==c&&list(other.replacements).some(replacement=>norm(replacement.player)===norm(p.player))))fail('BOUNDED_ABSENCE_DECLARATION_REQUIRED');
+            const checkOfficial=ids=>{
+              sourceCheck(ids,g.gameKey);
+              if(ids.some(id=>sources.get(id)?.kind!=='OFFICIAL'))fail('BOUNDED_ABSENCE_OFFICIAL_SOURCE_REQUIRED');
+            };
+            checkOfficial(c.roleSourceIds);
+            const exposure=historicalExposure(c.exposure,checkOfficial);
+            // Round the upper endpoint outwards so the admission check cannot understate uncertainty.
+            const upperMilli=Math.ceil(1000*p.waltersPoints*exposure.fractionRange.max);
+            const injuryLoss=round(upperMilli/2000);
+            modelEstimate={modelId:'graham-bounded-brief-absence-v1',method:c.resolution,classification:'GRAHAM_MODEL_ESTIMATE',
+              healthyValue:p.waltersPoints,replacementValue:null,injuryLoss,rawTeamContributionDelta:-injuryLoss,
+              injuryLossRange:[0,upperMilli/1000],upperMilli,exposure,roleRationale:c.roleRationale};
           }else if(c.resolution==='ZERO_CALIBRATED_LOSS'){
             if(calibration.nonQbConversion.bands.some(b=>!exact(b.points)||b.points<0)||(p.waltersPoints!==0||p.valueStatus==='HISTORICAL_ESTIMATE')||c.estimateAcknowledged!==true||!nonempty(c.assumptionRationale))fail('ZERO_LOSS_PROOF_REQUIRED');
             modelEstimate={modelId:'graham-zero-calibrated-loss-v1',method:c.resolution,injuryLoss:0,rawTeamContributionDelta:0,healthyValue:0,replacementValue:null,assumptionRationale:c.assumptionRationale,proof:'All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero.'};
@@ -213,7 +242,7 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             for(const row of modelEstimate?.reconciledRoles?.before||[]){if(chainRoles.has(row.role))fail('CHAIN_SIMULTANEOUS_ROLE_OVERLAP');chainRoles.add(row.role);}
             for(const r of reserved){if(r.valueProvenance?.gameKeys&&!r.valueProvenance.gameKeys.includes(g.gameKey))fail('VALUE_ESTIMATE_WRONG_GAME');
               if(String(r.eaPlayerId)===String(p.eaPlayerId)||(c.resolution!=='SPECIAL_TEAMS_ONLY_DUTY_ESTIMATE'&&((!crossPosition&&group(r.position)!==group(p.position))||(crossPosition&&group(r.position)===group(p.position))))||replacements.has(String(r.eaPlayerId)))fail('REPLACEMENT_ROLE_OR_DOUBLE_COUNT');
-              if((modelEstimate?.reservedPlayers||bundle.estimationPolicy==='graham-historical-value-estimates-v1')&&cs.some(other=>other!==c&&['IR','OUT','SUSPENDED','COMMISSIONER_EXEMPT'].includes(other.availabilityStatus)&&other.resolution!=='ACTIVE_FULL'&&String(lookup(other.player,other.eaPlayerId).eaPlayerId)===String(r.eaPlayerId)))fail('CHAIN_OCCUPANT_UNAVAILABLE_IN_OTHER_CASE');
+              if((modelEstimate?.reservedPlayers||bundle.estimationPolicy==='graham-historical-value-estimates-v1')&&cs.some(other=>other!==c&&['IR','OUT','SUSPENDED','COMMISSIONER_EXEMPT','HEALTHY_SCRATCH'].includes(other.availabilityStatus)&&other.resolution!=='ACTIVE_FULL'&&String(lookup(other.player,other.eaPlayerId).eaPlayerId)===String(r.eaPlayerId)))fail('CHAIN_OCCUPANT_UNAVAILABLE_IN_OTHER_CASE');
               replacements.add(String(r.eaPlayerId));}
             for(const ex of list(c.excludedBaselineContributors)){if(!nonempty(ex.player)||!nonempty(ex.rationale)||rs.some(r=>norm(r.player)===norm(ex.player)))fail('BASELINE_EXCLUSION_INVALID');sourceCheck(ex.sourceIds,g.gameKey);}
             value=modelEstimate?.replacementValue??rs[0].waltersPoints;
@@ -242,6 +271,8 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
         const groups=[];
         for(const name of new Set(computed.map(c=>c.group))){
           const entries=computed.filter(c=>c.group===name),cl=clusterMultiplier(calibration,name,entries);
+          const bounded=entries.filter(c=>c.modelEstimate?.method==='BOUNDED_BRIEF_ABSENCE');
+          if(bounded.length&&(bounded.length!==1||entries.some(c=>c!==bounded[0]&&c.rawTeamContributionDelta!==0)))fail('BOUNDED_ABSENCE_REQUIRES_ISOLATED_ROLE_GROUP:'+name);
           let receiverReview=null;
           if(name==='RECEIVER'&&cl.multiplier>1&&bundle.estimationPolicy==='graham-historical-value-estimates-v1'){
             receiverReview=t.receiverClusterReview;
@@ -265,7 +296,10 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
         teams.push({team:abbr,state:'GOVERNED',coverageExclusions:exclusions,participationReviews,specialistEstimates,valueBasis:(specialistEstimates.length||qbEstimate||computed.some(c=>c.modelEstimate)||exclusions.some(e=>e.estimateAcknowledged)||groups.some(g=>g.clusterReview))?'INCLUDES_GRAHAM_MODEL_ESTIMATE':'EXISTING_CALIBRATED_METHOD',injuryLoss,cases:computed,groups,...(qbEstimate?{qbEstimate}:{}),sourceIds:t.sourceIds});
       }catch(e){blockers.push({team:abbr,code:e.message});}
     }
-    results.push({gameKey:g.gameKey,state:blockers.length?'BLOCKED':'READY',teams,blockers});
+    const boundedMilli=teams.flatMap(t=>t.cases).reduce((sum,c)=>sum+(c.modelEstimate?.upperMilli??0),0);
+    if(boundedMilli>MAX_BOUNDED_INJURY_LOSS_MILLI)blockers.push({code:'BOUNDED_ABSENCE_PAIRED_LIMIT_EXCEEDED',injuryLossRangeWidth:boundedMilli/1000});
+    results.push({gameKey:g.gameKey,state:blockers.length?'BLOCKED':'READY',teams,blockers,
+      ...(boundedMilli?{boundedAbsenceSensitivity:{injuryLossRangeWidth:boundedMilli/1000,teamRatingRangeWidth:boundedMilli/10000}}:{})});
   }
   return {schema:1,season:bundle.season,sourceWeek:bundle.sourceWeek,recordedAt:bundle.recordedAt,games:results,readyGames:results.filter(g=>g.state==='READY').length,blockedGames:results.filter(g=>g.state==='BLOCKED').length,marketViewed:false};
 }

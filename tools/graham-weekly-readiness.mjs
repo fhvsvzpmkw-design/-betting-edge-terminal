@@ -15,6 +15,8 @@ const done=value=>/^(COMPLETE|RECONCILED|VERIFIED|READY)(?:_|$)/.test(String(val
 const digest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const targetedCodes=new Set(['REPLACEMENT_OR_VALUE_UNRESOLVED','IDENTITY_CONFLICT','PAIRED_HISTORY_CONFLICT']);
 const methodCodes=new Set(['SOURCE_NOT_YET_AVAILABLE','METHOD_DECISION_REQUIRED','IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED']);
+const chronologyCodes=new Set(['PAIRED_HISTORY_CONFLICT','PHI_INTERVENING_GRAHAM_ONE_TIME_CURRENT_RATING_REVIEW']);
+const assemblyCodes=new Set(['AVAILABLE_EVIDENCE_NOT_RECONCILED','EVALUATOR_ARCHIVED_NON_INJURY_CLOSURE_REQUIRED','ARCHIVED_NON_INJURY_STATUS_RECONCILIATION']);
 
 // Read-only projection. It cannot approve an estimate, set a rating or activate a week.
 export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effectiveAt,previous=[]}){
@@ -46,20 +48,36 @@ export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effecti
     const state=applied?'APPLIED':conflict?'BLOCKED_HISTORY':latest?.game.state==='READY'?'VALIDATE_AND_PUBLISH':latest?'RECONCILE':'PREPARE';
     const targetedBlocker=blockers.find(b=>targetedCodes.has(b.code));
     const methodBlocker=blockers.find(b=>methodCodes.has(b.code));
-    const workClass=state==='APPLIED'?'DONE':state==='VALIDATE_AND_PUBLISH'?'READY_FOR_VALIDATION':
-      targetedBlocker?'TARGETED_RECONCILIATION':methodBlocker?'WAITING_SOURCE_OR_METHOD':'AVAILABLE_WORK';
-    const fingerprint=digest({state,checklist,blockers});
+    const assemblyBlocker=blockers.find(b=>assemblyCodes.has(b.code));
+    const chronologyBlocker=blockers.find(b=>chronologyCodes.has(b.code));
+    const evidenceSourceIds=new Set(blockers.flatMap(b=>list(b.sourceIds)));
+    const sourceFindings=list(latest?.bundle.sources).filter(s=>evidenceSourceIds.has(s.id))
+      .map(({id,kind,url,finding})=>({id,kind,url,finding}));
+    const fingerprint=digest({state,checklist:Object.fromEntries(Object.entries(checklist).map(([k,v])=>[k,v.state])),
+      blockers,teams:latest?.game.teams,sourceFindings});
     const old=previous.find(p=>p.gameKey===game.gameKey);
     const firstSeenAt=old?.firstSeenAt||records.at(-1)?.bundle.recordedAt||effectiveAt;
     const lastEvidenceAt=latest?.bundle.recordedAt||null;
     const unchangedSince=old?.fingerprint===fingerprint?old.unchangedSince:(lastEvidenceAt||firstSeenAt);
     const stalled=state!=='APPLIED'&&Date.parse(effectiveAt)-Date.parse(unchangedSince)>=6*3600000;
+    const priorReconciliation=records.slice(1).some(r=>r.game.state==='BLOCKED');
+    const waitingReason=chronologyBlocker?'CHRONOLOGY_REQUIRES_GOVERNED_RESOLUTION':
+      latest?.game.followUpDisposition==='WAITING_SOURCE_OR_METHOD'?'TARGETED_PASS_EXHAUSTED':
+      blockers.length>0&&blockers.every(b=>methodCodes.has(b.code))?'MISSING_SOURCE_OR_METHOD':
+      stalled&&old?.fingerprint===fingerprint&&priorReconciliation&&!assemblyBlocker?'UNCHANGED_AFTER_RECONCILIATION':null;
+    const deferred=state!=='APPLIED'&&state!=='VALIDATE_AND_PUBLISH'&&Boolean(waitingReason);
+    const workClass=state==='APPLIED'?'DONE':state==='VALIDATE_AND_PUBLISH'?'READY_FOR_VALIDATION':
+      deferred?'WAITING_SOURCE_OR_METHOD':assemblyBlocker?'AVAILABLE_WORK':
+      targetedBlocker?'TARGETED_RECONCILIATION':methodBlocker?'WAITING_SOURCE_OR_METHOD':'AVAILABLE_WORK';
     rows.push({gameKey:game.gameKey,away:game.away,home:game.home,state,workClass,
       latestEvidence:latest?{path:latest.bundle.path,blobSha:latest.bundle.blobSha,recordedAt:lastEvidenceAt}:null,
       checklist,blockers,firstSeenAt,lastEvidenceAt,unchangedSince,stalled,fingerprint,
+      followUp:deferred?{state:'WAITING_SOURCE_OR_METHOD',reason:waitingReason,
+        resumeWhen:'New source facts or an approved method changes the recorded blocker.'}:null,
       receiptBlockerSuperseded:!applied&&!!receiptBlocked&&!!latest&&Date.parse(lastEvidenceAt)>Date.parse(receipt.appliedAt),
       owner:'GRAHAM_WALTERS_90_10',nextAction:state==='APPLIED'?'PRESERVE_PAIRED_HISTORY':state==='VALIDATE_AND_PUBLISH'?'RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER':
-        (targetedBlocker||methodBlocker||blockers[0])?.nextAction||'Complete the paired final-game inventory from the official gamebook, then validate supported estimates.',
+        deferred?'WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD':
+        (assemblyBlocker||targetedBlocker||methodBlocker||blockers[0])?.nextAction||'Complete the paired final-game inventory from the official gamebook, then validate supported estimates.',
       escalation:stalled?'UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient.':null});
   }
   // Work that can actually close a pair comes before a repeatedly unavailable

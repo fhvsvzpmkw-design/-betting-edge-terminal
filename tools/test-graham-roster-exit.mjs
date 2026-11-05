@@ -24,4 +24,48 @@ check('roster closure requires an official game-specific source',()=>{const f=fi
 check('closure retains the archived identity and cannot carry replacement credit',()=>{
  for(const change of [f=>record(f).replacements=[{player:'Jake Majors'}],f=>record(f).player='Lane Johnson',f=>{f.personnel.currentCases={};record(f).newlyIdentified=true;}]){const f=fixture();change(f);assert.equal(run(f).state,'BLOCKED');}
 });
-console.log(`ROSTER EXIT CLOSURE: ${n} PASS`);
+function scratchFixture(){
+ const f=fixture(),c=record(f),id='official-status';
+ f.bundle.sources.push({...f.bundle.sources[0],id,url:'https://example.com/final-status',finding:'Synthetic complete final injury status lists no injury for this inactive.'});
+ Object.assign(c,{resolution:'SOURCE_CONFIRMED_HEALTHY_SCRATCH',availabilityStatus:'HEALTHY_SCRATCH',sourceIds:['transaction',id],
+  healthyScratch:{inactive:true,noInjuryDesignation:true,inactiveSourceId:'transaction',finalStatusSourceId:id}});
+ return f;
+}
+check('a supported healthy scratch closes the archived case without replacement credit',()=>{
+ const g=run(scratchFixture());assert.equal(g.state,'READY');assert.equal(g.teams[0].injuryLoss,0);
+ assert.equal(g.teams[0].cases[0].caseKey,'archived');
+ assert.equal(g.teams[0].cases[0].modelEstimate.healthyScratch.noInjuryDesignation,true);
+});
+check('healthy-scratch closure requires two official game sources and affirmative no-injury evidence',()=>{
+ for(const mutate of [f=>f.bundle.sources[1].kind='REPORTING',f=>record(f).healthyScratch.noInjuryDesignation=false,
+  f=>record(f).healthyScratch.finalStatusSourceId='transaction',f=>record(f).replacements=[{player:'Jake Majors'}]]){
+  const f=scratchFixture();mutate(f);assert.equal(run(f).state,'BLOCKED');
+ }
+});
+function boundedCase(c, max){
+ Object.assign(c,{resolution:'BOUNDED_BRIEF_ABSENCE',availabilityStatus:'PARTIAL_GAME',baselineDoubleCountReviewed:true,
+  noReportedContinuingImpairment:true,roleRationale:'Synthetic isolated role with official time bounds.',roleSourceIds:sourceIds,
+  exposure:{modelId:'graham-historical-time-exposure-v1',estimateAcknowledged:true,activeEffectivenessConvention:'NORMAL_WHILE_ACTIVE_ESTIMATE',
+   gameDurationSeconds:3600,durationSourceIds:sourceIds,assumptionRationale:'Synthetic official game clock.',
+   unavailableIntervals:[{startEarliest:0,startLatest:0,endEarliest:max,endLatest:max,sourceIds,rationale:'Synthetic bounded interval.'}]}});
+}
+check('bounded absence records its midpoint and rating sensitivity',()=>{
+ const f=fixture();boundedCase(record(f),120);
+ const g=run(f);assert.equal(g.state,'READY');
+ assert.deepEqual(g.teams[0].cases[0].modelEstimate.injuryLossRange,[0,0.017]);
+ assert.equal(g.boundedAbsenceSensitivity.teamRatingRangeWidth,0.0017);
+});
+check('bounded absence cannot use a duration prior or continuing impairment',()=>{
+ for(const mutate of [c=>c.noReportedContinuingImpairment=false,c=>c.exposure.unavailableDurationEstimate={maximumSeconds:300}]){
+  const f=fixture();boundedCase(record(f),120);mutate(record(f));assert.equal(run(f).state,'BLOCKED');
+ }
+});
+check('both sides consume the same bounded-absence budget',()=>{
+ const f=fixture(),p=registry.players.find(x=>x.player==='Lane Johnson'&&x.valueStatus==='CALIBRATED');
+ assert.ok(p?.waltersPoints>0.25);
+ boundedCase(record(f),3600);
+ const opponent={caseKey:'opponent',player:p.player,eaPlayerId:p.eaPlayerId,newlyIdentified:true,rationale:'Synthetic opponent case',sourceIds};
+ boundedCase(opponent,1800);f.bundle.games[0].teams[1].cases=[opponent];
+ assert.ok(run(f).blockers.some(b=>b.code==='BOUNDED_ABSENCE_PAIRED_LIMIT_EXCEEDED'));
+});
+console.log(`HISTORICAL CLOSURE: ${n} PASS`);

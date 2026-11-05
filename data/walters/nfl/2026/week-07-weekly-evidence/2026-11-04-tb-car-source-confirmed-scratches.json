@@ -1,0 +1,1412 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 7,
+  "recordedAt": "2026-11-05T03:29:18.209Z",
+  "marketViewed": false,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "inputCommit": "8896e4c6e6f3ac7cc7be8a1d707c0421fa74c650",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-current-numbers.json": "d736fe960bf7d6158e1ed9c1b67ff4885cb99995",
+    "data/walters/nfl/2026/week-07-personnel-ledger.json": "c578c7f63ee823bcdaef151bf36bd231630653b2",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "9742cdf1ec46832d829e5791011fe232ba5b0efd",
+    "data/walters/nfl/matchup-production-current.json": "e733347372f2b40e7a5bb57145d9c2d612d0c041"
+  },
+  "sources": [
+    {
+      "id": "tb-car-gamebook",
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1792958060/gamecenter/aad59a67-4feb-11f1-abca-2c54536568a9.pdf",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official final play-by-play, inactives, starters, substitutions and snap-count appendix. Pages 12–14 and 17 bound the player-specific findings."
+    },
+    {
+      "id": "tb-inactive",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/bucs-panthers-inactives-baker-mayfield-returns-action",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Final inactive inventories classify Egbuka, Goedeke and Winfield as TB injury inactives; lists Dillon as a CAR inactive and identifies Phillips as the injury inactive from that list; Incoom separately on IR."
+    },
+    {
+      "id": "tb-injury",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/buccaneers-panthers-injury-report-oct-23-week-7-2026",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official final report states injured TB inactives; Dillon practiced fully all week and had no designation, as did starting QBs by final participation."
+    },
+    {
+      "id": "tb-post",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/bucs-panthers-week-7-recap-postgame-report-2026",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official Bucs game recap confirms Gainwell hip injury interrupted third-quarter work, and normally starting Irving ran before and through the affected period."
+    },
+    {
+      "id": "tb-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/bucs-release-week-seven-depth-chart-bucs-utilize-4-3-look-with-christian-rozeboom",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Game-week depth and baseline roles; use with final gamebook and later availability sources."
+    },
+    {
+      "id": "tb-ir",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/team/transactions/2026:signed",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Dated official transactions including Sills activation, Rozeboom IR and Fordham elevation."
+    },
+    {
+      "id": "tb-roze",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/bucs-activate-wr-sills-place-lb-rozeboom-on-injured-reserve",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official confirms October 22 Rozeboom finger IR and Sills activation, plus active LB alternative roles."
+    },
+    {
+      "id": "car-inactive",
+      "kind": "OFFICIAL",
+      "url": "https://www.panthers.com/news/week-7-inactives-vs-tampa-bay-no-jaelan-phillips-this-week",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official Carolina final inactives include Dillon and Phillips; named injury relief Umanmielen; Freeling available behind Walker/Moton, and elevations Hampton/Rochell."
+    },
+    {
+      "id": "car-snap",
+      "kind": "OFFICIAL",
+      "url": "https://www.panthers.com/news/inside-the-numbers-buccaneers-at-panthers-in-week-7",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Carolina official postgame snap counts: Moton 23, Freeling 33, team 56; Martin-Scott explicitly filled all Incoom special-teams roles."
+    },
+    {
+      "id": "car-moton",
+      "kind": "OFFICIAL",
+      "url": "https://www.panthers.com/news/dave-canales-taylor-moton-out-for-a-while-fractured-fibula",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official head coach identifies third-quarter leg injury, no return and Monroe Freeling as actual replacement at right tackle."
+    },
+    {
+      "id": "car-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.panthers.com/news/panthers-release-depth-chart-ahead-of-week-7-of-the-2026-season-bucs",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Dated Week 7 Carolina depth identifies active Freeling as Moton’s RT backup and current roles for the baseline cases."
+    },
+    {
+      "id": "car-trans",
+      "kind": "OFFICIAL",
+      "url": "https://www.panthers.com/team/transactions/index-mobile",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official dated Carolina transactions for injury/reserve/elevation coverage."
+    },
+    {
+      "id": "tb-rb-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/bucs-release-week-one-depth-chart-two-rookie-starters-defense-2026",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official RB depth lists starter Irving, Gainwell and Sean Tucker; current gamebook confirms the same three backs active, with Tucker the next reserve."
+    },
+    {
+      "id": "tb-post-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/bucs-release-week-eight-depth-chart-tez-johnson-ramps-up-playtime",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official postgame accounting directly identifies Tez Johnson primary beneficiary of Egbuka’s absence and Benjamin Chukwuma the actual Goedeke RT replacement in Week 7."
+    },
+    {
+      "id": "tb-winfield-relief",
+      "kind": "OFFICIAL",
+      "url": "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official identifies Melifonwu as replacement in Winfield’s continuous rib-injury absence; verify same role against Week 7 final gamebook."
+    },
+    {
+      "id": "car-scourton",
+      "kind": "OFFICIAL",
+      "url": "https://www.panthers.com/news/nic-scourton-placed-on-injured-reserve-among-other-moves-cam-gill",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "checkedAt": "2026-11-04T00:23:02Z",
+      "finding": "Official placement for season-ending knee injury on opening camp practice; retained archived injury case."
+    },
+    {
+      "id": "car-final-injury-status",
+      "kind": "OFFICIAL",
+      "url": "https://www.panthers.com/news/week-7-friday-injury-report-jaelan-phillips-out-monroe-freeling-questionable",
+      "checkedAt": "2026-11-05T03:29:18.209Z",
+      "gameKeys": [
+        "2026-W07-TB-CAR"
+      ],
+      "finding": "The final Panthers report lists Phillips, Incoom, Freeling and Martin-Scott as the only injury designations, with the rest of the roster full at the final practice. Dillon and Sanders have no designation and are separately identified on the official gameday inactive list."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-TB-CAR",
+      "away": "TB",
+      "home": "CAR",
+      "state": "READY",
+      "sourceIds": [
+        "tb-car-gamebook",
+        "tb-inactive",
+        "car-inactive",
+        "tb-injury"
+      ],
+      "caseReviews": [
+        {
+          "player": "Emeka Egbuka",
+          "eaPlayerId": "15054",
+          "caseKey": "2026-W07-TB-Emeka-Egbuka",
+          "availabilityStatus": "OUT",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "sourceIds": [
+            "tb-car-gamebook",
+            "tb-inactive",
+            "tb-depth",
+            "tb-post-depth"
+          ],
+          "rationale": "Club names Tez Johnson primary beneficiary of Egbuka injury vacancy; Week 7 depth listed him directly behind Egbuka. Preserve Godwin’s baseline and Hurst’s separate McMillan role.",
+          "newlyIdentified": true,
+          "modelId": "graham-replacement-role-estimate-v1",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Club names Tez Johnson primary beneficiary of Egbuka injury vacancy; Week 7 depth listed him directly behind Egbuka. Preserve Godwin’s baseline and Hurst’s separate McMillan role.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+          "baselineSourceIds": [
+            "tb-car-gamebook",
+            "tb-inactive",
+            "tb-depth",
+            "tb-post-depth"
+          ],
+          "roleRationale": "Club names Tez Johnson primary beneficiary of Egbuka injury vacancy; Week 7 depth listed him directly behind Egbuka. Preserve Godwin’s baseline and Hurst’s separate McMillan role.",
+          "roleSourceIds": [
+            "tb-car-gamebook",
+            "tb-inactive",
+            "tb-depth",
+            "tb-post-depth"
+          ],
+          "replacements": [
+            {
+              "player": "Tez Johnson",
+              "eaPlayerId": "15072"
+            }
+          ],
+          "primaryEvidence": "REPORTED_PRIMARY",
+          "team": "TB"
+        },
+        {
+          "player": "Luke Goedeke",
+          "eaPlayerId": "22112",
+          "caseKey": "2026-W07-TB-Luke-Goedeke",
+          "availabilityStatus": "OUT",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "sourceIds": [
+            "tb-car-gamebook",
+            "tb-inactive",
+            "tb-post-depth"
+          ],
+          "rationale": "Club directly reports Chukwuma started at right tackle for injured Goedeke. Wirfs retained his starting LT duties; gamebook confirms Chukwuma 63/63 offensive snaps.",
+          "newlyIdentified": true,
+          "modelId": "graham-replacement-role-estimate-v1",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Club directly reports Chukwuma started at right tackle for injured Goedeke. Wirfs retained his starting LT duties; gamebook confirms Chukwuma 63/63 offensive snaps.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+          "baselineSourceIds": [
+            "tb-car-gamebook",
+            "tb-inactive",
+            "tb-post-depth"
+          ],
+          "roleRationale": "Club directly reports Chukwuma started at right tackle for injured Goedeke. Wirfs retained his starting LT duties; gamebook confirms Chukwuma 63/63 offensive snaps.",
+          "roleSourceIds": [
+            "tb-car-gamebook",
+            "tb-inactive",
+            "tb-post-depth"
+          ],
+          "replacements": [
+            {
+              "player": "Benjamin Chukwuma",
+              "eaPlayerId": "4713"
+            }
+          ],
+          "primaryEvidence": "REPORTED_PRIMARY",
+          "team": "TB"
+        },
+        {
+          "player": "Christian Rozeboom",
+          "eaPlayerId": "21358",
+          "caseKey": "2026-W07-TB-Christian-Rozeboom",
+          "availabilityStatus": "IR",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "sourceIds": [
+            "tb-car-gamebook",
+            "tb-roze",
+            "tb-depth"
+          ],
+          "rationale": "Documented-depth assumption: game-active Dennis is the experienced available off-ball reserve for Rozeboom’s additional linebacker package after finger-IR placement. Preserve the ordinary Anzalone/Trotter starts and Dennis’ regular special teams duties; this does not assert observed relief workload.",
+          "newlyIdentified": true,
+          "modelId": "graham-replacement-role-estimate-v1",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Documented-depth assumption: game-active Dennis is the experienced available off-ball reserve for Rozeboom’s additional linebacker package after finger-IR placement. Preserve the ordinary Anzalone/Trotter starts and Dennis’ regular special teams duties; this does not assert observed relief workload.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+          "baselineSourceIds": [
+            "tb-car-gamebook",
+            "tb-roze",
+            "tb-depth"
+          ],
+          "roleRationale": "Documented-depth assumption: game-active Dennis is the experienced available off-ball reserve for Rozeboom’s additional linebacker package after finger-IR placement. Preserve the ordinary Anzalone/Trotter starts and Dennis’ regular special teams duties; this does not assert observed relief workload.",
+          "roleSourceIds": [
+            "tb-car-gamebook",
+            "tb-roze",
+            "tb-depth"
+          ],
+          "replacements": [
+            {
+              "player": "SirVocea Dennis",
+              "eaPlayerId": "23003"
+            }
+          ],
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "team": "TB"
+        },
+        {
+          "player": "Jaelan Phillips",
+          "eaPlayerId": "21512",
+          "caseKey": "2026-W07-CAR-Jaelan-Phillips",
+          "availabilityStatus": "OUT",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "sourceIds": [
+            "tb-car-gamebook",
+            "car-inactive",
+            "car-snap"
+          ],
+          "rationale": "Official Panthers inactive report directly names Umanmielen as replacement for Phillips’ hamstring absence opposite Patrick Jones II. Umanmielen appears as active and played 29 defensive snaps; he is not assigned to any other case.",
+          "newlyIdentified": true,
+          "modelId": "graham-replacement-role-estimate-v1",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Official Panthers inactive report directly names Umanmielen as replacement for Phillips’ hamstring absence opposite Patrick Jones II. Umanmielen appears as active and played 29 defensive snaps; he is not assigned to any other case.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+          "baselineSourceIds": [
+            "tb-car-gamebook",
+            "car-inactive",
+            "car-snap"
+          ],
+          "roleRationale": "Official Panthers inactive report directly names Umanmielen as replacement for Phillips’ hamstring absence opposite Patrick Jones II. Umanmielen appears as active and played 29 defensive snaps; he is not assigned to any other case.",
+          "roleSourceIds": [
+            "tb-car-gamebook",
+            "car-inactive",
+            "car-snap"
+          ],
+          "replacements": [
+            {
+              "player": "Princely Umanmielen",
+              "eaPlayerId": "15177"
+            }
+          ],
+          "primaryEvidence": "REPORTED_PRIMARY",
+          "team": "CAR"
+        }
+      ],
+      "teams": [
+        {
+          "team": "TB",
+          "sourceIds": [
+            "tb-car-gamebook",
+            "tb-inactive",
+            "tb-injury",
+            "tb-ir",
+            "tb-post",
+            "tb-post-depth",
+            "tb-depth"
+          ],
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "The source-bound final inactive and reserve inventory, official participation and reported in-game events are reconciled against the original case inventory. Non-injury inactives are classified separately from injury losses.",
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "sourceIds": [
+              "tb-car-gamebook",
+              "tb-inactive",
+              "tb-injury",
+              "tb-ir",
+              "tb-post",
+              "tb-post-depth",
+              "tb-depth"
+            ],
+            "rationale": "Official injury/inactive and gamebook identify Mayfield as active starter. Daniels played late with Tampa Bay ahead 43–13; no reported Mayfield injury interruption."
+          },
+          "cases": [
+            {
+              "player": "Josh Hayes",
+              "eaPlayerId": "23266",
+              "caseKey": "2026-W07-TB-Josh-Hayes",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-ir"
+              ],
+              "rationale": "Official transactions and game-day participation establish the continuing unavailable role.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Exact frozen zero and nonnegative replacement floor make injury loss zero for any missing role or exposure. No value or replacement is fabricated."
+            },
+            {
+              "player": "Mohamed Kamara",
+              "eaPlayerId": "14871",
+              "caseKey": "2026-W07-TB-Mohamed-Kamara",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-ir"
+              ],
+              "rationale": "Official transactions and game-day participation establish the continuing unavailable role.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Exact frozen zero and nonnegative replacement floor make injury loss zero for any missing role or exposure. No value or replacement is fabricated."
+            },
+            {
+              "player": "Benjamin Morrison",
+              "eaPlayerId": "15290",
+              "caseKey": "2026-W07-TB-Benjamin-Morrison",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-injury"
+              ],
+              "rationale": "Official gamebook establishes active participation with no reported injury absence."
+            },
+            {
+              "player": "David Sills V",
+              "eaPlayerId": "20350",
+              "caseKey": "2026-W07-TB-David-Sills-V",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-roze"
+              ],
+              "rationale": "Official club activated Sills on October 22; gamebook records active and participating, with no reported injury exit."
+            },
+            {
+              "player": "Jalen McMillan",
+              "eaPlayerId": "14660",
+              "caseKey": "2026-W07-TB-Jalen-McMillan",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-ir",
+                "tb-depth"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Ted Hurst III fills only Jalen McMillan’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Ted Hurst III fills only Jalen McMillan’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "tb-ir",
+                "tb-depth"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Ted Hurst III fills only Jalen McMillan’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "tb-ir",
+                "tb-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Ted Hurst III",
+                  "eaPlayerId": "1894"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Antoine Winfield Jr",
+              "eaPlayerId": "21017",
+              "caseKey": "2026-W07-TB-Antoine-Winfield-Jr",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-winfield-relief"
+              ],
+              "rationale": "The club had named Melifonwu as Winfield’s injury replacement, and he started at safety in Week 7 with 55 defensive snaps while Winfield remained out with fractured ribs. Preserve Tykee Smith’s and Melifonwu’s preexisting distinct duties.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The club had named Melifonwu as Winfield’s injury replacement, and he started at safety in Week 7 with 55 defensive snaps while Winfield remained out with fractured ribs. Preserve Tykee Smith’s and Melifonwu’s preexisting distinct duties.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-winfield-relief"
+              ],
+              "roleRationale": "The club had named Melifonwu as Winfield’s injury replacement, and he started at safety in Week 7 with 55 defensive snaps while Winfield remained out with fractured ribs. Preserve Tykee Smith’s and Melifonwu’s preexisting distinct duties.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-winfield-relief"
+              ],
+              "replacements": [
+                {
+                  "player": "Ifeatu Melifonwu",
+                  "eaPlayerId": "21471"
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY"
+            },
+            {
+              "player": "Emeka Egbuka",
+              "eaPlayerId": "15054",
+              "caseKey": "2026-W07-TB-Emeka-Egbuka",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-depth",
+                "tb-post-depth"
+              ],
+              "rationale": "Club names Tez Johnson primary beneficiary of Egbuka injury vacancy; Week 7 depth listed him directly behind Egbuka. Preserve Godwin’s baseline and Hurst’s separate McMillan role.",
+              "newlyIdentified": true,
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club names Tez Johnson primary beneficiary of Egbuka injury vacancy; Week 7 depth listed him directly behind Egbuka. Preserve Godwin’s baseline and Hurst’s separate McMillan role.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-depth",
+                "tb-post-depth"
+              ],
+              "roleRationale": "Club names Tez Johnson primary beneficiary of Egbuka injury vacancy; Week 7 depth listed him directly behind Egbuka. Preserve Godwin’s baseline and Hurst’s separate McMillan role.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-depth",
+                "tb-post-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Tez Johnson",
+                  "eaPlayerId": "15072"
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY"
+            },
+            {
+              "player": "Luke Goedeke",
+              "eaPlayerId": "22112",
+              "caseKey": "2026-W07-TB-Luke-Goedeke",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-post-depth"
+              ],
+              "rationale": "Club directly reports Chukwuma started at right tackle for injured Goedeke. Wirfs retained his starting LT duties; gamebook confirms Chukwuma 63/63 offensive snaps.",
+              "newlyIdentified": true,
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Club directly reports Chukwuma started at right tackle for injured Goedeke. Wirfs retained his starting LT duties; gamebook confirms Chukwuma 63/63 offensive snaps.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-post-depth"
+              ],
+              "roleRationale": "Club directly reports Chukwuma started at right tackle for injured Goedeke. Wirfs retained his starting LT duties; gamebook confirms Chukwuma 63/63 offensive snaps.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "tb-post-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Benjamin Chukwuma",
+                  "eaPlayerId": "4713"
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY"
+            },
+            {
+              "player": "Christian Rozeboom",
+              "eaPlayerId": "21358",
+              "caseKey": "2026-W07-TB-Christian-Rozeboom",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-roze",
+                "tb-depth"
+              ],
+              "rationale": "Documented-depth assumption: game-active Dennis is the experienced available off-ball reserve for Rozeboom’s additional linebacker package after finger-IR placement. Preserve the ordinary Anzalone/Trotter starts and Dennis’ regular special teams duties; this does not assert observed relief workload.",
+              "newlyIdentified": true,
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Documented-depth assumption: game-active Dennis is the experienced available off-ball reserve for Rozeboom’s additional linebacker package after finger-IR placement. Preserve the ordinary Anzalone/Trotter starts and Dennis’ regular special teams duties; this does not assert observed relief workload.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "tb-roze",
+                "tb-depth"
+              ],
+              "roleRationale": "Documented-depth assumption: game-active Dennis is the experienced available off-ball reserve for Rozeboom’s additional linebacker package after finger-IR placement. Preserve the ordinary Anzalone/Trotter starts and Dennis’ regular special teams duties; this does not assert observed relief workload.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "tb-roze",
+                "tb-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "SirVocea Dennis",
+                  "eaPlayerId": "23003"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Kenny Gainwell",
+              "eaPlayerId": "21571",
+              "caseKey": "2026-W07-TB-Kenny-Gainwell",
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-depth",
+                "tb-post"
+              ],
+              "rationale": "Week 7 depth names Tucker next behind Gainwell at both RB and kickoff returner, and gamebook confirms Tucker active. This estimate assigns Tucker only the vacancy’s additional duty, preserving starting RB Irving’s ordinary work and common returner duties. Irving actually carried during the sequence, but those touches cannot isolate his additional burden; the reserve assignment is a model assumption rather than observed snap sharing.",
+              "newlyIdentified": true,
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Week 7 depth names Tucker next behind Gainwell at both RB and kickoff returner, and gamebook confirms Tucker active. This estimate assigns Tucker only the vacancy’s additional duty, preserving starting RB Irving’s ordinary work and common returner duties. Irving actually carried during the sequence, but those touches cannot isolate his additional burden; the reserve assignment is a model assumption rather than observed snap sharing.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "tb-depth",
+                "tb-post"
+              ],
+              "roleRationale": "Week 7 depth names Tucker next behind Gainwell at both RB and kickoff returner, and gamebook confirms Tucker active. This estimate assigns Tucker only the vacancy’s additional duty, preserving starting RB Irving’s ordinary work and common returner duties. Irving actually carried during the sequence, but those touches cannot isolate his additional burden; the reserve assignment is a model assumption rather than observed snap sharing.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "tb-depth",
+                "tb-post"
+              ],
+              "replacements": [
+                {
+                  "player": "Sean Tucker",
+                  "eaPlayerId": "22735"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Use the documented elapsed-game bounds and midpoint convention. Reporting placement is an endpoint bound; no observed return play or medical impairment is inferred.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "tb-car-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1685,
+                    "startLatest": 1923,
+                    "endEarliest": 1923,
+                    "endLatest": 2265,
+                    "sourceIds": [
+                      "tb-car-gamebook",
+                      "tb-depth",
+                      "tb-post"
+                    ],
+                    "rationale": "Last explicitly named Gainwell participation before notice is Q2 1:55 carry (earliest exit); questionable notice at Q3 12:57 is latest exit and earliest return boundary. Explicit return printed with Q3 7:15 is latest possible return to availability, not an exact participation clock. Next named carry Q4 15:00. The team says hip injury disrupted Q3; this model conservatively brackets availability rather than inferring absence from Irving carries or from total snap shares."
+                  }
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Ayden Garnes",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive"
+              ],
+              "rationale": "Game-day inactive; official final source explicitly distinguishes Egbuka, Goedeke and Winfield as the injury inactives."
+            },
+            {
+              "player": "Billy Schrauth",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive"
+              ],
+              "rationale": "Game-day inactive; official final source explicitly distinguishes Egbuka, Goedeke and Winfield as the injury inactives."
+            },
+            {
+              "player": "DeMonte Capehart",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive"
+              ],
+              "rationale": "Game-day inactive; official final source explicitly distinguishes Egbuka, Goedeke and Winfield as the injury inactives."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Chase McLaughlin / Riley Dixon / Evan Deckers",
+              "sourceIds": [
+                "tb-car-gamebook"
+              ],
+              "finding": "Normal specialist availability and participation; no injury vacancy."
+            }
+          ],
+          "clusterReviews": []
+        },
+        {
+          "team": "CAR",
+          "sourceIds": [
+            "tb-car-gamebook",
+            "car-inactive",
+            "car-snap",
+            "car-moton",
+            "car-depth",
+            "car-trans",
+            "tb-inactive",
+            "tb-injury",
+            "car-final-injury-status"
+          ],
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "The source-bound final inactive and reserve inventory, official participation and reported in-game events are reconciled against the original case inventory. Non-injury inactives are classified separately from injury losses.",
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "sourceIds": [
+              "tb-car-gamebook",
+              "car-inactive",
+              "car-snap",
+              "car-moton",
+              "car-depth",
+              "car-trans",
+              "tb-inactive",
+              "tb-injury"
+            ],
+            "rationale": "Gamebook confirms Young starts and Pickett participates in the fourth quarter after large score separation; official Panthers game-day snap article describes the clearing of the bench and no Young injury exit. Haynes King emergency third QB was inactive."
+          },
+          "cases": [
+            {
+              "player": "Cam Jackson",
+              "eaPlayerId": "15207",
+              "caseKey": "2026-W07-CAR-Cam-Jackson",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans"
+              ],
+              "rationale": "Official transactions and game-day participation establish the continuing unavailable role.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Exact frozen zero and nonnegative replacement floor make injury loss zero for any missing role or exposure. No value or replacement is fabricated."
+            },
+            {
+              "player": "Bam Martin-Scott",
+              "eaPlayerId": "15260",
+              "caseKey": "2026-W07-CAR-Bam-Martin-Scott",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-snap"
+              ],
+              "rationale": "Official reports activated and played immediately on special teams, taking all the duties of newly injured Thomas Incoom."
+            },
+            {
+              "player": "Monroe Freeling",
+              "eaPlayerId": "16165",
+              "caseKey": "2026-W07-CAR-Monroe-Freeling",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolution": "ACTIVE_FULL",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "car-snap",
+                "car-moton"
+              ],
+              "rationale": "Questionable pregame, official final active and played; was named actual RT relief for Moton. No injury absence for Freeling."
+            },
+            {
+              "player": "Jaycee Horn",
+              "eaPlayerId": "21451",
+              "caseKey": "2026-W07-CAR-Jaycee-Horn",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Will Lee III fills only Jaycee Horn’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Will Lee III fills only Jaycee Horn’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Will Lee III fills only Jaycee Horn’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Will Lee III",
+                  "eaPlayerId": "16315"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Mike Jackson",
+              "eaPlayerId": "20607",
+              "caseKey": "2026-W07-CAR-Mike-Jackson",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Akayleb Evans fills only Mike Jackson’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Akayleb Evans fills only Mike Jackson’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Akayleb Evans fills only Mike Jackson’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Akayleb Evans",
+                  "eaPlayerId": "22208"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Chris Brazzell II",
+              "eaPlayerId": "1810",
+              "caseKey": "2026-W07-CAR-Chris-Brazzell-II",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Brycen Tremayne fills only Chris Brazzell II’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Brycen Tremayne fills only Chris Brazzell II’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Brycen Tremayne fills only Chris Brazzell II’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Brycen Tremayne",
+                  "eaPlayerId": "4724"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Xavier Legette",
+              "eaPlayerId": "14652",
+              "caseKey": "2026-W07-CAR-Xavier-Legette",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: John Metchie III fills only Xavier Legette’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: John Metchie III fills only Xavier Legette’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: John Metchie III fills only Xavier Legette’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "John Metchie III",
+                  "eaPlayerId": "22361"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Jonathon Brooks",
+              "eaPlayerId": "14621",
+              "caseKey": "2026-W07-CAR-Jonathon-Brooks",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Trevor Etienne fills only Jonathon Brooks’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Trevor Etienne fills only Jonathon Brooks’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Trevor Etienne fills only Jonathon Brooks’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Trevor Etienne",
+                  "eaPlayerId": "15050"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Brady Christensen",
+              "eaPlayerId": "21532",
+              "caseKey": "2026-W07-CAR-Brady-Christensen",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Corey Bullock fills only Brady Christensen’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Corey Bullock fills only Brady Christensen’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Corey Bullock fills only Brady Christensen’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Corey Bullock",
+                  "eaPlayerId": "4708"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Ikem Ekwonu",
+              "eaPlayerId": "22439",
+              "caseKey": "2026-W07-CAR-Ikem-Ekwonu",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Rasheed Walker fills only Ikem Ekwonu’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Rasheed Walker fills only Ikem Ekwonu’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Rasheed Walker fills only Ikem Ekwonu’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Rasheed Walker",
+                  "eaPlayerId": "22448"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Nic Scourton",
+              "eaPlayerId": "15203",
+              "caseKey": "2026-W07-CAR-Nic-Scourton",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "rationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Patrick Jones II fills only Nic Scourton’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Patrick Jones II fills only Nic Scourton’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "roleRationale": "Retain approved documented-depth allocation from frozen Week 7 personnel case: Patrick Jones II fills only Nic Scourton’s distinct additional vacancy duty; rechecked current game-day availability. Preserve unrelated common baseline roles.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-trans",
+                "car-depth",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Patrick Jones II",
+                  "eaPlayerId": "21690"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Taylor Moton",
+              "eaPlayerId": "12636",
+              "caseKey": "2026-W07-CAR-Taylor-Moton",
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-moton",
+                "car-snap",
+                "car-depth"
+              ],
+              "rationale": "Coach and team report name Freeling as actual injury relief at RT, with Moton’s 23 and Freeling’s 33 combining to all 56 team offensive snaps. Existing separate left-tackle and interior duty assignments stay distinct.",
+              "newlyIdentified": true,
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Coach and team report name Freeling as actual injury relief at RT, with Moton’s 23 and Freeling’s 33 combining to all 56 team offensive snaps. Existing separate left-tackle and interior duty assignments stay distinct.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-moton",
+                "car-snap",
+                "car-depth"
+              ],
+              "roleRationale": "Coach and team report name Freeling as actual injury relief at RT, with Moton’s 23 and Freeling’s 33 combining to all 56 team offensive snaps. Existing separate left-tackle and interior duty assignments stay distinct.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-moton",
+                "car-snap",
+                "car-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Monroe Freeling",
+                  "eaPlayerId": "16165"
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Use the documented elapsed-game bounds and midpoint convention. Reporting placement is an endpoint bound; no observed return play or medical impairment is inferred.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "tb-car-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1847,
+                    "startLatest": 1847,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "tb-car-gamebook",
+                      "car-moton",
+                      "car-snap",
+                      "car-depth"
+                    ],
+                    "rationale": "Gamebook marks Moton injured on Q3 14:13 play, coach confirms carted off and never returned, and gamebook separately confirms out. Use the printed injury play boundary and regulation ending; out-notice placement is not used as departure."
+                  }
+                ]
+              }
+            },
+            {
+              "player": "Jaelan Phillips",
+              "eaPlayerId": "21512",
+              "caseKey": "2026-W07-CAR-Jaelan-Phillips",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "car-snap"
+              ],
+              "rationale": "Official Panthers inactive report directly names Umanmielen as replacement for Phillips’ hamstring absence opposite Patrick Jones II. Umanmielen appears as active and played 29 defensive snaps; he is not assigned to any other case.",
+              "newlyIdentified": true,
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official Panthers inactive report directly names Umanmielen as replacement for Phillips’ hamstring absence opposite Patrick Jones II. Umanmielen appears as active and played 29 defensive snaps; he is not assigned to any other case.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are credited. Any duties held in common and the other distinct relief roles are retained. The assignment estimate does not claim measured workload.",
+              "baselineSourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "car-snap"
+              ],
+              "roleRationale": "Official Panthers inactive report directly names Umanmielen as replacement for Phillips’ hamstring absence opposite Patrick Jones II. Umanmielen appears as active and played 29 defensive snaps; he is not assigned to any other case.",
+              "roleSourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "car-snap"
+              ],
+              "replacements": [
+                {
+                  "player": "Princely Umanmielen",
+                  "eaPlayerId": "15177"
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY"
+            },
+            {
+              "player": "Thomas Incoom",
+              "eaPlayerId": "22964",
+              "caseKey": "2026-W07-CAR-Thomas-Incoom",
+              "availabilityStatus": "IR",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "tb-inactive",
+                "car-trans",
+                "car-snap"
+              ],
+              "rationale": "Official team sources confirm calf IR before kickoff and identify Martin-Scott as actual special-teams relief. Frozen healthy value is exactly zero.",
+              "newlyIdentified": true,
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Exact frozen zero and nonnegative replacement floor make injury loss zero for any missing role or exposure. No value or replacement is fabricated."
+            },
+            {
+              "caseKey": "2026-W07-CAR-A-J-Dillon",
+              "player": "A.J. Dillon",
+              "eaPlayerId": "20917",
+              "availabilityStatus": "HEALTHY_SCRATCH",
+              "resolution": "SOURCE_CONFIRMED_HEALTHY_SCRATCH",
+              "rationale": "Official final inactive and injury status establish a non-injury inactive. Preserve the archived case key and the original record.",
+              "sourceIds": [
+                "car-inactive",
+                "car-final-injury-status"
+              ],
+              "healthyScratch": {
+                "inactive": true,
+                "noInjuryDesignation": true,
+                "inactiveSourceId": "car-inactive",
+                "finalStatusSourceId": "car-final-injury-status"
+              }
+            },
+            {
+              "caseKey": "2026-W07-CAR-Ja-Tavion-Sanders",
+              "player": "Ja'Tavion Sanders",
+              "eaPlayerId": "14679",
+              "availabilityStatus": "HEALTHY_SCRATCH",
+              "resolution": "SOURCE_CONFIRMED_HEALTHY_SCRATCH",
+              "rationale": "Official final inactive and injury status establish a non-injury inactive. Preserve the archived case key and the original record.",
+              "sourceIds": [
+                "car-inactive",
+                "car-final-injury-status"
+              ],
+              "healthyScratch": {
+                "inactive": true,
+                "noInjuryDesignation": true,
+                "inactiveSourceId": "car-inactive",
+                "finalStatusSourceId": "car-final-injury-status"
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Sam Hecht",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "tb-inactive"
+              ],
+              "rationale": "Official final inactive lists name the player and classify Phillips as the game-day injury inactive; no role loss from injury is reported."
+            },
+            {
+              "player": "Stone Forsythe",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "tb-inactive"
+              ],
+              "rationale": "Official final inactive lists name the player and classify Phillips as the game-day injury inactive; no role loss from injury is reported."
+            },
+            {
+              "player": "TeRah Edwards",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "tb-inactive"
+              ],
+              "rationale": "Official final inactive lists name the player and classify Phillips as the game-day injury inactive; no role loss from injury is reported."
+            },
+            {
+              "player": "Haynes King",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive"
+              ],
+              "rationale": "Emergency third quarterback was designated inactive; starter and active second QB handled all actual work."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Ryan Fitzgerald / Sam Martin / J.J. Jansen",
+              "sourceIds": [
+                "tb-car-gamebook"
+              ],
+              "finding": "Normal specialist availability and participation; no injury vacancy."
+            },
+            {
+              "player": "A.J. Dillon",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "tb-inactive",
+                "tb-injury"
+              ],
+              "finding": "Inactive; fully practiced all week with no game designation. Opposing official club names Phillips as its opponent’s injury inactive from this list. Do not retain archived ACTIVE_FULL."
+            },
+            {
+              "player": "Ja'Tavion Sanders",
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-inactive",
+                "tb-inactive",
+                "tb-injury"
+              ],
+              "finding": "Inactive and not identified as an injury inactive on final lists. His archived injury/availability row should be retained and resolved truthfully."
+            }
+          ],
+          "clusterReviews": [
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-moton",
+                "car-depth"
+              ],
+              "rationale": "Freeling actual right tackle relief, with Walker distinct at left tackle and Bullock retained in interior depth."
+            },
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "tb-car-gamebook",
+                "car-snap",
+                "car-depth"
+              ],
+              "rationale": "Maintain distinct outside corner relief for Horn and Jackson without added multiplier."
+            }
+          ]
+        }
+      ],
+      "checklist": {
+        "pairedGameDayInjuryLoss": "READY_FOR_BOUND_EVALUATOR",
+        "finalInactiveReserveAndElevationInventories": "COMPLETE_SOURCE_BOUND_PAIRED"
+      }
+    }
+  ]
+}

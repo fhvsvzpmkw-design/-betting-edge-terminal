@@ -65,4 +65,21 @@ test('a final Week 8 opens Week 9 with 6 of 14 Week 7 pairs applied',()=>{
 });
 test('readiness explicitly reports the missing next week and cannot issue numbers',()=>{const f=fixture();const q=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals:{state:'COMPLETE',gamesVerified:2,gamesExpected:2}});assert.equal(q.rollover.required,true);assert.equal(q.rollover.nextWeek,6);assert.equal(q.state,'BLOCKED');assert.equal(q.numericAuthority,false);assert.match(q.customerMessage,/has not been published/);assert.equal(q.processProblems.some(p=>p.code==='EARLIER_PUBLISHED_BATCHES_NOT_PROPAGATED'),false);});
 test('pending current baseline recovery is independent of unfinished learning and rollover',()=>{const f=fixture();f.power.weekly90_10.state='PARTIAL_BLOCKED';const q=buildWeeklyReadiness({...f,prior:{games:schedule},evidence,activeFinals:{state:'UNVERIFIED',gamesVerified:0,gamesExpected:2}});assert.equal(q.currentBaseline.required,true);assert.equal(q.currentBaseline.nextAction,'RUN_ACTIVE_BASELINE_RECOVERY');assert.equal(q.currentBaseline.historicalLearningBlocksReview,false);assert.equal(q.currentBaseline.requiresSeparateResearchRuntime,true);assert.equal(q.rollover.required,false);assert.equal(q.state,'CURRENT_WITH_LIMITATIONS');assert.equal(q.completion.components.historicalLearning.state,'INCOMPLETE');assert.ok(q.processProblems.some(p=>p.code==='INITIAL_BASELINE_RECOVERY_REQUIRED'));});
+test('one exhausted targeted pass waits, a copied timestamp cannot restart it, and new findings can',()=>{
+ const game=schedule[0],blockers=[{code:'MISSING_ROLE',finding:'No dated source confirms the added role.'}];
+ const oldEvidence={path:'earlier.json',recordedAt:'2026-10-03T04:00:00Z',games:[{gameKey:game.gameKey,state:'BLOCKED',blockers}]};
+ const reviewed={path:'review.json',recordedAt:'2026-10-03T05:00:00Z',games:[{gameKey:game.gameKey,state:'BLOCKED',blockers,
+  followUpDisposition:'WAITING_SOURCE_OR_METHOD'}]};
+ const input={season:2026,sourceWeek:4,schedule:[game],power,effectiveAt:'2026-10-03T13:00:00Z'};
+ const first=recoveryQueue({...input,evidence:[oldEvidence,reviewed]})[0];
+ assert.equal(first.nextAction,'WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD');
+ const copy={...reviewed,path:'new-timestamp.json',recordedAt:'2026-10-03T06:00:00Z'};
+ const repeated=recoveryQueue({...input,evidence:[reviewed,copy],previous:[first]})[0];
+ assert.equal(repeated.fingerprint,first.fingerprint);
+ assert.equal(repeated.unchangedSince,first.unchangedSince);
+ const changed={...copy,games:[{gameKey:game.gameKey,state:'BLOCKED',blockers:[{code:'AVAILABLE_EVIDENCE_NOT_RECONCILED',finding:'Official gamebook now binds the replacement.'}]}]};
+ const reopened=recoveryQueue({...input,evidence:[reviewed,changed],previous:[repeated]})[0];
+ assert.equal(reopened.workClass,'AVAILABLE_WORK');
+ assert.equal(reopened.followUp,null);
+});
 console.log(`GRAHAM WEEKLY PRODUCTION: ${count} PASS`);
