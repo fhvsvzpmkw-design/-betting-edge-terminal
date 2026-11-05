@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-11-05T03:02:48.181Z",
+  "lastAppliedAt": "2026-11-05T04:25:43.000Z",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -66,15 +66,15 @@
       "team": "ARI",
       "teamName": "Arizona",
       "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "currentStarterStatus": "PROJECTED_QB1",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
       "currentStarterPlayer": {
-        "playerId": "17566",
-        "gsisId": "00-0033119",
-        "playerName": "Jacoby Brissett",
+        "playerId": "20347",
+        "gsisId": "00-0035289",
+        "playerName": "Gardner Minshew",
         "candidateValue": 7.17,
         "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-        "confidence": "MEDIUM",
-        "evidenceDropbacks": 704
+        "confidence": "LOW",
+        "evidenceDropbacks": 335
       },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
@@ -88,20 +88,20 @@
       "embeddedBaselineQbValue": 7.5,
       "teamQbDelta": -0.33,
       "gameContributionEligible": true,
-      "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
+      "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchSweepSequence": 0,
-        "researchFinding": "Jacoby Brissett is the projected bridge starter under new head coach Mike LaFleur; rookie Carson Beck and James Conner are questionable and Trey Benson is on IR. The uncertainty is monitored without a carried move.",
+        "researchFinding": "Arizona officially named Gardner Minshew its Week 9 starter. Apply only the frozen approved candidate through the existing QB calculator; preserve the embedded baseline and every non-QB layer.",
         "sourceRefs": [
-          "data/walters/nfl/2026/week-01-research-ledger.json",
-          "core/staging/walters-nfl-seed-dataset-2026.json",
-          "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-          "data/walters/nfl/2026/week-01-research-ledger.json"
+          "https://www.azcardinals.com/news/gardner-minshew-named-cardinals-starting-quarterback-carson-beck-made-backup",
+          "https://www.nfl.com/news/cardinals-qb-gardner-minshew-starting-qb-carson-beck-backup",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-02T19:16:51-07:00",
-      "marketViewed": false
+      "lastUpdatedAt": "2026-11-05T04:25:43.000Z",
+      "marketViewed": false,
+      "failClosedCode": null,
+      "priorEstimate": null
     },
     {
       "team": "ATL",
@@ -158,13 +158,13 @@
       "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
       "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
       "currentStarterPlayer": {
-        "playerId": "13092",
-        "gsisId": "00-0034796",
-        "playerName": "Lamar Jackson",
-        "candidateValue": 9.32,
-        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-        "confidence": "MEDIUM",
-        "evidenceDropbacks": 825
+        "playerId": "16275",
+        "gsisId": "00-0040981",
+        "playerName": "Joe Fagnano",
+        "candidateValue": 6,
+        "candidateStatus": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "confidence": "LOW",
+        "evidenceDropbacks": 0
       },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
@@ -174,23 +174,42 @@
         "priorValue": 9.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": 9.32,
+      "approvedProductionStarterValue": 6,
       "embeddedBaselineQbValue": 9.25,
-      "teamQbDelta": 0.07,
+      "teamQbDelta": -3.25,
       "gameContributionEligible": true,
-      "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
+      "sampleTreatment": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
       "evidence": {
-        "researchFinding": "Baltimore Head Coach Jesse Minter announced Friday October 30 that Lamar Jackson will play against Buffalo after three full practices. Use only the existing frozen approved QB-performance candidate and preserve the embedded baseline and all orthogonal terms.",
+        "researchFinding": "Baltimore's final Thursday report and official club update confirm Joe Fagnano will start with Lamar Jackson and Tyler Huntley out. Use the existing approved LOW-confidence frozen-prior route; do not infer performance validation or alter the embedded Lamar Jackson baseline.",
         "sourceRefs": [
-          "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
-          "https://www.baltimoreravens.com/team/injury-report/"
+          "https://www.baltimoreravens.com/team/injury-report/",
+          "https://www.baltimoreravens.com/news/",
+          "data/walters/nfl/qb-production/production-contract-v1.json",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+          "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-10-30T11:35:52-07:00",
+      "lastUpdatedAt": "2026-11-05T04:25:43.000Z",
       "marketViewed": false,
       "failClosedCode": null,
-      "priorEstimate": null
+      "priorEstimate": {
+        "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "value": 6,
+        "confidence": "LOW",
+        "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+        "evidenceDropbacks": 0,
+        "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+        "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+        "starterEvidence": {
+          "kind": "OFFICIAL",
+          "team": "BAL",
+          "playerId": "16275",
+          "url": "https://www.baltimoreravens.com/team/injury-report/",
+          "observedAt": "2026-11-05T04:11:26.000Z",
+          "finding": "Baltimore's final Week 9 injury report and club update identify Joe Fagnano as the starting quarterback against Jacksonville; Lamar Jackson and Tyler Huntley are out."
+        }
+      }
     },
     {
       "team": "BUF",
@@ -359,17 +378,9 @@
     {
       "team": "CLE",
       "teamName": "Cleveland",
-      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
-      "currentStarterPlayer": {
-        "playerId": "12561",
-        "gsisId": "00-0033537",
-        "playerName": "Deshaun Watson",
-        "candidateValue": 6.35,
-        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-        "confidence": "LOW",
-        "evidenceDropbacks": 249
-      },
+      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
+      "currentStarterStatus": "WATSON_CONCUSSION_PROTOCOL_STARTER_UNRESOLVED",
+      "currentStarterPlayer": null,
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "12561",
@@ -378,24 +389,22 @@
         "priorValue": 7,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": 6.35,
+      "approvedProductionStarterValue": null,
       "embeddedBaselineQbValue": 7,
-      "teamQbDelta": -0.65,
-      "gameContributionEligible": true,
+      "teamQbDelta": null,
+      "gameContributionEligible": false,
       "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchSweepSequence": 0,
-        "researchFinding": "Deshaun Watson has been named Week 1 starter under new head coach Todd Monken after missing all of 2025 and not taking a real snap since 2024. Alex Wright is on IR and OL/defensive depth injuries remain. The long QB layoff is handled as a matchup adjustment, not a carried team downgrade.",
+        "researchFinding": "Cleveland placed Deshaun Watson in concussion protocol and described the Week 9 quarterback decision as day-to-day. No replacement starter is confirmed. Preserve the last approved fair until official resolution.",
         "sourceRefs": [
-          "data/walters/nfl/2026/week-01-research-ledger.json",
-          "core/staging/walters-nfl-seed-dataset-2026.json",
-          "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-          "data/walters/nfl/2026/week-01-research-ledger.json"
+          "https://www.clevelandbrowns.com/team/injury-report/",
+          "https://www.clevelandbrowns.com/news/"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-02T19:16:51-07:00",
-      "marketViewed": false
+      "lastUpdatedAt": "2026-11-05T04:25:43.000Z",
+      "marketViewed": false,
+      "failClosedCode": "CURRENT_STARTER_AVAILABILITY_UNRESOLVED"
     },
     {
       "team": "DAL",
@@ -889,17 +898,9 @@
     {
       "team": "MIN",
       "teamName": "Minnesota",
-      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "currentStarterStatus": "CONFIRMED_WEEK3_STARTER",
-      "currentStarterPlayer": {
-        "playerId": "20430",
-        "gsisId": "00-0035228",
-        "playerName": "Kyler Murray",
-        "candidateValue": 8.25,
-        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-        "confidence": "MEDIUM",
-        "evidenceDropbacks": 748
-      },
+      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
+      "currentStarterStatus": "MURRAY_HAMSTRING_MONDAY_REPORT_NOT_FILED",
+      "currentStarterPlayer": null,
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "20430",
@@ -908,23 +909,21 @@
         "priorValue": 8.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": 8.25,
+      "approvedProductionStarterValue": null,
       "embeddedBaselineQbValue": 8.25,
-      "teamQbDelta": 0,
-      "gameContributionEligible": true,
+      "teamQbDelta": null,
+      "gameContributionEligible": false,
       "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Minnesota head coach Kevin O'Connell confirmed Kyler Murray cleared concussion protocol and will start Week 3 at Tampa Bay. Apply the frozen approved Murray candidate through the governed QB performance calculator and preserve all non-QB layers. No market information was viewed.",
+        "researchFinding": "Minnesota's Kyler Murray has an unresolved hamstring issue and the Monday-game Week 9 injury report was not yet filed at the review cutoff. Preserve the last approved fair pending official starter availability.",
         "sourceRefs": [
-          "https://www.vikings.com/news/kyler-murray-starting-quarterback-week-3-buccaneers-injury",
-          "data/walters/nfl/qb-production/production-contract-v1.json",
-          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-monday-nov-2"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-22T11:13:00-07:00",
+      "lastUpdatedAt": "2026-11-05T04:25:43.000Z",
       "marketViewed": false,
-      "failClosedCode": null
+      "failClosedCode": "CURRENT_STARTER_AVAILABILITY_UNRESOLVED"
     },
     {
       "team": "NE",
@@ -1094,13 +1093,13 @@
       "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
       "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
       "currentStarterPlayer": {
-        "playerId": "22712",
-        "gsisId": "00-0038400",
-        "playerName": "Tanner McKee",
-        "candidateValue": 6,
+        "playerId": "14614",
+        "gsisId": "00-0039398",
+        "playerName": "Joe Milton",
+        "candidateValue": 7,
         "candidateStatus": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
         "confidence": "LOW",
-        "evidenceDropbacks": 86
+        "evidenceDropbacks": 29
       },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
@@ -1110,40 +1109,39 @@
         "priorValue": 8.5,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": 6,
+      "approvedProductionStarterValue": 7,
       "embeddedBaselineQbValue": 8.5,
-      "teamQbDelta": -2.5,
+      "teamQbDelta": -1.5,
       "gameContributionEligible": true,
       "sampleTreatment": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
       "evidence": {
-        "researchFinding": "Official Eagles Thursday report explicitly says Tanner McKee will start against Carolina; independent official Spadaro article identifies him as Week 6 starting quarterback. This resolves today's saved exact named-starter dependency. Frozen EA 22712 has BLOCKED_INSUFFICIENT_QB_SAMPLE, zero reliability/blend and candidate equal to prior. Use existing approved LOW-confidence frozen-prior fallback through the QB calculator only; do not infer performance validation, alter Hurts embedded baseline or use market response.",
+        "researchFinding": "The official NFL Wednesday roundup records Philadelphia naming Joe Milton the Week 9 starter instead of Tanner McKee. Use the approved LOW-confidence frozen-prior route only; preserve Jalen Hurts' embedded baseline and all non-QB layers.",
         "sourceRefs": [
-          "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
-          "https://www.philadelphiaeagles.com/news/tanner-mckee-will-be-ready-for-his-moment-2026-nfl-week-6-carolina-panthers",
+          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-nov-4",
           "data/walters/nfl/qb-production/production-contract-v1.json",
           "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
           "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-10-15T23:54:56.497Z",
+      "lastUpdatedAt": "2026-11-05T04:25:43.000Z",
       "marketViewed": false,
       "failClosedCode": null,
       "priorEstimate": {
         "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
-        "value": 6,
+        "value": 7,
         "confidence": "LOW",
         "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
-        "evidenceDropbacks": 86,
+        "evidenceDropbacks": 29,
         "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
         "reopenOn": "Official starter change or separately authorized performance-model recalibration",
         "starterEvidence": {
           "kind": "OFFICIAL",
           "team": "PHI",
-          "playerId": "22712",
-          "url": "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
-          "observedAt": "2026-10-15T23:54:56.497Z",
-          "finding": "The official October 15 Week 6 Eagles injury report explicitly confirms: Quarterback Tanner McKee will start for the Eagles against the Carolina Panthers on Sunday with Jalen Hurts out."
+          "playerId": "14614",
+          "url": "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-nov-4",
+          "observedAt": "2026-11-05T04:11:26.000Z",
+          "finding": "The official NFL November 4 roundup records that Philadelphia named Joe Milton the starting quarterback for Week 9 against the Giants."
         }
       }
     },
@@ -1194,13 +1192,13 @@
       "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
       "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
       "currentStarterPlayer": {
-        "playerId": "13097",
-        "gsisId": "00-0034869",
-        "playerName": "Sam Darnold",
-        "candidateValue": 8.25,
+        "playerId": "20328",
+        "gsisId": "00-0035704",
+        "playerName": "Drew Lock",
+        "candidateValue": 6.75,
         "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-        "confidence": "HIGH",
-        "evidenceDropbacks": 1084
+        "confidence": "LOW",
+        "evidenceDropbacks": 183
       },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
@@ -1210,24 +1208,23 @@
         "priorValue": 9,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": 8.25,
+      "approvedProductionStarterValue": 6.75,
       "embeddedBaselineQbValue": 9,
-      "teamQbDelta": -0.75,
+      "teamQbDelta": -2.25,
       "gameContributionEligible": true,
       "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Seattle removed Sam Darnold from the Week 3 injury report and confirmed that he will start against Washington after missing Week 2. Resolve the prior fail-closed Week 3 starter status using Darnold's frozen Stage 3C candidate; repository production owns the exact arithmetic and fair update.",
+        "researchFinding": "The official NFL Wednesday roundup says Sam Darnold is out and Drew Lock will start against Arizona. Apply only Lock's frozen approved candidate through the repository calculator; his limited elbow practice remains a separate availability fact.",
         "sourceRefs": [
-          "https://www.nfl.com/news/sam-darnold-glute-seahawks-commanders",
-          "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
-          "data/walters/nfl/qb-production/production-contract-v1.json",
+          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-nov-4",
           "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-25T16:54:00-07:00",
+      "lastUpdatedAt": "2026-11-05T04:25:43.000Z",
       "marketViewed": false,
-      "failClosedCode": null
+      "failClosedCode": null,
+      "priorEstimate": null
     },
     {
       "team": "SF",
@@ -1465,7 +1462,8 @@
     "graham-week7-tb-qb-20261023T184500Z",
     "graham-week7-saturday-delta-qb-20261024T235430Z",
     "graham-tuesday-baseline-2026-w08-20261027T112200-0700-qb-01",
-    "graham-daily-review-2026-w08-20261030T113155-0700-qb-01"
+    "graham-daily-review-2026-w08-20261030T113155-0700-qb-01",
+    "graham-tuesday-baseline-2026-w09-20261104T200422-0800-qb-01"
   ],
   "bindingUpdates": [
     {
@@ -1847,6 +1845,20 @@
         "BAL"
       ],
       "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-tuesday-baseline-2026-w09-20261104T200422-0800-qb-01",
+      "effectiveAt": "2026-11-05T04:25:43.000Z",
+      "teams": [
+        "ARI",
+        "BAL",
+        "PHI",
+        "SEA",
+        "CLE",
+        "MIN"
+      ],
+      "sourceTask": "TUESDAY_BASELINE",
       "marketViewed": false
     }
   ],
