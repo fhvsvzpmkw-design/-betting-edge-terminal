@@ -4,7 +4,7 @@
   "publication": "THE PRIVATE LINE",
   "season": 2026,
   "week": 9,
-  "generatedAt": "2026-11-05T04:24:06.573Z",
+  "generatedAt": "2026-11-05T04:28:16.703Z",
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED",
   "baselineStatus": "CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10",
@@ -112,7 +112,7 @@
     "season": 2026,
     "activeWeek": 9,
     "state": "CURRENT_WITH_LIMITATIONS",
-    "generatedAt": "2026-11-05T04:24:06.441Z",
+    "generatedAt": "2026-11-05T04:28:16.536Z",
     "counts": {
       "historicalApplied": 7,
       "historicalExpected": 14,
@@ -258,16 +258,37 @@
       "homeRating": 25.2200677378,
       "neutralBaseHome": 1.9477497142,
       "espnNeutralHome": 3.5,
-      "grahamFairHome": 0,
-      "grahamAsOf": "2026-11-05T04:17:54.238Z",
+      "grahamFairHome": 3.5,
+      "grahamAsOf": "2026-11-05T04:25:43.000Z",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "grahamMove": null,
+      "grahamMove": 3.5,
       "personnelEstimateCases": [],
       "personnelUnresolvedCases": [],
       "personnelBlockedGroups": [],
       "qbPerformanceFailClosedTeams": [],
-      "qbPriorEstimateTeams": [],
-      "qbPriorEstimates": [],
+      "qbPriorEstimateTeams": [
+        "BAL"
+      ],
+      "qbPriorEstimates": [
+        {
+          "team": "BAL",
+          "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+          "value": 6,
+          "confidence": "LOW",
+          "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+          "evidenceDropbacks": 0,
+          "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+          "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+          "starterEvidence": {
+            "kind": "OFFICIAL",
+            "team": "BAL",
+            "playerId": "16275",
+            "url": "https://www.baltimoreravens.com/team/injury-report/",
+            "observedAt": "2026-11-05T04:11:26.000Z",
+            "finding": "Baltimore's final Week 9 injury report and club update identify Joe Fagnano as the starting quarterback against Jacksonville; Lamar Jackson and Tyler Huntley are out."
+          }
+        }
+      ],
       "weeklyRatingInput": {
         "state": "PARTIAL_BLOCKED",
         "sourceWeek": 8,
@@ -286,7 +307,7 @@
         "marketViewed": false
       },
       "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
-      "researchSummary": "Governed fair decomposition: neutral/team base +1.948; home field -2.082; other governed +0.270; pre-personnel exact +0.136; personnel +0.000; matchup +0.000; exact Graham home fair +0.136; displayed +0.0.",
+      "researchSummary": "Governed fair decomposition: neutral/team base +1.948; home field -2.082; other governed +3.590; pre-personnel exact +3.456; personnel +0.000; matchup +0.000; exact Graham home fair +3.456; displayed +3.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -310,14 +331,14 @@
           "awayTeam": "JAX",
           "homeTeam": "BAL",
           "awayStarter": "Trevor Lawrence",
-          "homeStarter": "Lamar Jackson",
+          "homeStarter": "Joe Fagnano",
           "awayTeamQbDelta": 0.34,
-          "homeTeamQbDelta": 0.07,
-          "pointsToHomeSpread": 0.27,
-          "reason": "Governed Walters QB differential: JAX 0.34 minus BAL 0.07 equals +0.27 points to the home-spread coordinate.",
+          "homeTeamQbDelta": -3.25,
+          "pointsToHomeSpread": 3.59,
+          "reason": "Governed Walters QB differential: JAX 0.34 minus BAL -3.25 equals +3.59 points to the home-spread coordinate. BAL uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
           "valuationMethods": {
             "away": "STAGE3_PERFORMANCE_CANDIDATE",
-            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+            "home": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1"
           },
           "sourceRefs": [
             "data/walters/nfl/qb-production/production-contract-v1.json",
@@ -326,10 +347,12 @@
             "data/walters/nfl/2026/week-01-research-ledger.json",
             "core/staging/walters-nfl-seed-dataset-2026.json",
             "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-            "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
-            "https://www.baltimoreravens.com/team/injury-report/"
+            "https://www.baltimoreravens.com/team/injury-report/",
+            "https://www.baltimoreravens.com/news/",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
           ],
-          "effectiveAt": "2026-11-05T03:02:48.181Z",
+          "effectiveAt": "2026-11-05T04:25:43.000Z",
           "marketViewed": false
         }
       ],
@@ -355,7 +378,7 @@
       "pinnacleMoneylineAwayLimit": 37128,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": 10.5,
+      "grahamHomeStrengthGap": 7,
       "officialDailySequence": null,
       "officialDailyCapturedAt": null
     },
@@ -917,7 +940,9 @@
       "personnelEstimateCases": [],
       "personnelUnresolvedCases": [],
       "personnelBlockedGroups": [],
-      "qbPerformanceFailClosedTeams": [],
+      "qbPerformanceFailClosedTeams": [
+        "CLE"
+      ],
       "qbPriorEstimateTeams": [],
       "qbPriorEstimates": [],
       "weeklyRatingInput": {
@@ -1017,10 +1042,10 @@
       "homeRating": 24.504974248,
       "neutralBaseHome": -3.8062869,
       "espnNeutralHome": -1.5,
-      "grahamFairHome": -4.5,
-      "grahamAsOf": "2026-11-05T04:17:54.238Z",
+      "grahamFairHome": -5.5,
+      "grahamAsOf": "2026-11-05T04:25:43.000Z",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "grahamMove": 1.5,
+      "grahamMove": -1,
       "personnelEstimateCases": [],
       "personnelUnresolvedCases": [],
       "personnelBlockedGroups": [],
@@ -1032,19 +1057,19 @@
         {
           "team": "PHI",
           "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
-          "value": 6,
+          "value": 7,
           "confidence": "LOW",
           "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
-          "evidenceDropbacks": 86,
+          "evidenceDropbacks": 29,
           "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
           "reopenOn": "Official starter change or separately authorized performance-model recalibration",
           "starterEvidence": {
             "kind": "OFFICIAL",
             "team": "PHI",
-            "playerId": "22712",
-            "url": "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
-            "observedAt": "2026-10-15T23:54:56.497Z",
-            "finding": "The official October 15 Week 6 Eagles injury report explicitly confirms: Quarterback Tanner McKee will start for the Eagles against the Carolina Panthers on Sunday with Jalen Hurts out."
+            "playerId": "14614",
+            "url": "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-nov-4",
+            "observedAt": "2026-11-05T04:11:26.000Z",
+            "finding": "The official NFL November 4 roundup records that Philadelphia named Joe Milton the starting quarterback for Week 9 against the Giants."
           }
         }
       ],
@@ -1065,7 +1090,7 @@
         "marketViewed": false
       },
       "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
-      "researchSummary": "Governed fair decomposition: neutral/team base -3.806; home field -2.082; other governed +1.420; pre-personnel exact -4.468; personnel +0.000; matchup +0.000; exact Graham home fair -4.468; displayed -4.5.",
+      "researchSummary": "Governed fair decomposition: neutral/team base -3.806; home field -2.082; other governed +0.420; pre-personnel exact -5.468; personnel +0.000; matchup +0.000; exact Graham home fair -5.468; displayed -5.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1089,11 +1114,11 @@
           "awayTeam": "NYG",
           "homeTeam": "PHI",
           "awayStarter": "J.J. McCarthy",
-          "homeStarter": "Tanner McKee",
+          "homeStarter": "Joe Milton",
           "awayTeamQbDelta": -1.08,
-          "homeTeamQbDelta": -2.5,
-          "pointsToHomeSpread": 1.42,
-          "reason": "Governed Walters QB differential: NYG -1.08 minus PHI -2.50 equals +1.42 points to the home-spread coordinate. PHI uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
+          "homeTeamQbDelta": -1.5,
+          "pointsToHomeSpread": 0.42,
+          "reason": "Governed Walters QB differential: NYG -1.08 minus PHI -1.50 equals +0.42 points to the home-spread coordinate. PHI uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
           "valuationMethods": {
             "away": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
             "home": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1"
@@ -1103,12 +1128,11 @@
             "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
             "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
             "https://www.giants.com/news/week-7-tracker-latest-news-notes-roster-moves-houston-texans-jameis-winston-jj-mccarthy",
-            "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
-            "https://www.philadelphiaeagles.com/news/tanner-mckee-will-be-ready-for-his-moment-2026-nfl-week-6-carolina-panthers",
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-nov-4",
             "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
             "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
           ],
-          "effectiveAt": "2026-11-05T03:02:48.181Z",
+          "effectiveAt": "2026-11-05T04:25:43.000Z",
           "marketViewed": false
         }
       ],
@@ -1134,7 +1158,7 @@
       "pinnacleMoneylineAwayLimit": 6567,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": 7.5,
+      "grahamHomeStrengthGap": 8.5,
       "officialDailySequence": null,
       "officialDailyCapturedAt": null
     },
@@ -1580,10 +1604,10 @@
       "homeRating": 28.03230106,
       "neutralBaseHome": -11.532041702,
       "espnNeutralHome": -8,
-      "grahamFairHome": -13,
-      "grahamAsOf": "2026-11-05T04:17:54.238Z",
+      "grahamFairHome": -11.5,
+      "grahamAsOf": "2026-11-05T04:25:43.000Z",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "grahamMove": 0.5,
+      "grahamMove": 1.5,
       "personnelEstimateCases": [],
       "personnelUnresolvedCases": [],
       "personnelBlockedGroups": [],
@@ -1608,7 +1632,7 @@
         "marketViewed": false
       },
       "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
-      "researchSummary": "Governed fair decomposition: neutral/team base -11.532; home field -2.082; other governed +0.420; pre-personnel exact -13.194; personnel +0.000; matchup +0.000; exact Graham home fair -13.194; displayed -13.0.",
+      "researchSummary": "Governed fair decomposition: neutral/team base -11.532; home field -2.082; other governed +1.920; pre-personnel exact -11.694; personnel +0.000; matchup +0.000; exact Graham home fair -11.694; displayed -11.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1631,28 +1655,26 @@
           "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
           "awayTeam": "ARI",
           "homeTeam": "SEA",
-          "awayStarter": "Jacoby Brissett",
-          "homeStarter": "Sam Darnold",
+          "awayStarter": "Gardner Minshew",
+          "homeStarter": "Drew Lock",
           "awayTeamQbDelta": -0.33,
-          "homeTeamQbDelta": -0.75,
-          "pointsToHomeSpread": 0.42,
-          "reason": "Governed Walters QB differential: ARI -0.33 minus SEA -0.75 equals +0.42 points to the home-spread coordinate.",
+          "homeTeamQbDelta": -2.25,
+          "pointsToHomeSpread": 1.92,
+          "reason": "Governed Walters QB differential: ARI -0.33 minus SEA -2.25 equals +1.92 points to the home-spread coordinate.",
           "valuationMethods": {
-            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "away": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
             "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
           },
           "sourceRefs": [
             "data/walters/nfl/qb-production/production-contract-v1.json",
             "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
             "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-            "https://www.nfl.com/news/sam-darnold-glute-seahawks-commanders",
-            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
-            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+            "https://www.azcardinals.com/news/gardner-minshew-named-cardinals-starting-quarterback-carson-beck-made-backup",
+            "https://www.nfl.com/news/cardinals-qb-gardner-minshew-starting-qb-carson-beck-backup",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-nov-4"
           ],
-          "effectiveAt": "2026-11-05T03:02:48.181Z",
+          "effectiveAt": "2026-11-05T04:25:43.000Z",
           "marketViewed": false
         }
       ],
@@ -1678,7 +1700,7 @@
       "pinnacleMoneylineAwayLimit": 2250,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": 4.5,
+      "grahamHomeStrengthGap": 3,
       "officialDailySequence": null,
       "officialDailyCapturedAt": null
     },
@@ -1808,7 +1830,9 @@
       "personnelEstimateCases": [],
       "personnelUnresolvedCases": [],
       "personnelBlockedGroups": [],
-      "qbPerformanceFailClosedTeams": [],
+      "qbPerformanceFailClosedTeams": [
+        "MIN"
+      ],
       "qbPriorEstimateTeams": [],
       "qbPriorEstimates": [],
       "weeklyRatingInput": {
