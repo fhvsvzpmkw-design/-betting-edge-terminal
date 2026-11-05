@@ -617,9 +617,14 @@ function protectedArtifactHashes(active) {
     PERSONNEL_PRODUCTION_PATH,
     MATCHUP_PRODUCTION_PATH,
     HOME_FIELD_PRODUCTION_PATH,
-    relative(active.absolutePaths.personnelLedger),
   ];
-  return Object.fromEntries(paths.map(item => [item, sha256File(absolute(item))]));
+  const personnelLedger = active.absolutePaths.personnelLedger;
+  // A fresh week creates this ledger with its first governed personnel batch.
+  // Include absence in the comparison so creation or removal is also detected.
+  return {
+    ...Object.fromEntries(paths.map(item => [item, sha256File(absolute(item))])),
+    [relative(personnelLedger)]: fs.existsSync(personnelLedger) ? sha256File(personnelLedger) : null,
+  };
 }
 
 function validateBoard(board, production, contract) {
