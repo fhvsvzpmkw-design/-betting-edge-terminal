@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-15:15-evening-2026-11-06",
+  "executionRunId": "2026-11-06T15:30:40-07:00|4",
+  "workBinding": {
+    "candidateId": "2026-11-06T15:30:40-07:00|4",
+    "feedBlobSha": "98c937933ad70644c4cf16e5b6079a3d65188c91",
+    "checkpointPath": "data/report-production/checkpoints/20261106-evening-1515-153041.json",
+    "assignmentRevision": 1,
+    "finalMergedRevision": null
+  },
+  "mode": "BROAD_RESEARCH",
+  "reason": "The 15:15 broad profile used one complete-event researcher and one critical reviewer for the three-game NHL subset; the coordinator retained the remaining fourteen priced games.",
+  "workers": [
+    {
+      "id": "/root/evening_researcher",
+      "role": "complete-event-researcher",
+      "readOnly": true,
+      "freshContextBoundary": "Exact candidate, revision, feed and three NHL event IDs acknowledged before research; no shared writes or delegation authorized.",
+      "assignmentIds": ["72909366", "72909368", "72909370"],
+      "launchObservedAt": "2026-11-06T22:31:00Z",
+      "acknowledgmentObservedAt": "2026-11-06T22:31:20Z",
+      "returnObservedAt": null,
+      "state": "ACKNOWLEDGED",
+      "completedReviews": 0,
+      "error": null
+    },
+    {
+      "id": "/root/evening_reviewer",
+      "role": "independent-critical-reviewer",
+      "readOnly": true,
+      "freshContextBoundary": "Exact candidate, revision, feed and NHL/Guy review scope acknowledged before review; no shared writes or delegation authorized.",
+      "assignmentIds": ["72909366", "72909368", "72909370", "guy-early-shortlist"],
+      "launchObservedAt": "2026-11-06T22:31:00Z",
+      "acknowledgmentObservedAt": "2026-11-06T22:31:40Z",
+      "returnObservedAt": null,
+      "state": "ACKNOWLEDGED",
+      "completedReviews": 0,
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_ONE_RESEARCHER_AND_ONE_REVIEWER",
+      "workers": 2,
+      "question": "Resolve the three NHL events' current goalie/personnel/model/settlement evidence and independently challenge any source-led opinion or Guy handoff.",
+      "expectedQualityBenefit": "Complete-event coverage plus an independent correlation, identity and contrary-evidence check on the most source-rich league.",
+      "releaseCondition": "Both workers return or report a concrete source/tool shortfall; no routine expansion beyond the two-worker profile is planned."
+    }
+  ],
+  "qualityFindings": [],
+  "completedWork": {
+    "eventsResearched": 0,
+    "selectionsAssessed": 0,
+    "independentReviews": 0,
+    "workerReturns": 0,
+    "coordinatorMergedEvents": 0,
+    "startupSaveState": "STARTUP_SAVE_PENDING_REMOTE_VERIFICATION"
+  },
+  "remainingWork": ["Worker research/review is in progress; coordinator analysis and event checkpoint merges remain pending."],
+  "recordedAt": "2026-11-06T22:32:03Z"
+}
