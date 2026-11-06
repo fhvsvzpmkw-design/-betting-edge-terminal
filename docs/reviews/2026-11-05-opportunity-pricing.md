@@ -24,7 +24,7 @@ The earlier saved movement study found that following sustained moves at final p
 
 ## Existing analysts, clearer duty
 
-The existing complete-game owners now own opportunity pricing within their games. Their meaningful candidate returns lead with executable American odds/break-even, the signed Pinnacle comparison, applicable model/native fair, strongest contrary finding and the remaining decision-sensitive question. They reuse the event package and existing typed fields. The existing reviewer challenges those numerical claims and consequential rejections. No additional worker or recurring task is added; reduced broad/update staffing and normal research bounds continue.
+The existing complete-game owners now own opportunity pricing within their games. Their meaningful candidate returns lead with executable American odds/break-even, the signed Pinnacle comparison, applicable model/native fair, strongest contrary finding and the remaining decision-sensitive question. They reuse the event package and existing typed fields. The existing reviewer challenges those numerical claims and consequential rejections. Routine broad staffing is reduced from two researchers plus one reviewer to one researcher plus one reviewer, with the coordinator owning the remaining games. Update runs still start with zero workers and allow one targeted worker routinely. Expansion needs the existing named consequential exception. No recurring task or odds pull is added.
 
 ## Verification
 
