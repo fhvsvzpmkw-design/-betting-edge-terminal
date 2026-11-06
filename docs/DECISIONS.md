@@ -305,6 +305,8 @@ The native Cloudflare dispatch path still requires reliability diagnosis. The ba
 
 ## D-032 — Research Library v1.8 is production read-only authority
 
+**Current scope clarification — November 6, 2026:** This decision governs the frozen History Fit/Core component. [D-048](#d-048--keep-adaptive-research-current-and-bound-superseded-rules) authorizes the separate living strategy catalogue and research/feedback process; read-only component rules do not prohibit discovery or documented current-method revisions.
+
 **Status:** Active as of 2026-08-25
 
 Research Library v1.8 / R3 is the production Research authority. Normal History Fit remains read-only and cannot create BET, supply executable price, directly move the fair point estimate, lower model error or set stake.
@@ -488,6 +490,8 @@ The user explicitly instructed setup after reviewing the D-045 circular dependen
 
 ## D-047 — Use adaptive research groups to improve depth and quality
 
+**Current Main staffing:** The November 4 reduced profiles in [the execution guide](REPORT_RESEARCH_AGENTS.md) supersede the original Main four-researcher/two-reviewer default below. Other group boundaries remain. November 6 adaptive research does not expand worker counts or Graham authority.
+
 **Date:** 2026-11-01. **Status:** OPERATIONAL CONFIGURATION; TASK READBACK AND LIVE ACCEPTANCE RECORDED SEPARATELY.
 
 The user instructed implementation of the recommended groups and asked that each coordinator be able to add agents as needed. Apply [research-agent-groups-v2](../data/research-agents/policy.json) and the [shared execution guide](REPORT_RESEARCH_AGENTS.md). Main normally uses four complete-event researchers/two critical reviewers; Graham two independent case researchers/one reviewer; Meat Desk one fresh-discovery researcher/one challenger; grading one historical-exception researcher when needed; requested manual Crypto source analysis one reader/one reviewer. Size each actual pool to useful work. No new recurring task or automatic source-upload analysis is introduced.
@@ -499,3 +503,17 @@ Every Graham worker starts in a fresh context without parent history and receive
 Attempt durable activity records at startup, material returns and final delivery for substantive delegated phases or actual startup failures in each group's specified directory. Verified unchanged hourly/mechanical checks, already-published retries with no new research and clear-backlog checks with no delegation write no new timestamp-only receipt; report zero new workers in execution output. Scheduled Graham runtime/sweep/completion records remain mandatory. Baseline delegation additionally requires the expected-main-head exclusive claim of its existing RUN_STARTED event, so scheduled/hourly entrants cannot both acquire ownership from the same no-owner state. This is a narrow metadata write allowance, not a new research queue or numerical/publication gate. It supersedes optional-only recording; record actual IDs/bindings/errors, scaling reasons, returned facts/reviews, corrections adopted/rejected and precise remaining work. Save failures are disclosed without blocking independently completed products. An already-published retry reads the original receipt or reports original agent use UNVERIFIED. Quality is measured by important verified facts, errors caught, source conflicts addressed and reasoning/decision corrections, not agent agreement, pick counts, runtime or a single day's results.
 
 All existing schedules, activation, odds budgets, decision/stake rules, immutable issuance and the one publisher per product remain. New source or method authority still requires its normal approval; adding a worker cannot supply it. Deployment/readback, acknowledgment capacity, substantive returned work and live product acceptance must remain separately evidenced.
+
+## D-048 — Keep adaptive research current and bound superseded rules
+
+**Date:** 2026-11-06. **Status:** APPROVED ANALYTICAL DIRECTION; IMPLEMENTED IN PR #133; DOCUMENTATION CONSOLIDATED.
+
+The user approved restoring reviewed strategies, exploring published methods, form and streaks, and letting the coordinator develop evidence-based methods from saved results. Apply [adaptive strategy research](ADAPTIVE_STRATEGY_RESEARCH.md) from the code's exact `2026-11-06T17:00:00Z` cutoff (10:00 on the current America/Vancouver clock). The earlier 09:00 wording was a label error; do not change issued timestamps or the activation code to fit it.
+
+The living `research/strategy-registry.json` is a starting set, not an exclusive allowlist. Current source/strategy feedback informs discovery and documented revisions. `SOURCE_LED_OPINION` permits a reviewed exact original forecast LEAN without a qualified Pinnacle pair or fixed NHL two-source/one-point rule. Keep original supporting/contrary replay, current applicability, explicit unadopted fair/uncertainty, any available exact signed benchmark and zero risk. BET retains its supported fair/range, independent-support, model-error, personnel, exposure and staking requirements. Forecast-supported PASS retains a real directional objection. The existing NHL price-WAIT helper's concrete one-point reassessment arithmetic remains helper-specific, not a universal LEAN floor.
+
+Mark the older universal numerical-fair requirement, fixed NHL corroboration, one-point default/mandatory PASS exception and candidate-first discovery ban with their historical/component scope in the current authoring guides. Keep frozen Research Library checksums, Core manifests/components, the independent Graham workflow and issued decisions unchanged. The older full results/CLV-loop deferral does not disable the separately implemented source-form/prospective-strategy feedback. Main uses the reduced November 4 staffing; no additional worker, task, prediction service or odds pull is created.
+
+Deployment, a new feedback artifact, actual ordinary-run adoption and successful betting performance are separate findings. Inspect the current report instant and pinned inputs; retain original source clocks and use the existing unfrozen preparation flow where appropriate. Missing optional feedback creates no publication veto. Preserve prospectively captured method versions, negative results and correlated-sample limitations; revise future definitions transparently rather than rewrite prior trials.
+
+**Reason:** Prevent old analytical instructions from silently regaining authority while preserving data integrity, reproducible history and wagering controls.
