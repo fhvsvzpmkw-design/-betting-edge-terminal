@@ -1,5 +1,7 @@
 import {nhlCorroborationApplies,inspectNhlCorroboration,buildNhlCorroboration,validateNhlCorroboration,
   nhlCorroborationPriceTarget,nhlCorroborationText,buildNhlPinnacleReview,nhlPinnacleReviewText} from './nhl-forecast-corroboration.mjs';
+import {adaptiveResearchActive} from './strategy-research.mjs';
+import {evaluate,matchCondition,loadProductionFramework} from './core-handicap-framework.mjs';
 
 // A reviewed published probability can support an opinion without becoming
 // an independently validated fair or acquiring BET/staking authority.
@@ -26,6 +28,10 @@ function targetPrice(probability) {
 // Producer guidance only: current exact forecast comparisons still come from
 // the bound-record/applicability validators. This does not create a decision.
 export function forecastLeanDefault(report, decision, comparisons = []) {
+  if (adaptiveResearchActive(report)) return {active:true,applies:false,flexible:true,
+    minimumEdgeProbabilityPoints:null,recommendedStatus:null,decisionAuthority:false,
+    qualifyingRecordIds:list(comparisons).filter(r=>r.direction==='SUPPORTS_PRICE' && close(r.priceDecimal,Number(decision?.feed?.priceDecimal))).map(r=>r.recordId),
+    instruction:'Assess source quality, current applicability, strategy findings, recent performance and contrary evidence. A positive exact forecast can support a discretionary zero-stake LEAN without a fixed one-point gap, second source or available Pinnacle reference. Explain the opinion; retain uncertainty and meaningful rechecks. Source support never automatically assigns a status or stake.'};
   const active = Date.parse(report?.ts) >= Date.parse(FORECAST_LEAN_DEFAULT_FROM);
   const exact = list(comparisons).filter(row => row.direction === 'SUPPORTS_PRICE' &&
     Number.isFinite(row.edgeProbabilityPoints) && row.edgeProbabilityPoints >= FORECAST_LEAN_DEFAULT_MIN_POINTS &&
@@ -58,9 +64,10 @@ function validateForecastPoint(report, rec, a, ids, {status, basis, from}) {
   if (a == null) return false;
   ensure(Date.parse(report.ts)>=Date.parse(from),'predates forward activation');
   ensure(rec.status===status && /^\$?0(?:\.0+)?$/.test(String(rec.stake)) && rec.playTo==='NO BET' && !rec.priceWatch,'opinion only; cannot authorize BET, stake or a wagering threshold');
-  ensure(rec.marketAssessment?.basis==='QUALIFIED_PINNACLE' && rec.fairValueEvidence==null,'requires the existing exact market assessment; cannot masquerade as adopted fair');
+  const sourceLed=adaptiveResearchActive(report) && rec.marketAssessment?.basis==='SOURCE_LED_OPINION';
+  ensure((rec.marketAssessment?.basis==='QUALIFIED_PINNACLE'||sourceLed) && rec.fairValueEvidence==null,'requires an exact market or forward source-led assessment; cannot masquerade as adopted fair');
   ensure(a.schema===1 && a.basis===basis && a.selectionKey===rec.feed?.selectionKey,'requires exact selection identity');
-  ensure(rec.coreAssessment?.context?.fairValueBasis==='MARKET_DERIVED_ONLY' && rec.coreAssessment.betEligibleByModelError===false,'must retain honest market-only Core classification and blocked BET authority');
+  ensure((rec.coreAssessment?.context?.fairValueBasis==='MARKET_DERIVED_ONLY'||sourceLed&&rec.coreAssessment?.context?.fairValueBasis==='UNAVAILABLE') && rec.coreAssessment.betEligibleByModelError===false,'must retain honest non-adopted-fair Core classification and blocked BET authority');
   const at=Date.parse(a.checkedAt);
   ensure(Number.isFinite(at) && at>=Date.parse(report.feedGeneratedAt) && at<=Date.parse(report.ts),'requires current producer judgment');
   ensure(Date.parse(rec.feed?.eventDate)>Date.parse(report.ts),'requires an unstarted event');
@@ -77,7 +84,7 @@ function validateForecastPoint(report, rec, a, ids, {status, basis, from}) {
   ensure(typeof a.provisional==='boolean','requires explicit provisional state');
   const unresolved=rec.marketAssessment.informationReview?.state==='UNRESOLVED' || rec.coreAssessment.context.personnelSensitivity==='UNRESOLVED';
   if (unresolved) ensure(a.provisional===true && text(a.recheckCondition),'unresolved material information requires provisional wording and a named recheck');
-  ensure(String(rec.fair).startsWith('Market reference: '),'market reference must remain separately labelled');
+  ensure(String(rec.fair).startsWith(sourceLed?'Published forecast point: ':'Market reference: '),'forecast point and market reference must remain separately labelled');
   ensure(new RegExp(`\\b${status}\\b`).test(rec.analysis) && /no (?:bet|wager)/i.test(rec.analysis),'visible analysis must identify an opinion and no wager');
   if (a.provisional) ensure(/provisional/i.test(rec.analysis) && rec.analysis.includes(a.recheckCondition),'visible analysis must carry the provisional condition');
   ensure(rec.analysis.includes(a.uncertainty) && rec.analysis.includes(a.conflictReview),'uncertainty and disagreement must be visible');
@@ -88,7 +95,7 @@ export function validateForecastLean(report, rec, ids = new Map(list(rec?.source
   if (rec?.forecastLean == null) return false;
   ensure(rec.forecastWait == null, 'cannot carry both forecast LEAN and forecast WAIT');
   const valid = validateForecastPoint(report, rec, rec.forecastLean, ids, {status:'LEAN',basis:'REVIEWED_FORECAST_POINT',from:FORECAST_LEAN_FROM});
-  if (nhlPriceOpinion(report, rec)) {
+  if (nhlPriceOpinion(report, rec) && !adaptiveResearchActive(report)) {
     const r = list(rec.forecastReview?.records).find(r => r.recordId === rec.forecastLean.forecastRecordId);
     ensure(r.probabilityBasis === 'UNCONDITIONAL' && points(r) >= FORECAST_LEAN_DEFAULT_MIN_POINTS - 1e-8,
       'NHL forecast LEAN requires at least one probability point; smaller positive gaps belong in forecast price WAIT');
@@ -130,6 +137,26 @@ export function validateForecastLeanDirections(report) {
     g.sides.add(f.side);g.forecastOpinion ||= rec.forecastLean!=null || rec.forecastWait!=null;groups.set(key,g);
   }
   for (const g of groups.values()) if (g.forecastOpinion) ensure(g.sides.size===1,'select one directional preference per exact paired contract; retain disagreement in analysis');
+}
+
+/** Producer-supplied judgment is mandatory; this never auto-promotes cards. */
+export function createSourceLedForecastLean(report, rec, judgment, framework=loadProductionFramework()) {
+  ensure(adaptiveResearchActive(report),'source-led opinions predate activation');
+  const r=list(rec.forecastReview?.records).find(r=>r.recordId===judgment?.forecastRecordId);
+  ensure(r,'reviewed record required');
+  const next=structuredClone(rec),context={...next.coreAssessment?.context,fairValueBasis:'UNAVAILABLE',independentCurrentSupport:'NONE'};
+  context.graduatedResearchIds=[...new Set(framework.graduatedResearchRules.filter(rule=>matchCondition(rule.when,context)).map(rule=>rule.priorId))];
+  next.coreAssessment={...next.coreAssessment,frameworkId:framework.frameworkId,context,...evaluate(framework,context),
+    fairValueBasisRationale:'A reviewed published point supports an opinion; no independent fair is adopted.',
+    uncertaintyStatement:judgment.uncertainty,rationale:judgment.rationale};
+  next.fairValueEvidence=null;
+  next.fair=`Published forecast point: ${(r.probability*100).toFixed(2)}% (independent fair unavailable)`;
+  next.marketAssessment={schema:1,basis:'SOURCE_LED_OPINION',selectionKey:next.feed?.selectionKey,
+    probabilityBasis:r.probabilityBasis,informationReview:judgment.informationReview||rec.marketAssessment?.informationReview,
+    settlementRationale:judgment.settlementRationale||rec.marketAssessment?.settlementRationale,
+    limitations:judgment.limitations,decisionRationale:judgment.rationale};
+  if(next.pinnacleBenchmark?.state!=='QUALIFIED')next.benchmarkComparison=null;
+  return createForecastLean(report,next,judgment);
 }
 
 /** Producer-supplied judgment is mandatory; this never auto-promotes cards. */

@@ -14,6 +14,8 @@ import {list,number,digest,readOptional,eventIdentity,sameEvent,recordId,validat
 import {loadForecastSourceRegistry} from './forecast-evidence.mjs';
 import {mlbScheduleUrl,parseOfficialMlb} from './official-personnel.mjs';
 import {parseEspnGoalieContext,replaceEspnGoalieFacts} from './guy-goalie-context.mjs';
+import {buildStrategyTrials} from './strategy-research.mjs';
+import {exactMarketReference,marketComparison} from './market-price-assessment.mjs';
 
 export const ROUTES={NFL:'football/nfl',NCAAF:'football/college-football',CFL:'football/cfl',MLB:'baseball/mlb',NBA:'basketball/nba',WNBA:'basketball/wnba',NHL:'hockey/nhl'};
 export const NFELO_URL='https://raw.githubusercontent.com/greerreNFL/nfelo/main/output_data/nfelo_games.csv';
@@ -246,10 +248,14 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
   const facts=previousUsable?list(prior.facts).filter(r=>events.some(e=>sameEvent(r,e))):[];
   const policy=readOptional(path.join(root,'data/major-sport-market-coverage-v1.json'));
   const inventory=policy?derivePrimarySelectionInventory({ts:at,feedGeneratedAt:feed.generatedAt},feed,policy):{selections:[]};
+  const observer=readOptional(path.join(root,'data/oddspapi-observer.json'));
   const quoteRows=list(inventory.selections).flatMap(selection=>list(selection.quotes).map(quote=>{
     const c=forecastCandidate({...selection,quote},{feed});
-    return {eventId:c.eventId,startTime:c.startTime,sport:c.sport,marketDetail:c.marketDetail,side:c.side,line:c.line,
-      book:quote.book,priceDecimal:quote.priceDecimal,observedAt:quote.quoteObservedAt||quote.quoteUpdatedAt};
+    const event=events.find(e=>sameEvent(e,c));
+    let pinnacleDirection='UNAVAILABLE';
+    try {pinnacleDirection=marketComparison(quote.priceDecimal,exactMarketReference({ts:at,feedGeneratedAt:feed.generatedAt},{...quote,eventDate:c.startTime},observer).selected.noVigProbability).direction;} catch {}
+    return {eventId:c.eventId,startTime:c.startTime,sport:c.sport,home:event?.home,away:event?.away,marketDetail:c.marketDetail,side:c.side,line:c.line,
+      book:quote.book,priceDecimal:quote.priceDecimal,observedAt:quote.quoteObservedAt||quote.quoteUpdatedAt,pinnacleDirection};
   }));
   const quoteGroups=new Map();
   for(const q of [...(previousUsable?list(prior.quoteHistory):[]),...quoteRows]){
@@ -392,6 +398,8 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
   }
   const capture={schema:1,collectedAt:clock(),feedGeneratedAt:feed.generatedAt,records,facts,quoteHistory,curatedPicks:curated.picks,sources,requestCache:cache,
     acquisition:{requests:requests.length,oddsApiRequests:0,modelCalls:0,receipts:requests}};
+  capture.strategyTrials=buildStrategyTrials({registry:readOptional(path.join(root,'research/strategy-registry.json')),
+    records,quotes:quoteRows,facts,at:capture.collectedAt,feedGeneratedAt:feed.generatedAt});
   capture.snapshotId=digest(capture);
   validateCapture(capture,registry);
   return capture;

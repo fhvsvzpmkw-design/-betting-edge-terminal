@@ -7,6 +7,7 @@ import {pathToFileURL} from 'node:url';
 import {gradeCuratedSources,validCuratedRecord} from './curated-aggregation.mjs';
 import {list,readOptional,number} from './game-intelligence.mjs';
 import {ROUTES,matchEspnEvent} from './collect-game-intelligence.mjs';
+import {gradeStrategyTrials,sourceFormFeedback} from './strategy-research.mjs';
 const time=x=>Date.parse(x||'');
 const day=x=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(x));
 export function latestForecasts(captures,at){
@@ -91,7 +92,8 @@ export async function grade({root=process.cwd(),at=new Date().toISOString(),fetc
   const forecasts=latestForecasts(captures,at),previous=readOptional(path.join(root,'data/game-intelligence/performance.json'));
   const results=new Map(list(previous?.results).map(r=>[`${r.eventId}|${r.startTime}`,r])),boards=new Map(),errors=[];
   const curated=captures.flatMap(c=>list(c.curatedPicks)).filter(r=>validCuratedRecord(r,null,at));
-  const events=[...new Map([...forecasts,...curated].filter(r=>time(r.startTime)<time(at)-6*3600000).map(r=>[`${r.eventId}|${r.startTime}`,r])).values()];
+  const strategyTrials=captures.filter(c=>time(c.collectedAt)<=time(at)).flatMap(c=>list(c.strategyTrials));
+  const events=[...new Map([...forecasts,...curated,...strategyTrials].filter(r=>ROUTES[r.sport]&&time(r.startTime)<time(at)-6*3600000).map(r=>[`${r.eventId}|${r.startTime}`,r])).values()];
   for(const event of events){
     const key=`${event.eventId}|${event.startTime}`;if(results.has(key))continue;
     const boardKey=`${event.sport}|${day(event.startTime)}`;
@@ -118,6 +120,7 @@ export async function grade({root=process.cwd(),at=new Date().toISOString(),fetc
   return {schema:1,asOf:at,counts:{observations:rows.length,graded:rows.filter(r=>r.state==='GRADED').length,
     events:new Set(rows.filter(r=>r.state==='GRADED').map(r=>r.eventId+'|'+r.startTime)).size},bySource,
     moneyPuckComponents:compareMoneyPuckComponents(forecasts,rows),curatedSources:gradeCuratedSources(captures,[...results.values()],at),rows,results:[...results.values()],errors,
+    sourceForm:sourceFormFeedback(rows),strategyLearning:gradeStrategyTrials(captures,[...results.values()],at),
     population:'Last observed pregame forecast per source, game and market, one orientation. No reconstructed pregame values. Pushes/ties excluded from resolved-outcome Brier.',
     limitation:'Source tracking is prospective and descriptive. No automatic weighting, ROI claim, stake or decision change.'};
 }

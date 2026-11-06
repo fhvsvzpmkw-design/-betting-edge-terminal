@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "effectiveFrom": "2026-11-06T17:00:00Z",
+  "purpose": "Living research methods and prospective experiments. The coordinator may add, revise or retire methods using saved evidence; analytical defaults are revisable. Actual prices, identities, clocks, grading and bankroll controls retain their authority.",
+  "revisionPolicy": "Preserve each captured rule fingerprint. Change the version and future effectiveFrom when changing a trial definition; evaluate the new version separately. Historical exploratory findings are not prospective validation.",
+  "methods": [
+    {
+      "id": "wong_price_and_settlement", "version": 1, "kind": "METHOD", "sports": ["ALL"],
+      "name": "Wong: forecast, settlement and price",
+      "sourcePaths": ["docs/source-material/sharp-sports-betting-methods.md", "docs/SHARP_SPORTS_BETTING_FULL_REVIEW_2026-09-07.md"],
+      "question": "Does a supported outcome estimate justify the actual payoff after pushes, settlement rules and uncertainty?",
+      "limitation": "Preserve the reviewed mathematical corrections. The book supplies methods, not today's prediction or a universal profitable threshold."
+    },
+    {
+      "id": "walters_current_matchup", "version": 1, "kind": "METHOD", "sports": ["NFL"],
+      "name": "Walters: independent matchup and fair line",
+      "sourcePaths": ["docs/GRAHAM_NFL_FAIR_HANDOFF.md"],
+      "question": "What do the current governed Graham fair, personnel and matchup explain about this offered spread?",
+      "limitation": "Reuse the current independent Graham ownership and evidence; do not create another rating system or move its fair merely to follow Pinnacle."
+    },
+    {
+      "id": "football_key_numbers", "version": 1, "kind": "METHOD", "sports": ["NFL", "NCAAF"],
+      "name": "Football key numbers and price sensitivity",
+      "priorIds": ["v18_football_key_numbers_demand_not_information"],
+      "sourcePaths": ["docs/source-material/sharp-sports-betting-methods.md"],
+      "sourceUrls": ["https://bj21.com/articles/sports-betting/good-six-point-teaser-bets"],
+      "question": "How much does crossing a key number change this exact contract's payoff and supported value?",
+      "limitation": "Do not transplant old NFL tables across sports. Teasers remain research unless an actual offered product and its payout/settlement are captured; straight-spread prices cannot price a teaser."
+    },
+    {
+      "id": "movement_and_reversal", "version": 1, "kind": "HYPOTHESIS", "sports": ["MLB", "NFL", "NBA", "NHL"],
+      "name": "Movement path, reversals and timing",
+      "priorIds": ["mlb_intraday_line_movement", "mlb_intraday_inefficiency_2024", "qr_line_movement_overreaction"],
+      "sourceUrls": ["https://doi.org/10.1287/mnsc.2022.00456", "https://doi.org/10.1177/15586235251394815"],
+      "question": "Does the observed path offer predictive information at the current price, and at which time horizon?",
+      "limitation": "Our earlier sustained-move result was negative. Reversal findings were exploratory. Define the entry before the game; a hindsight latest snapshot cannot become a live trigger."
+    },
+    {
+      "id": "demand_and_recency", "version": 1, "kind": "HYPOTHESIS", "sports": ["ALL"],
+      "name": "Demand, recency and price shading",
+      "priorIds": ["v18_online_bookmaker_orderflow_price_adjustment", "v18_nfl_totals_momentum_behavior", "v18_college_football_sportsbook_demand_pricing"],
+      "sourceUrls": ["https://doi.org/10.1111/j.1468-0297.2004.00207.x", "https://doi.org/10.1016/j.jbef.2021.100522"],
+      "question": "Does a book's response to recent results or bettor preferences systematically overprice one side?",
+      "limitation": "Odds alone do not identify a book's liabilities, betting volume or intended winner. Test observable pricing and outcomes, with sport/era limits."
+    },
+    {
+      "id": "forecast_price", "version": 1, "kind": "PROSPECTIVE_TEST", "sports": ["ALL"],
+      "name": "Published forecast at an obtainable price",
+      "rule": "At the first captured positive exact forecast-price gap per source family, game, side, line and book, retain that point and price. Compare all cases with Pinnacle-support and two-family-support subsets on those same frozen entries.",
+      "question": "Which sources and market conditions predict useful returns, including when Pinnacle is unavailable or disagrees?",
+      "limitation": "Research samples have not received a producer's current personnel/applicability judgment. A published point is not a calibrated fair; subgroup samples overlap."
+    },
+    {
+      "id": "recent_form_follow", "version": 1, "kind": "PROSPECTIVE_TEST", "sports": ["ALL"],
+      "name": "Follow recent winning form",
+      "parameters": {"consecutiveWins": 3},
+      "rule": "From a current provider recent-game sequence containing at least three verified pre-observation wins, follow that team at the first captured full-game moneyline price. Keep one frozen entry per game and book.",
+      "sourceUrls": ["https://doi.org/10.1177/1527002512465414", "https://doi.org/10.1177/15586235251403232"],
+      "question": "Does recent winning form persist enough to beat the offered price?",
+      "limitation": "An initial experimental definition, not a claim of persistent skill. Review opponent quality, personnel and performance versus expectation. Three is revisable through a separately versioned experiment."
+    },
+    {
+      "id": "recent_form_fade", "version": 1, "kind": "PROSPECTIVE_TEST", "sports": ["ALL"],
+      "name": "Fade a recent winning streak",
+      "parameters": {"consecutiveWins": 3},
+      "rule": "Use the same documented recent-winning-form trigger, but record the available opposing full-game moneyline at the first capture. Conflicting triggers on both teams do not select a side.",
+      "sourceUrls": ["https://doi.org/10.1177/1527002512465414", "https://doi.org/10.1177/15586235251403232"],
+      "question": "Has the price overreacted to recent wins?",
+      "limitation": "A losing outcome is not due. Compare against following form and actual prices; generic historical streak strategies have mixed or negative evidence."
+    },
+    {
+      "id": "native_projection_price", "version": 1, "kind": "HYPOTHESIS", "sports": ["ALL"],
+      "name": "Native spread and total projections",
+      "sourcePaths": ["docs/CURATED_SOURCE_AGGREGATION.md"],
+      "question": "Which published point projections select useful sides at the actual offered line and price?",
+      "limitation": "Evaluate projections in their original units. Do not invent cover probabilities from a point difference; source-price ROI and point error remain distinct."
+    }
+  ]
+}

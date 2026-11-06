@@ -1,5 +1,7 @@
 # Core 1.5 current operating contract
 
+**November 6 forward amendment, 09:00 Pacific:** Apply `docs/ADAPTIVE_STRATEGY_RESEARCH.md`. The living strategy catalogue and saved source/strategy feedback can inform research before candidate formation and support documented method revisions. The historical research component's fixed error-floor allowlist remains a component rule; it does not prohibit this separately authorized discovery and current-evidence work. Forward forecast opinions may use `SOURCE_LED_OPINION` without a qualified Pinnacle reference or fixed two-source/one-point gate. They retain original forecast replay and explicit unadopted fair/uncertainty, with zero stake. Existing supported-fair and risk requirements govern any BET.
+
 Status: OPERATIONAL for report timestamps at/after `2026-09-21T06:00:00-07:00`.
 Governance Contract remains v1.0; scheduled report authority remains v1.2; Research Library remains v1.8; outer VigScope UI remains v1.5. These are independent version tracks.
 

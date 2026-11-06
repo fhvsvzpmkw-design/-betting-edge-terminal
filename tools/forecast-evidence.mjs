@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {isDeepStrictEqual} from 'node:util';
 import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
 import {nhlCorroborationApplies,NHL_FORECAST_SOURCES,validateNhlCorroboration} from './nhl-forecast-corroboration.mjs';
+import {adaptiveResearchActive} from './strategy-research.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const list = value => Array.isArray(value) ? value : [];
@@ -188,6 +189,16 @@ export function validateBoundForecastLean({report, sidecar, selection, receipt, 
     throw new Error(`Forecast LEAN bound record/applicability does not qualify: ${actual.reasons.join(', ')}`);
   const display=list(rec.forecastReview?.records).filter(r=>r.recordId===a.forecastRecordId);
   if (display.length!==1 || !isDeepStrictEqual(display[0],actual)) throw new Error('Forecast LEAN reviewed display differs from bound source replay');
+  if(adaptiveResearchActive(report)) {
+    const other=list(sidecar.forecastEvidence?.records).filter(r=>String(r.eventId)===candidate.eventId && r.sport===candidate.sport &&
+      r.marketDetail===candidate.marketDetail && r.period===candidate.period && r.side===candidate.side);
+    for(const raw of other) {
+      const reviewed=evaluateForecast(raw,candidate,{asOf:report.ts,revalidations:sidecar.forecastEvidence?.revalidations});
+      if(reviewed.eligibility!=='ELIGIBLE_EXACT')continue;
+      const shown=list(rec.forecastReview?.records).filter(r=>r.recordId===reviewed.recordId);
+      if(shown.length!==1||!isDeepStrictEqual(shown[0],reviewed))throw new Error('Source-led opinion cannot omit or alter an applicable supporting or contrary forecast');
+    }
+  }
   if(nhlCorroborationApplies(report,rec)) {
     // Replay every applicable approved source, including contrary versions.
     // The producer cannot invent a second point or hide a disagreeing capture.
