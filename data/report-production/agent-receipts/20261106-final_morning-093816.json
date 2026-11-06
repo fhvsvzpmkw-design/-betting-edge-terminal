@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-09:30-2026-11-06",
+  "executionRunId": "20261106-final_morning-093816",
+  "workBinding": {
+    "candidateIdAtAssignment": "2026-11-06T09:42:59.000-07:00|3",
+    "feedBlobSha": "cc3965aa07ad03be733ab5ec510497efd598341f",
+    "checkpointPath": "data/report-production/checkpoints/20261106-final_morning-093816.json",
+    "assignedRevision": 2,
+    "finalCandidateId": "2026-11-06T09:56:14.000-07:00|3",
+    "scope": "Read-only independent review of the three NHL events, Guy shortlist, contrary evidence, History Fit, and the adaptive-strategy activation conflict."
+  },
+  "mode": "TARGETED_REVIEW",
+  "reason": "The 09:30 coordinator screen identified a consequential NHL forecast/goalie conflict and Guy-call question; one independent reviewer was the routine update worker.",
+  "workers": [
+    {
+      "id": "/root/reviewer_1",
+      "role": "independent_reviewer",
+      "readOnly": true,
+      "acknowledged": true,
+      "acknowledgmentWindow": "WITHIN_60_SECONDS",
+      "acknowledgedAt": null,
+      "acknowledgmentClockNote": "The coordinator observed the exact-bound acknowledgment within 60 seconds; the precise timestamp was not retained after context compaction.",
+      "returned": true,
+      "returnState": "COMPLETED",
+      "sharedMutation": false,
+      "subagentsSpawned": 0,
+      "completedWork": [
+        "Reviewed all 18 NHL moneyline, puck-line and total selections across Columbus-Buffalo, San Jose-Minnesota and Anaheim-Calgary.",
+        "Checked the current Guy shortlist, opposing forecast directions, projected goalie uncertainty and History Fit applicability."
+      ],
+      "materialFindings": [
+        "All 18 NHL selections remained PASS: positive single-source points were opposed by the exact market reference or other captured sources, and projected/conflicting goalies prevented stronger clearance.",
+        "No November 6 Guy call was present; Anaheim moneyline was the only plausible provisional source-led opinion, but the implementation activation mismatch and unresolved goalie/model-incorporation limits prevented adoption."
+      ]
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "ONE_ROUTINE_REVIEWER",
+      "reason": "The remaining queue was fully screened by the coordinator; one independent challenge was sufficient for the consequential NHL/Guy conflict.",
+      "launches": 1,
+      "openWorkerPeak": 1
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "reason": "The reviewer returned complete bounded work and the coordinator completed the other 14 events, quarterback checks and all market-family assessments."
+    }
+  ],
+  "qualityCorrections": [
+    "Retained all NHL contracts as zero-stake PASS instead of promoting a market-blended or single-source signal.",
+    "Kept the authority-versus-registry adaptive-strategy activation mismatch as a route limitation rather than a report-wide publication veto."
+  ],
+  "coordinatorWork": {
+    "eventsScreened": 17,
+    "selectionsAvailable": 102,
+    "selectionsEvaluated": 96,
+    "documentedShortfalls": 6,
+    "forecastApplicabilityReviews": 58,
+    "quarterbackFollowUps": 5,
+    "savedEventReviews": 17
+  },
+  "finalizedAt": "2026-11-06T17:03:51Z",
+  "telemetry": {
+    "modelUsage": "UNKNOWN",
+    "tokenUsage": "UNKNOWN",
+    "creditUsage": "UNKNOWN",
+    "overlap": "UNKNOWN"
+  }
+}
