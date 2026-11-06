@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_PRODUCTION_ACTIVE_WEEK_FINAL_PREPARATION",
+  "executionRunId": null,
+  "workBinding": {
+    "phase": "ACTIVE_WEEK_FINAL_EVIDENCE_PREPARATION",
+    "activeManifest": {
+      "season": 2026,
+      "week": 9,
+      "mainHead": "3c6d79fff4a9d27cbfe439e8271d4fb296386d5e",
+      "manifestBlobSha": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a"
+    },
+    "currentNumbersBlobSha": "e2cbbc9e680ec4c334ddbb13a81c4a3e100d68c4",
+    "powerLedgerBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "readinessBlobSha": "d7de72c65e190cb388e21a9af6f68a64e4f630bf",
+    "gameKeys": ["2026-W09-JAX-BAL"],
+    "verifiedFinal": {"away": "JAX", "awayScore": 33, "home": "BAL", "homeScore": 10},
+    "marketViewed": false,
+    "scope": "Fresh-context source-only team inventories and an independent paired reviewer. No worker wrote shared state, changed methods or numbers, used market inputs, delegated, or issued a bet."
+  },
+  "mode": "AGENTS_READY_BLOCKED_NUMERICALLY",
+  "reason": "A newly final active-week game required complete paired factual preparation before any valuation work.",
+  "workers": [
+    {
+      "workerId": "/root/w09_jax_source",
+      "role": "SOURCE_RESEARCHER_JAX",
+      "returnState": "COMPLETE_WITH_EXPLICIT_GAPS",
+      "observedAt": "2026-11-06T04:16:20Z",
+      "quality": "Official gamebook and Jaguars sources; complete enumerated factual categories; snaps, phase splits and value/role work explicitly unresolved."
+    },
+    {
+      "workerId": "/root/w09_bal_source",
+      "role": "SOURCE_RESEARCHER_BAL",
+      "returnState": "COMPLETE_WITH_EXPLICIT_GAPS",
+      "observedAt": "2026-11-06T04:16:45Z",
+      "quality": "Official gamebook and Ravens sources; complete enumerated factual categories and literal notice placement; snaps, phase splits, diagnoses and value/role work explicitly unresolved."
+    },
+    {
+      "workerId": "/root/w09_pair_reviewer",
+      "role": "CRITICAL_PAIRED_REVIEWER",
+      "returnState": "COMPLETE_BLOCKED_NUMERICALLY",
+      "observedAt": "2026-11-06T04:19:25Z",
+      "quality": "Required linked status chains, game-date provenance, descriptive-only participation, notice-placement wording, no inferred diagnosis or workload, and a BLOCKED numerical disposition."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "THREE_WORKERS",
+      "reason": "Two independent team-side source owners plus one fresh critical reviewer matched the Graham default; no additional named method question was actionable before official snap publication."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "Elevated, inactive, reserve, participation, injury and return statuses remain separate fields linked by player identity and are not summed as separate losses."
+    },
+    {
+      "finding": "Active DNP players remain active DNP and are not relabelled inactive or assigned an absence exposure. Kedon Slovis retains the official 3QB designation."
+    },
+    {
+      "finding": "No Jacksonville printed injury notice is a document observation only; it does not prove no injury or full participation. Baltimore notice clocks are placement boundaries, not inferred injury times."
+    },
+    {
+      "finding": "Enumerated participation is complete for official gamebook categories, but individual phase exposure and several unit assignments are not complete."
+    }
+  ],
+  "completedWork": {
+    "gameKeys": ["2026-W09-JAX-BAL"],
+    "evidencePath": "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-05-jax-bal-final-factual-preparation.json",
+    "result": "FACTUAL_AVAILABILITY_RECORD_PREPARED_NUMERICAL_LEARNING_BLOCKED"
+  },
+  "remainingWork": {
+    "gameKeys": ["2026-W09-JAX-BAL"],
+    "gaps": [
+      "Official individual offense, defense and special-teams snap counts and percentages",
+      "Exact phase assignment for the named ambiguous participants",
+      "Immutable value and distinct replacement-role bindings",
+      "Eligible exposure method for Adisa Isaac and Kyle Hamilton, if supported after phase snaps"
+    ],
+    "next": "Wait for materially changed official snap evidence or an approved method; then reconcile the exact saved blocker without rewriting this receipt or the completed baseline."
+  },
+  "recordedAt": "2026-11-06T04:19:25Z"
+}
