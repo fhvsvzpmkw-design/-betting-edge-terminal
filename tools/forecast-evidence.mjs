@@ -42,9 +42,15 @@ function sportFor(sport, event) {
   return 'NBA_WNBA'; // Never silently route WNBA to an NBA predictor.
 }
 
-export function forecastRoutes(sport, marketDetail, registry = loadForecastSourceRegistry()) {
+export function forecastRoutes(sport, marketDetail, registry = loadForecastSourceRegistry(), asOf = null) {
   const market = forecastMarketClass(marketDetail), key = `${sport}:${market}`;
-  const route = registry.markets?.[key];
+  const configured = registry.markets?.[key];
+  const inactive = Object.entries(configured?.sourceEffectiveFrom || {}).filter(([, from]) =>
+    asOf !== null && (time(from) === null || time(asOf) === null || time(asOf) < time(from))).map(([sourceId]) => sourceId);
+  const route = inactive.length ? {...configured,
+    exact: list(configured.exact).filter(id => !inactive.includes(id)),
+    provisional: list(configured.provisional).filter(id => !inactive.includes(id)),
+    context: unique([...list(configured.context), ...inactive])} : configured;
   if (!route) return {key, capability: 'UNRESOLVED_SPORT_OR_MARKET', exact: [], context: [], provisional: [], sources: []};
   const sources = unique([...list(route.exact), ...list(route.provisional), ...list(route.context)]).map(sourceId => {
     const source = registry.sources[sourceId];
@@ -107,7 +113,7 @@ function reviewFor(record, revalidations, asOf) {
 }
 
 export function evaluateForecast(record, candidate, {asOf, revalidations = [], registry = loadForecastSourceRegistry()} = {}) {
-  const reasons = [], source = registry.sources?.[record.sourceId], route = forecastRoutes(candidate.sport, candidate.marketDetail, registry);
+  const reasons = [], source = registry.sources?.[record.sourceId], route = forecastRoutes(candidate.sport, candidate.marketDetail, registry, asOf);
   const review = reviewFor(record, revalidations, asOf);
   const reportMs = time(asOf), startMs = time(candidate.startTime), forecastMs = time(record.forecastAt), observedMs = time(record.observedAt);
   const sourceKnown = !!source;
@@ -231,7 +237,7 @@ export function buildForecastCoverage({report, sidecar, universe, feed = null, p
   const records = [...byId.values()].filter(record => !conflicts.has(record.recordId));
   const rows = list(inventory.selections || inventory).map(selection => {
     const receipt = receipts.find(row => row.selectionId === selection.selectionId), candidate = forecastCandidate(selection, {receipt, feed});
-    const route = forecastRoutes(candidate.sport, candidate.marketDetail, registry);
+    const route = forecastRoutes(candidate.sport, candidate.marketDetail, registry, now);
     const relevant = records.filter(record => String(record.eventId || '') === candidate.eventId);
     const reviews = relevant.map(record => evaluateForecast(record, candidate, {asOf: now, revalidations: evidence.revalidations, registry}));
     const eligibleExactRecordIds = reviews.filter(row => row.eligibility === 'ELIGIBLE_EXACT').map(row => row.recordId);

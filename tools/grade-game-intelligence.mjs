@@ -48,6 +48,41 @@ export function scoreForecast(record,result){
     brier:scoredProbability!==null?(scoredProbability-outcome)**2:null,
     scoringBasis:scoredProbability!==null?'RESOLVED_OUTCOMES':'PUBLISHED_BASIS_UNRESOLVED'};
 }
+
+// Compare probabilities on the same already-graded games. These are the
+// provider's native components, not a Pinnacle reference or a betting fair.
+export function compareMoneyPuckComponents(records,rows){
+  const originals=new Map(records.map(record=>[record.recordId,record])),paired=[],seen=new Set();
+  const probability=p=>typeof p==='number'&&Number.isFinite(p)&&p>=0&&p<=1;
+  for(const row of rows){
+    const record=originals.get(row.recordId),blend=record?.marketBlendObservation;
+    const key=record&&[record.sport,record.eventId,record.startTime,record.marketDetail].join('|');
+    if(record?.sourceId!=='moneypuck'||record.sport!=='NHL'||record.period!=='FULL_GAME'||
+      record.marketDetail!=='full_game_moneyline'||!['home','away'].includes(record.side)||
+      record.state!=='PRE_GAME'||!Number.isFinite(time(record.observedAt))||time(record.observedAt)>=time(record.startTime)||
+      row.state!=='GRADED'||![0,1].includes(row.outcome)||!probability(row.scoredProbability)||
+      row.eventId!==record.eventId||time(row.startTime)!==time(record.startTime)||row.side!==record.side||
+      !probability(blend?.modelHomeProbability)||!probability(blend?.bookmakerHomeProbability)||seen.has(key))continue;
+    seen.add(key);
+    const orient=p=>record.side==='home'?p:1-p,loss=p=>(p-row.outcome)**2;
+    paired.push({startTime:record.startTime,raw:loss(orient(blend.modelHomeProbability)),
+      published:loss(row.scoredProbability),market:loss(orient(blend.bookmakerHomeProbability))});
+  }
+  const mean=xs=>xs.reduce((sum,x)=>sum+x,0)/xs.length;
+  const summarize=sample=>{
+    if(!sample.length)return {games:0,brier:null,rawMinusMarket:null};
+    const differences=sample.map(row=>row.raw-row.market),difference=mean(differences);
+    const se=sample.length>1?Math.sqrt(mean(differences.map(x=>(x-difference)**2))/(sample.length-1)):null;
+    return {games:sample.length,brier:{rawModel:mean(sample.map(r=>r.raw)),publishedBlend:mean(sample.map(r=>r.published)),
+      embeddedBookComponent:mean(sample.map(r=>r.market))},rawMinusMarket:{mean:difference,
+      approximate95PercentInterval:sample.length>=30?[difference-1.96*se,difference+1.96*se]:null}};
+  };
+  const cutoff='2026-10-14T07:00:00Z';
+  return {schema:1,decisionAuthority:false,benchmark:'MONEYPUCK_EMBEDDED_BOOK_COMPONENT',
+    all:summarize(paired),postStudy:{from:cutoff,...summarize(paired.filter(row=>time(row.startTime)>=time(cutoff)))},
+    interpretation:'Lower Brier loss is better; negative raw-minus-market favors the raw model on these same games. The post-study subset is descriptive and overlaps the all-games sample.',
+    limitation:'Latest observed pregame snapshots, one orientation per game. The embedded book component is not identified as Pinnacle. Approximate paired intervals are descriptive, with no multiple-testing correction. No executable-price ROI, fitted weights, calibrated fair or BET authority follows.'};
+}
 export async function grade({root=process.cwd(),at=new Date().toISOString(),fetchImpl=fetch}={}){
   const dir=path.join(root,'data/game-intelligence/captures'),captures=[];
   if(fs.existsSync(dir))for(const dayName of fs.readdirSync(dir).filter(x=>/^\d{4}-\d\d-\d\d$/.test(x)).sort())
@@ -70,7 +105,7 @@ export async function grade({root=process.cwd(),at=new Date().toISOString(),fetc
     results.set(key,{eventId:event.eventId,startTime:event.startTime,state:'FINAL',homeScore:Number(home.score),awayScore:Number(away.score),
       special:/shortened|suspend|forfeit/i.test(competition.status.type.description||''),url:board.url,verifiedAt:at});
   }
-  const rows=forecasts.map(record=>({recordId:record.recordId,sourceId:record.sourceId,modelFamily:record.modelFamily,eventId:record.eventId,
+  const rows=forecasts.map(record=>({recordId:record.recordId,sourceId:record.sourceId,modelFamily:record.modelFamily,sport:record.sport,eventId:record.eventId,
     startTime:record.startTime,marketDetail:record.marketDetail,side:record.side,line:record.line,observedAt:record.observedAt,
     ...scoreForecast(record,results.get(`${record.eventId}|${record.startTime}`))}));
   const groups=new Map();for(const row of rows){const key=`${row.sourceId}|${row.marketDetail}`;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);}
@@ -79,7 +114,8 @@ export async function grade({root=process.cwd(),at=new Date().toISOString(),fetc
     graded:group.filter(r=>r.state==='GRADED').length,pending:group.filter(r=>r.state==='PENDING').length,
     scored:scored.length,brier:scored.length?scored.reduce((n,r)=>n+r.brier,0)/scored.length:null};});
   return {schema:1,asOf:at,counts:{observations:rows.length,graded:rows.filter(r=>r.state==='GRADED').length,
-    events:new Set(rows.filter(r=>r.state==='GRADED').map(r=>r.eventId+'|'+r.startTime)).size},bySource,rows,results:[...results.values()],errors,
+    events:new Set(rows.filter(r=>r.state==='GRADED').map(r=>r.eventId+'|'+r.startTime)).size},bySource,
+    moneyPuckComponents:compareMoneyPuckComponents(forecasts,rows),rows,results:[...results.values()],errors,
     population:'Last observed pregame forecast per source, game and market, one orientation. No reconstructed pregame values. Pushes/ties excluded from resolved-outcome Brier.',
     limitation:'Source tracking is prospective and descriptive. No automatic weighting, ROI claim, stake or decision change.'};
 }

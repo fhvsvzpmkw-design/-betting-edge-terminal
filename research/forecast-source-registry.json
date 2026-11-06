@@ -1,53 +1,716 @@
 {
   "schema": 1,
-  "version": "2026-10-06.3",
-  "capabilitiesCheckedAt": "2026-10-06",
+  "version": "2026-11-05-opportunity-pricing",
+  "capabilitiesCheckedAt": "2026-11-06T02:25:10Z",
   "scope": "Full-game primary moneyline, spread/run-line/puck-line and total; seven sports; props and alternate/period markets excluded.",
   "authority": "Retrieval configuration only. Capability examples are not a guarantee of current, free, whole-slate coverage, calibration, independence or integration permission.",
-  "projectUse": {"mode":"NON_COMMERCIAL","confirmedBy":"USER","confirmedAt":"2026-10-06T17:41:26Z","scope":"Current VigScope operation; do not infer commercial use solely from product/customer language."},
+  "projectUse": {
+    "mode": "NON_COMMERCIAL",
+    "confirmedBy": "USER",
+    "confirmedAt": "2026-10-06T17:41:26Z",
+    "scope": "Current VigScope operation; do not infer commercial use solely from product/customer language."
+  },
   "sources": {
-    "fangraphs": {"publisher":"FanGraphs","modelFamily":"FANGRAPHS_GAME_ODDS","marketDependence":"NOT_FULLY_AUDITED","classification":"STATISTICAL_FOUNDATION_DESCRIBED","routes":["https://www.fangraphs.com/scores?date={YYYY-MM-DD}"],"methodUrl":"https://blogs.fangraphs.com/fangraphs-game-odds/","notes":"Use pregame Game Odds, with pitchers and lineups. Live win expectancy is not a pregame forecast."},
-    "dratings": {"publisher":"DRatings","modelFamily":"DRATINGS","marketDependence":"UNCLEAR","classification":"EXTERNAL_MODEL_INPUTS_INCOMPLETELY_DISCLOSED","routes":["https://www.dratings.com/predictor/{sport}-predictions/"],"methodUrl":"https://www.dratings.com/methodology/","sportBoards":{"MLB":"https://www.dratings.com/predictor/mlb-baseball-predictions/","NFL":"https://www.dratings.com/predictor/nfl-football-predictions/","NCAAF":"https://www.dratings.com/predictor/ncaa-football-predictions/","CFL":"https://www.dratings.com/predictor/canadian-football-league-predictions/","NBA":"https://www.dratings.com/predictor/nba-basketball-predictions/","WNBA":"https://www.dratings.com/predictor/wnba-basketball-predictions/","NHL":"https://www.dratings.com/predictor/nhl-hockey-predictions/"},"notes":"Win probabilities and projected scores are different fields. Bet Value/Base Rating/Bet Trends/Sharp Line components and displayed sportsbook odds are not outcome probabilities. MLB injury and late-starter assumptions require review.","collection":{"mode":"RESEARCH_OR_PERMITTED_IMPORT","reason":"Public probability board is readable through source research; direct HTTP returned 403 in verification. No bypass or unverified automated adapter."}},
-    "stats_insider": {"publisher":"Stats Insider","modelFamily":"CIPHER","marketDependence":"MARKET_INFLUENCE_DISCLOSED","classification":"EXTERNAL_MARKET_INFLUENCED_MODEL","routes":["https://www.statsinsider.com.au/news/"],"methodUrl":"https://www.statsinsider.com.au/about-us","notes":"Public dated MLB articles supplied exact run-line/total percentages. Game hub access differs. Australian date must be matched to event UTC. Same source family as Dimers."},
-    "dimers": {"publisher":"Dimers","modelFamily":"CIPHER","marketDependence":"MARKET_INFLUENCE_DISCLOSED","classification":"EXTERNAL_MARKET_INFLUENCED_MODEL","routes":["https://www.dimers.com/{sport}/predictions","https://www.dimers.com/{sport}/news"],"sportSlugs":{"MLB":"mlb","NFL":"nfl","NCAAF":"cfb","NBA":"nba","WNBA":"wnba","NHL":"nhl"},"methodUrl":"https://www.dimers.com/our-data","notes":"Use public exact market tabs or dated articles. Free selections and coverage vary. Syndicated Dimers articles remain CIPHER; a second publisher is not a second model. Archive updates after tip establish capability only.","collection":{"mode":"PERMITTED_IMPORT_REQUIRED","reason":"Terms restrict automated collection and commercial redistribution. No scraper configured; a permitted feed or source-specific permission is needed."}},
-    "ats_io": {"publisher":"ATS.io","modelFamily":"ATS_IO","marketDependence":"MARKET_INFLUENCE_DISCLOSED","classification":"PROVISIONAL_COMPARATOR","routes":["https://ats.io/mlb/"],"methodUrl":"https://ats.io/mlb/","notes":"A named MLB exact-total probability was verified. Price/break-even inconsistency in sampled prose requires own-price arithmetic and field validation. Not a proven whole-slate feed."},
-    "nfelo": {"publisher":"nfelo","modelFamily":"NFELO","marketDependence":"MARKET_REGRESSION_DISCLOSED","classification":"EXTERNAL_MARKET_INFLUENCED_MODEL","routes":["https://www.nfeloapp.com/"],"methodUrl":"https://www.nfeloapp.com/analysis/using-market-regression-to-improve-prediction-accuracy-in-the-nfl/","notes":"NFL win and exact-cover fields verified. Model-calculation timestamp and model total were not verified; resolve timestamp before treating a value as currently eligible.","collection":{"mode":"PUBLIC_MODEL_OUTPUT","reason":"Public maintainer CSV; use only exact current season/week and ordered teams verified against the event schedule.","url":"https://raw.githubusercontent.com/greerreNFL/nfelo/main/output_data/nfelo_games.csv"}},
-    "talisman_red": {"publisher":"Talisman Red","modelFamily":"TALISMAN_RED","marketDependence":"NOT_FULLY_AUDITED","classification":"SCORE_CONTEXT","routes":["https://talismanred.com/ratings/cf/predictions.shtml"],"methodUrl":"https://talismanred.com/ratings/cf/explain.shtml","notes":"NCAAF projected margin/total only in verified route. Do not convert to cover or total probability without a separately validated distribution."},
-    "cleanup_hitter": {"publisher":"Cleanup Hitter","modelFamily":"CLEANUP_HITTER","marketDependence":"UNCLEAR","classification":"PROVISIONAL_SCORE_CONTEXT","routes":["https://cleanuphitter.com/cfl/"],"methodUrl":"https://cleanuphitter.com/about.php","notes":"Use distinct own projected-score column; market-estimated team totals are different. Limited method detail; no exact CFL cover/total probability verified."},
-    "dunks_threes": {"publisher":"Dunks & Threes","modelFamily":"DUNKS_THREES_EPM","marketDependence":"NOT_FULLY_AUDITED","classification":"STATISTICAL_FOUNDATION_DESCRIBED","routes":["https://dunksandthrees.com/"],"methodUrl":"https://dunksandthrees.com/","notes":"Dated NBA public game win probability verified. Recheck free in-season access and expected participation; custom minutes/API access is paid. No exact spread/total probability verified."},
-    "espn": {"publisher":"ESPN","modelFamily":"ESPN_MATCHUP_PREDICTOR","marketDependence":"NOT_FULLY_AUDITED","classification":"EXTERNAL_MODEL","routes":["https://www.espn.com/wnba/scoreboard"],"notes":"Upcoming WNBA Matchup Predictor percentages verified. Match actual event, calculation time and personnel assumptions; a today heading is insufficient.","collection":{"mode":"PUBLIC_GAME_SUMMARY","reason":"Existing public scoreboard and game summary routes; match ordered teams and kickoff; preserve missing probability semantics.","sports":["NFL","NCAAF","CFL","MLB","NBA","WNBA","NHL"],"coverage":"Fetch event summaries for active sports; retain context-only when no predictor field exists. Availability is measured per event."}},
-    "moneypuck": {"publisher":"MoneyPuck","modelFamily":"MONEYPUCK","marketDependence":"NOT_FULLY_AUDITED","classification":"EXTERNAL_MARKET_INFLUENCED_MODEL","routes":["https://moneypuck.com/"],"methodUrl":"https://moneypuck.com/about.htm","usageUrl":"https://www.moneypuck.com/data.htm","automatedReuse":"USER_AUTHORIZED_NON_COMMERCIAL_COLLECTION_PUBLISHER_SCRAPING_APPROVAL_NOT_DOCUMENTED","notes":"Verified October 6 daily previews and native per-game CSVs for all nine active NHL games. Use preGameHomeTeamWinOverallScore and preGameAwayTeamWinOverallScore, including native regulation/OT components. Both are published; no away complement is inferred. The overall probability equals the mean of the raw MoneyPuck home prediction and source betting probability in all nine sampled rows: observed market dependence, not independent confirmation. Preserve both components, timestamps, attribution and current goalie/settlement review. Raw model, sportsbook, regulation, live and Deserve To Win fields are separate.","collection":{"mode":"PUBLIC_NON_COMMERCIAL_FORECAST_CSV","sports":["NHL"],"use":"NON_COMMERCIAL","effectiveFrom":"2026-10-06T17:55:00Z","cacheMinutes":15,"attribution":"MoneyPuck.com — https://www.moneypuck.com/","dailyUrlTemplate":"https://moneypuck.com/moneypuck/dates/{YYYYMMDD}.htm","gameUrlTemplate":"https://moneypuck.com/moneypuck/predictions/{gameID}.csv","reason":"Current user-authorized non-commercial connection. Verified ordinary identified HTTP access on October 6 before enabling. Exact daily preview teams/Eastern kickoff, CSV game/team codes and full-game probability components must agree. Public forecast endpoints are not a licensed API; MoneyPuck's separate scraping-approval policy remains documented and no publisher approval is asserted."},"sportBoards":{"NHL":"https://www.moneypuck.com/"}},
-    "puckcast": {"publisher":"PuckCast","modelFamily":"PUCKCAST","marketDependence":"NOT_FULLY_AUDITED","classification":"EXPERIMENTAL","routes":["https://puckcast.ai/"],"methodUrl":"https://puckcast.ai/how-it-works","notes":"Upcoming NHL win percentages verified, with preseason regressions and seven-day model changes. Inconsistent method/validation claims remain unresolved. Not a qualified probability fallback by default."},
-    "oddstrader": {"publisher":"OddsTrader","modelFamily":"ODDSTRADER","marketDependence":"MARKET_INFLUENCE_DISCLOSED","classification":"PROVISIONAL_COMPARATOR","routes":["https://www.oddstrader.com/today/picks/"],"methodUrl":"https://www.oddstrader.com/editorial-policy/","notes":"Observed article/board line and side conflicts. Verify actual selected side, exact line, probability and time together. Do not reconstruct a probability from undefined displayed EV."},
-    "prediction_tracker": {"publisher":"The Prediction Tracker","modelFamily":"PREDICTION_TRACKER_CATALOG","marketDependence":"SYNDICATED_CATALOG","classification":"MODEL_DISCOVERY_AND_SCORE_CONTEXT","routes":["https://www.thepredictiontracker.com/prednfl.html"],"sportBoards":{"NFL":"https://www.thepredictiontracker.com/prednfl.html","NCAAF":"https://www.thepredictiontracker.com/predncaa.html","NBA":"https://www.thepredictiontracker.com/prednba.html"},"methodUrl":"https://www.thepredictiontracker.com/","usageUrl":"https://www.thepredictiontracker.com/disclaimer.txt","automatedReuse":"COMMERCIAL_REUSE_NOT_ESTABLISHED","notes":"Catalog advertises over 50 systems; live tables contain fewer models/variants and may still show completed games. Record original models separately. Catalogue averages/model dispersion are descriptive, not another independent model, game variance or calibrated fair. Home-positive margins differ from sportsbook handicaps.","collection":{"mode":"RESEARCH_OR_PERMITTED_IMPORT","sports":["NFL","NCAAF","NBA"],"reason":"Discover original models and verify exact slate. Commercial bulk reuse permission is not established."}},
-    "bet_better": {"publisher":"Bet Better","modelFamily":"BET_BETTER","marketDependence":"NOT_FULLY_AUDITED","classification":"PROVISIONAL_EXTERNAL_MODEL","routes":["https://betbetter.world/predicted-scores/nfl"],"sportBoards":{"NFL":"https://betbetter.world/predicted-scores/nfl","NCAAF":"https://betbetter.world/predicted-scores/ncaaf","MLB":"https://betbetter.world/predicted-scores/mlb","NBA":"https://betbetter.world/predicted-scores/nba","WNBA":"https://betbetter.world/predicted-scores/wnba","NHL":"https://betbetter.world/predicted-scores/nhl"},"methodUrl":"https://betbetter.world/how-it-works","usageUrl":"https://betbetter.world/api/","automatedReuse":"CC_BY_4_0_WITH_ATTRIBUTION","notes":"Separate score export publishes scores, home margin, total and home-win probability. NFL upcoming board verified October 6. Picks API exposes selected free picks; other fields locked/null. Never replace missing probability with 50%, infer cover/total probabilities or an away complement/tie/OT convention. Proprietary methods and unverified performance.","collection":{"mode":"PUBLIC_LICENSED_MODEL_OUTPUT","sports":["NFL","NCAAF","MLB","NBA","WNBA","NHL"],"reason":"Publisher documents CC BY 4.0 commercial use with attribution. Only uniquely matched priced rows; failures remain explicit.","effectiveFrom":"2026-10-06T17:05:06Z","urlTemplate":"https://betbetter.world/predicted-scores/{sport}?format=csv","cacheMinutes":15,"attribution":"Bet Better — https://betbetter.world"}},
-    "playerwon": {"publisher":"playerWON","modelFamily":"PLAYERWON_XGBOOST","marketDependence":"NOT_FULLY_AUDITED","classification":"PROVISIONAL_EXTERNAL_MODEL","routes":["https://www.playerwon.ca/"],"sportBoards":{"NHL":"https://www.playerwon.ca/"},"methodUrl":"https://www.playerwon.ca/picks/models/nhl/pre-game/","usageUrl":"https://www.playerwon.ca/terms/","automatedReuse":"COMMERCIAL_REUSE_NOT_ESTABLISHED","notes":"Nine current October 6 NHL matchups had V2 win probabilities. V1/V2 share one family. Displayed performance sample was 42 games. Stat CSV downloads are not a prediction export. Preserve page/time; review goalie assumptions and full-game OT/SO settlement.","collection":{"mode":"PERMITTED_IMPORT_REQUIRED","sports":["NHL"],"reason":"Free reading verified; commercial automated collection/redistribution permission is unestablished. Use only permitted source captures."}},
-    "covers_oddsshark": {"publisher":"Covers / Odds Shark","modelFamily":"ODDSSHARK_COMPUTER","marketDependence":"NOT_FULLY_AUDITED","classification":"SCORE_CONTEXT","routes":["https://www.covers.com/picks/nfl"],"sportBoards":{"NFL":"https://www.covers.com/picks/nfl","NCAAF":"https://www.covers.com/picks/ncaaf","CFL":"https://www.covers.com/picks/cfl","MLB":"https://www.covers.com/picks/mlb","NBA":"https://www.covers.com/picks/nba","WNBA":"https://www.covers.com/picks/wnba","NHL":"https://www.covers.com/picks/nhl"},"methodUrl":"https://www.covers.com/picks/nhl","automatedReuse":"COMMERCIAL_REUSE_NOT_ESTABLISHED","notes":"October 6 board supplied nine NHL and two MLB predicted scores. Sportsbook ML/spread/total prices, including percentage-format odds, are NOT model outcome probabilities. Expert picks and computer scores differ. Count Odds Shark syndication once; native score/margin/total context only.","collection":{"mode":"RESEARCH_OR_PERMITTED_IMPORT","sports":["NFL","NCAAF","CFL","MLB","NBA","WNBA","NHL"],"reason":"Public score research leads; no authorized commercial automated feed established. Do not scrape or treat book odds as model probabilities."}},
-    "the_margin": {"publisher":"The Margin / McConnell Digital","modelFamily":"THE_MARGIN","marketDependence":"NOT_FULLY_AUDITED","classification":"PROVISIONAL_EXTERNAL_MODEL","routes":["https://margin.mcconnelldigital.com/nfl/games/"],"sportBoards":{"NFL":"https://margin.mcconnelldigital.com/nfl/games/","NCAAF":"https://margin.mcconnelldigital.com/cfb/games/"},"methodUrl":"https://margin.mcconnelldigital.com/data/","usageUrl":"https://margin.mcconnelldigital.com/data/","automatedReuse":"TRACKER_RESEARCH_EXPORTS_DOCUMENTED_COMMERCIAL_PERMISSION_UNRESOLVED","notes":"Documents weekly frozen NFL/CFB CSV and static JSON; current file access needs verification. NFL CSV market_total is the bookmaker total, not a model total. NFL model disclosed not to beat market. CFB priors include SP+ and limited new-team market priors. Freeze time does not prove pregame public availability.","collection":{"mode":"RESEARCH_OR_PERMITTED_IMPORT","sports":["NFL","NCAAF"],"reason":"Invites tracker/grader/research exports; commercial redistribution unresolved. Verify current file, actual observation and exact schedule."}},
-    "podium_oracle": {"publisher":"PodiumOracle","modelFamily":"PODIUMORACLE_ELO","marketDependence":"NOT_FULLY_AUDITED","classification":"PROVISIONAL_BASELINE_MODEL","routes":["https://podiumoracle.com/nhl"],"sportBoards":{"NHL":"https://podiumoracle.com/nhl"},"methodUrl":"https://podiumoracle.com/nhl/model","usageUrl":"https://podiumoracle.com/terms","automatedReuse":"WRITTEN_PERMISSION_REQUIRED_FOR_COMMERCIAL_USE","notes":"Current NHL probabilities and held-back results verified. Own evaluation trails books; goalie adjustment small and xG/shot data absent. ESPN raw data is not ESPN matchup predictor. Review OT/SO settlement and rounding. No spread/total probability verified.","collection":{"mode":"PERMITTED_IMPORT_REQUIRED","sports":["NHL"],"reason":"Free reading; terms require written permission for commercial/bulk reuse. CSV downloads are subscriber feature."}}
+    "fangraphs": {
+      "publisher": "FanGraphs",
+      "modelFamily": "FANGRAPHS_GAME_ODDS",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "STATISTICAL_FOUNDATION_DESCRIBED",
+      "routes": [
+        "https://www.fangraphs.com/scores?date={YYYY-MM-DD}"
+      ],
+      "methodUrl": "https://blogs.fangraphs.com/fangraphs-game-odds/",
+      "notes": "Use pregame Game Odds, with pitchers and lineups. Live win expectancy is not a pregame forecast."
+    },
+    "dratings": {
+      "publisher": "DRatings",
+      "modelFamily": "DRATINGS",
+      "marketDependence": "UNCLEAR",
+      "classification": "EXTERNAL_MODEL_INPUTS_INCOMPLETELY_DISCLOSED",
+      "routes": [
+        "https://www.dratings.com/predictor/{sport}-predictions/"
+      ],
+      "methodUrl": "https://www.dratings.com/methodology/",
+      "sportBoards": {
+        "MLB": "https://www.dratings.com/predictor/mlb-baseball-predictions/",
+        "NFL": "https://www.dratings.com/predictor/nfl-football-predictions/",
+        "NCAAF": "https://www.dratings.com/predictor/ncaa-football-predictions/",
+        "CFL": "https://www.dratings.com/predictor/canadian-football-league-predictions/",
+        "NBA": "https://www.dratings.com/predictor/nba-basketball-predictions/",
+        "WNBA": "https://www.dratings.com/predictor/wnba-basketball-predictions/",
+        "NHL": "https://www.dratings.com/predictor/nhl-hockey-predictions/"
+      },
+      "notes": "Win probabilities and projected scores are different fields. Bet Value/Base Rating/Bet Trends/Sharp Line components and displayed sportsbook odds are not outcome probabilities. MLB injury and late-starter assumptions require review.",
+      "collection": {
+        "mode": "RESEARCH_OR_PERMITTED_IMPORT",
+        "reason": "Public probability board is readable through source research; direct HTTP returned 403 in verification. No bypass or unverified automated adapter."
+      }
+    },
+    "stats_insider": {
+      "publisher": "Stats Insider",
+      "modelFamily": "CIPHER",
+      "marketDependence": "MARKET_INFLUENCE_DISCLOSED",
+      "classification": "EXTERNAL_MARKET_INFLUENCED_MODEL",
+      "routes": [
+        "https://www.statsinsider.com.au/news/"
+      ],
+      "methodUrl": "https://www.statsinsider.com.au/about-us",
+      "notes": "Public dated MLB articles supplied exact run-line/total percentages. Game hub access differs. Australian date must be matched to event UTC. Same source family as Dimers."
+    },
+    "dimers": {
+      "publisher": "Dimers",
+      "modelFamily": "CIPHER",
+      "marketDependence": "MARKET_INFLUENCE_DISCLOSED",
+      "classification": "EXTERNAL_MARKET_INFLUENCED_MODEL",
+      "routes": [
+        "https://www.dimers.com/{sport}/predictions",
+        "https://www.dimers.com/{sport}/news"
+      ],
+      "sportSlugs": {
+        "MLB": "mlb",
+        "NFL": "nfl",
+        "NCAAF": "cfb",
+        "NBA": "nba",
+        "WNBA": "wnba",
+        "NHL": "nhl"
+      },
+      "methodUrl": "https://www.dimers.com/our-data",
+      "notes": "Use public exact market tabs or dated articles. Free selections and coverage vary. Syndicated Dimers articles remain CIPHER; a second publisher is not a second model. Archive updates after tip establish capability only.",
+      "collection": {
+        "mode": "PERMITTED_IMPORT_REQUIRED",
+        "reason": "Terms restrict automated collection and commercial redistribution. No scraper configured; a permitted feed or source-specific permission is needed."
+      }
+    },
+    "ats_io": {
+      "publisher": "ATS.io",
+      "modelFamily": "ATS_IO",
+      "marketDependence": "MARKET_INFLUENCE_DISCLOSED",
+      "classification": "PROVISIONAL_COMPARATOR",
+      "routes": [
+        "https://ats.io/mlb/"
+      ],
+      "methodUrl": "https://ats.io/mlb/",
+      "notes": "A named MLB exact-total probability was verified. Price/break-even inconsistency in sampled prose requires own-price arithmetic and field validation. Not a proven whole-slate feed."
+    },
+    "nfelo": {
+      "publisher": "nfelo",
+      "modelFamily": "NFELO",
+      "marketDependence": "MARKET_REGRESSION_DISCLOSED",
+      "classification": "EXTERNAL_MARKET_INFLUENCED_MODEL",
+      "routes": [
+        "https://www.nfeloapp.com/"
+      ],
+      "methodUrl": "https://www.nfeloapp.com/analysis/using-market-regression-to-improve-prediction-accuracy-in-the-nfl/",
+      "notes": "NFL win and exact-cover fields verified. Model-calculation timestamp and model total were not verified; resolve timestamp before treating a value as currently eligible.",
+      "collection": {
+        "mode": "PUBLIC_MODEL_OUTPUT",
+        "reason": "Public maintainer CSV; use only exact current season/week and ordered teams verified against the event schedule.",
+        "url": "https://raw.githubusercontent.com/greerreNFL/nfelo/main/output_data/nfelo_games.csv"
+      }
+    },
+    "talisman_red": {
+      "publisher": "Talisman Red",
+      "modelFamily": "TALISMAN_RED",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "SCORE_CONTEXT",
+      "routes": [
+        "https://talismanred.com/ratings/cf/predictions.shtml"
+      ],
+      "methodUrl": "https://talismanred.com/ratings/cf/explain.shtml",
+      "notes": "NCAAF projected margin/total only in verified route. Do not convert to cover or total probability without a separately validated distribution."
+    },
+    "cleanup_hitter": {
+      "publisher": "Cleanup Hitter",
+      "modelFamily": "CLEANUP_HITTER",
+      "marketDependence": "UNCLEAR",
+      "classification": "PROVISIONAL_SCORE_CONTEXT",
+      "routes": [
+        "https://cleanuphitter.com/cfl/"
+      ],
+      "methodUrl": "https://cleanuphitter.com/about.php",
+      "notes": "Use distinct own projected-score column; market-estimated team totals are different. Limited method detail; no exact CFL cover/total probability verified."
+    },
+    "dunks_threes": {
+      "publisher": "Dunks & Threes",
+      "modelFamily": "DUNKS_THREES_EPM",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "STATISTICAL_FOUNDATION_DESCRIBED",
+      "routes": [
+        "https://dunksandthrees.com/"
+      ],
+      "methodUrl": "https://dunksandthrees.com/",
+      "notes": "Dated NBA public game win probability verified. Recheck free in-season access and expected participation; custom minutes/API access is paid. No exact spread/total probability verified."
+    },
+    "espn": {
+      "publisher": "ESPN",
+      "modelFamily": "ESPN_MATCHUP_PREDICTOR",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "EXTERNAL_MODEL",
+      "routes": [
+        "https://www.espn.com/wnba/scoreboard"
+      ],
+      "notes": "Upcoming WNBA Matchup Predictor percentages verified. Match actual event, calculation time and personnel assumptions; a today heading is insufficient. NBA and NCAAF native pregame gameProjection fields were also verified in the preserved November 5 collector records, with exact ordered teams and kickoff. Eligibility starts at the sport route sourceEffectiveFrom; football tie/settlement semantics are not inferred for NFL or CFL.",
+      "collection": {
+        "mode": "PUBLIC_GAME_SUMMARY",
+        "reason": "Existing public scoreboard and game summary routes; match ordered teams and kickoff; preserve missing probability semantics.",
+        "sports": [
+          "NFL",
+          "NCAAF",
+          "CFL",
+          "MLB",
+          "NBA",
+          "WNBA",
+          "NHL"
+        ],
+        "coverage": "Fetch event summaries for active sports; retain context-only when no predictor field exists. Availability is measured per event."
+      },
+      "sportBoards": {
+        "NBA": "https://www.espn.com/nba/scoreboard",
+        "NCAAF": "https://www.espn.com/college-football/scoreboard",
+        "WNBA": "https://www.espn.com/wnba/scoreboard"
+      }
+    },
+    "moneypuck": {
+      "publisher": "MoneyPuck",
+      "modelFamily": "MONEYPUCK",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "EXTERNAL_MARKET_INFLUENCED_MODEL",
+      "routes": [
+        "https://moneypuck.com/"
+      ],
+      "methodUrl": "https://moneypuck.com/about.htm",
+      "usageUrl": "https://www.moneypuck.com/data.htm",
+      "automatedReuse": "USER_AUTHORIZED_NON_COMMERCIAL_COLLECTION_PUBLISHER_SCRAPING_APPROVAL_NOT_DOCUMENTED",
+      "notes": "Verified October 6 daily previews and native per-game CSVs for all nine active NHL games. Use preGameHomeTeamWinOverallScore and preGameAwayTeamWinOverallScore, including native regulation/OT components. Both are published; no away complement is inferred. The overall probability equals the mean of the raw MoneyPuck home prediction and source betting probability in all nine sampled rows: observed market dependence, not independent confirmation. Preserve both components, timestamps, attribution and current goalie/settlement review. Raw model, sportsbook, regulation, live and Deserve To Win fields are separate.",
+      "collection": {
+        "mode": "PUBLIC_NON_COMMERCIAL_FORECAST_CSV",
+        "sports": [
+          "NHL"
+        ],
+        "use": "NON_COMMERCIAL",
+        "effectiveFrom": "2026-10-06T17:55:00Z",
+        "cacheMinutes": 15,
+        "attribution": "MoneyPuck.com \u2014 https://www.moneypuck.com/",
+        "dailyUrlTemplate": "https://moneypuck.com/moneypuck/dates/{YYYYMMDD}.htm",
+        "gameUrlTemplate": "https://moneypuck.com/moneypuck/predictions/{gameID}.csv",
+        "reason": "Current user-authorized non-commercial connection. Verified ordinary identified HTTP access on October 6 before enabling. Exact daily preview teams/Eastern kickoff, CSV game/team codes and full-game probability components must agree. Public forecast endpoints are not a licensed API; MoneyPuck's separate scraping-approval policy remains documented and no publisher approval is asserted."
+      },
+      "sportBoards": {
+        "NHL": "https://www.moneypuck.com/"
+      }
+    },
+    "puckcast": {
+      "publisher": "PuckCast",
+      "modelFamily": "PUCKCAST",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "EXPERIMENTAL",
+      "routes": [
+        "https://puckcast.ai/"
+      ],
+      "methodUrl": "https://puckcast.ai/how-it-works",
+      "notes": "Upcoming NHL win percentages verified, with preseason regressions and seven-day model changes. Inconsistent method/validation claims remain unresolved. Not a qualified probability fallback by default."
+    },
+    "oddstrader": {
+      "publisher": "OddsTrader",
+      "modelFamily": "ODDSTRADER",
+      "marketDependence": "MARKET_INFLUENCE_DISCLOSED",
+      "classification": "PROVISIONAL_COMPARATOR",
+      "routes": [
+        "https://www.oddstrader.com/today/picks/"
+      ],
+      "methodUrl": "https://www.oddstrader.com/editorial-policy/",
+      "notes": "Observed article/board line and side conflicts. Verify actual selected side, exact line, probability and time together. Do not reconstruct a probability from undefined displayed EV."
+    },
+    "prediction_tracker": {
+      "publisher": "The Prediction Tracker",
+      "modelFamily": "PREDICTION_TRACKER_CATALOG",
+      "marketDependence": "SYNDICATED_CATALOG",
+      "classification": "MODEL_DISCOVERY_AND_SCORE_CONTEXT",
+      "routes": [
+        "https://www.thepredictiontracker.com/prednfl.html"
+      ],
+      "sportBoards": {
+        "NFL": "https://www.thepredictiontracker.com/prednfl.html",
+        "NCAAF": "https://www.thepredictiontracker.com/predncaa.html",
+        "NBA": "https://www.thepredictiontracker.com/prednba.html"
+      },
+      "methodUrl": "https://www.thepredictiontracker.com/",
+      "usageUrl": "https://www.thepredictiontracker.com/disclaimer.txt",
+      "automatedReuse": "COMMERCIAL_REUSE_NOT_ESTABLISHED",
+      "notes": "Catalog advertises over 50 systems; live tables contain fewer models/variants and may still show completed games. Record original models separately. Catalogue averages/model dispersion are descriptive, not another independent model, game variance or calibrated fair. Home-positive margins differ from sportsbook handicaps.",
+      "collection": {
+        "mode": "RESEARCH_OR_PERMITTED_IMPORT",
+        "sports": [
+          "NFL",
+          "NCAAF",
+          "NBA"
+        ],
+        "reason": "Discover original models and verify exact slate. Commercial bulk reuse permission is not established."
+      }
+    },
+    "bet_better": {
+      "publisher": "Bet Better",
+      "modelFamily": "BET_BETTER",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "PROVISIONAL_EXTERNAL_MODEL",
+      "routes": [
+        "https://betbetter.world/predicted-scores/nfl"
+      ],
+      "sportBoards": {
+        "NFL": "https://betbetter.world/predicted-scores/nfl",
+        "NCAAF": "https://betbetter.world/predicted-scores/ncaaf",
+        "MLB": "https://betbetter.world/predicted-scores/mlb",
+        "NBA": "https://betbetter.world/predicted-scores/nba",
+        "WNBA": "https://betbetter.world/predicted-scores/wnba",
+        "NHL": "https://betbetter.world/predicted-scores/nhl"
+      },
+      "methodUrl": "https://betbetter.world/how-it-works",
+      "usageUrl": "https://betbetter.world/api/",
+      "automatedReuse": "CC_BY_4_0_WITH_ATTRIBUTION",
+      "notes": "Separate score export publishes scores, home margin, total and home-win probability. NFL upcoming board verified October 6. Picks API exposes selected free picks; other fields locked/null. Never replace missing probability with 50%, infer cover/total probabilities or an away complement/tie/OT convention. Proprietary methods and unverified performance.",
+      "collection": {
+        "mode": "PUBLIC_LICENSED_MODEL_OUTPUT",
+        "sports": [
+          "NFL",
+          "NCAAF",
+          "MLB",
+          "NBA",
+          "WNBA",
+          "NHL"
+        ],
+        "reason": "Publisher documents CC BY 4.0 commercial use with attribution. Only uniquely matched priced rows; failures remain explicit.",
+        "effectiveFrom": "2026-10-06T17:05:06Z",
+        "urlTemplate": "https://betbetter.world/predicted-scores/{sport}?format=csv",
+        "cacheMinutes": 15,
+        "attribution": "Bet Better \u2014 https://betbetter.world"
+      }
+    },
+    "playerwon": {
+      "publisher": "playerWON",
+      "modelFamily": "PLAYERWON_XGBOOST",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "PROVISIONAL_EXTERNAL_MODEL",
+      "routes": [
+        "https://www.playerwon.ca/"
+      ],
+      "sportBoards": {
+        "NHL": "https://www.playerwon.ca/"
+      },
+      "methodUrl": "https://www.playerwon.ca/picks/models/nhl/pre-game/",
+      "usageUrl": "https://www.playerwon.ca/terms/",
+      "automatedReuse": "COMMERCIAL_REUSE_NOT_ESTABLISHED",
+      "notes": "Nine current October 6 NHL matchups had V2 win probabilities. V1/V2 share one family. Displayed performance sample was 42 games. Stat CSV downloads are not a prediction export. Preserve page/time; review goalie assumptions and full-game OT/SO settlement.",
+      "collection": {
+        "mode": "PERMITTED_IMPORT_REQUIRED",
+        "sports": [
+          "NHL"
+        ],
+        "reason": "Free reading verified; commercial automated collection/redistribution permission is unestablished. Use only permitted source captures."
+      }
+    },
+    "covers_oddsshark": {
+      "publisher": "Covers / Odds Shark",
+      "modelFamily": "ODDSSHARK_COMPUTER",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "SCORE_CONTEXT",
+      "routes": [
+        "https://www.covers.com/picks/nfl"
+      ],
+      "sportBoards": {
+        "NFL": "https://www.covers.com/picks/nfl",
+        "NCAAF": "https://www.covers.com/picks/ncaaf",
+        "CFL": "https://www.covers.com/picks/cfl",
+        "MLB": "https://www.covers.com/picks/mlb",
+        "NBA": "https://www.covers.com/picks/nba",
+        "WNBA": "https://www.covers.com/picks/wnba",
+        "NHL": "https://www.covers.com/picks/nhl"
+      },
+      "methodUrl": "https://www.covers.com/picks/nhl",
+      "automatedReuse": "COMMERCIAL_REUSE_NOT_ESTABLISHED",
+      "notes": "October 6 board supplied nine NHL and two MLB predicted scores. Sportsbook ML/spread/total prices, including percentage-format odds, are NOT model outcome probabilities. Expert picks and computer scores differ. Count Odds Shark syndication once; native score/margin/total context only.",
+      "collection": {
+        "mode": "RESEARCH_OR_PERMITTED_IMPORT",
+        "sports": [
+          "NFL",
+          "NCAAF",
+          "CFL",
+          "MLB",
+          "NBA",
+          "WNBA",
+          "NHL"
+        ],
+        "reason": "Public score research leads; no authorized commercial automated feed established. Do not scrape or treat book odds as model probabilities."
+      }
+    },
+    "the_margin": {
+      "publisher": "The Margin / McConnell Digital",
+      "modelFamily": "THE_MARGIN",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "PROVISIONAL_EXTERNAL_MODEL",
+      "routes": [
+        "https://margin.mcconnelldigital.com/nfl/games/"
+      ],
+      "sportBoards": {
+        "NFL": "https://margin.mcconnelldigital.com/nfl/games/",
+        "NCAAF": "https://margin.mcconnelldigital.com/cfb/games/"
+      },
+      "methodUrl": "https://margin.mcconnelldigital.com/data/",
+      "usageUrl": "https://margin.mcconnelldigital.com/data/",
+      "automatedReuse": "TRACKER_RESEARCH_EXPORTS_DOCUMENTED_COMMERCIAL_PERMISSION_UNRESOLVED",
+      "notes": "Documents weekly frozen NFL/CFB CSV and static JSON; current file access needs verification. NFL CSV market_total is the bookmaker total, not a model total. NFL model disclosed not to beat market. CFB priors include SP+ and limited new-team market priors. Freeze time does not prove pregame public availability.",
+      "collection": {
+        "mode": "RESEARCH_OR_PERMITTED_IMPORT",
+        "sports": [
+          "NFL",
+          "NCAAF"
+        ],
+        "reason": "Invites tracker/grader/research exports; commercial redistribution unresolved. Verify current file, actual observation and exact schedule."
+      }
+    },
+    "podium_oracle": {
+      "publisher": "PodiumOracle",
+      "modelFamily": "PODIUMORACLE_ELO",
+      "marketDependence": "NOT_FULLY_AUDITED",
+      "classification": "PROVISIONAL_BASELINE_MODEL",
+      "routes": [
+        "https://podiumoracle.com/nhl"
+      ],
+      "sportBoards": {
+        "NHL": "https://podiumoracle.com/nhl"
+      },
+      "methodUrl": "https://podiumoracle.com/nhl/model",
+      "usageUrl": "https://podiumoracle.com/terms",
+      "automatedReuse": "WRITTEN_PERMISSION_REQUIRED_FOR_COMMERCIAL_USE",
+      "notes": "Current NHL probabilities and held-back results verified. Own evaluation trails books; goalie adjustment small and xG/shot data absent. ESPN raw data is not ESPN matchup predictor. Review OT/SO settlement and rounding. No spread/total probability verified.",
+      "collection": {
+        "mode": "PERMITTED_IMPORT_REQUIRED",
+        "sports": [
+          "NHL"
+        ],
+        "reason": "Free reading; terms require written permission for commercial/bulk reuse. CSV downloads are subscriber feature."
+      }
+    }
   },
   "markets": {
-    "MLB:moneyline": {"capability":"CURRENT_EXAMPLE","exact":["fangraphs","dratings","stats_insider","dimers","espn"],"context":["covers_oddsshark"],"notes":"FanGraphs dated scores first; DRatings then public Cipher access. ESPN full-game matchup predictor fields were verified September 27; preserve raw percentages and review personnel/settlement.","provisional":["bet_better"]},
-    "MLB:spread": {"capability":"CURRENT_SELECTIVE","exact":["stats_insider","dimers"],"context":["dratings","bet_better","covers_oddsshark"],"notes":"Run line. A dependable second separate free run-line model remains unverified."},
-    "MLB:total": {"capability":"CURRENT_SELECTIVE","exact":["stats_insider","dimers"],"provisional":["ats_io","oddstrader"],"context":["dratings","bet_better","covers_oddsshark"],"notes":"Exact line is mandatory for exact-probability coverage; score totals remain context."},
-    "NFL:moneyline": {"capability":"CURRENT_EXAMPLE","exact":["dimers","nfelo"],"context":["espn","prediction_tracker","covers_oddsshark"],"notes":"nfelo market regression and uncertain model time must remain visible.","provisional":["bet_better","the_margin"]},
-    "NFL:spread": {"capability":"CURRENT_EXAMPLE","exact":["dimers","nfelo"],"context":["bet_better","prediction_tracker","the_margin","covers_oddsshark"],"notes":"Public NFL tabs first; dated Dimers articles are another access route, not another model."},
-    "NFL:total": {"capability":"CURRENT_EXAMPLE","exact":["dimers"],"context":["bet_better","prediction_tracker","the_margin","covers_oddsshark"],"notes":"A second dependable free exact-total provider remains unverified."},
-    "NCAAF:moneyline": {"capability":"CURRENT_EXAMPLE","exact":["dratings","dimers"],"context":["talisman_red","espn","prediction_tracker","covers_oddsshark"],"notes":"DRatings includes FCS-involving games. CollegeFootballData pregame win probability is spread-derived, not independent team forecasting.","provisional":["bet_better","the_margin"]},
-    "NCAAF:spread": {"capability":"CURRENT_SELECTIVE","exact":["dimers"],"context":["dratings","talisman_red","bet_better","prediction_tracker","the_margin","covers_oddsshark"],"notes":"Public Dimers-origin exact-cover articles; syndication adds access only. Complete FCS coverage unverified."},
-    "NCAAF:total": {"capability":"CURRENT_SELECTIVE","exact":["dimers"],"context":["dratings","talisman_red","bet_better","prediction_tracker","the_margin","covers_oddsshark"],"notes":"Projected total points are not an Over/Under probability."},
-    "CFL:moneyline": {"capability":"CURRENT_EXAMPLE","exact":["dratings"],"context":["cleanup_hitter","espn","covers_oddsshark"],"notes":"Dedicated DRatings CFL win board; check UTC/local event date."},
-    "CFL:spread": {"capability":"EXACT_PROBABILITY_UNVERIFIED","exact":[],"context":["dratings","cleanup_hitter","covers_oddsshark"],"notes":"Keep the exact-cover gap explicit; no invented score-to-probability conversion. Qualified Pinnacle assessment remains available under existing rules."},
-    "CFL:total": {"capability":"EXACT_PROBABILITY_UNVERIFIED","exact":[],"context":["dratings","cleanup_hitter","covers_oddsshark"],"notes":"No free exact O/U probability verified. DRatings Bet Value components are not event probabilities."},
-    "NBA:moneyline": {"capability":"HISTORICAL_EXAMPLE_RECHECK_IN_SEASON","exact":["dunks_threes","dimers"],"provisional":["dratings","bet_better"],"context":["espn","covers_oddsshark","prediction_tracker"],"notes":"DRatings is a proposed additional lookup; this guide did not verify a current NBA slate."},
-    "NBA:spread": {"capability":"HISTORICAL_SELECTIVE","exact":["dimers"],"context":["bet_better","covers_oddsshark","prediction_tracker"],"notes":"Free dated public articles demonstrate field availability, not present slate coverage."},
-    "NBA:total": {"capability":"HISTORICAL_SELECTIVE","exact":["dimers"],"context":["bet_better","covers_oddsshark","prediction_tracker"],"notes":"Free exact-line selections; archive pre-tip values for prospective tracking."},
-    "WNBA:moneyline": {"capability":"UPCOMING_EXAMPLE","exact":["espn","dratings","dimers"],"context":["covers_oddsshark"],"notes":"ESPN/DRatings upcoming values; check injury weighting and calculation time.","provisional":["bet_better"]},
-    "WNBA:spread": {"capability":"HISTORICAL_SELECTIVE","exact":["dimers"],"context":["dratings","bet_better","covers_oddsshark"],"notes":"Sample article updated after tip; historic value cannot be represented as observed pregame."},
-    "WNBA:total": {"capability":"HISTORICAL_SELECTIVE","exact":["dimers"],"context":["dratings","bet_better","covers_oddsshark"],"notes":"Selected free access, not guaranteed whole-slate probabilities."},
-    "NHL:moneyline": {"capability":"HISTORICAL_AND_UPCOMING_EXAMPLES","exact":["dratings","moneypuck","dimers"],"provisional":["puckcast","bet_better","playerwon","podium_oracle"],"context":["espn","covers_oddsshark"],"notes":"Include MoneyPuck in current non-commercial pregame research with MoneyPuck.com attribution. Verify exact event, observed pregame probability, full-game settlement and goalie assumptions; listing the route is not collected coverage."},
-    "NHL:spread": {"capability":"HISTORICAL_SELECTIVE","exact":["dimers"],"context":["dratings","bet_better","covers_oddsshark"],"notes":"Puck line; a second separate exact-line model remains unverified."},
-    "NHL:total": {"capability":"HISTORICAL_SELECTIVE","exact":["dimers"],"context":["dratings","bet_better","covers_oddsshark"],"notes":"Half-goal examples verified; integer totals require known push conventions."}
+    "MLB:moneyline": {
+      "capability": "CURRENT_EXAMPLE",
+      "exact": [
+        "fangraphs",
+        "dratings",
+        "stats_insider",
+        "dimers",
+        "espn"
+      ],
+      "context": [
+        "covers_oddsshark"
+      ],
+      "notes": "FanGraphs dated scores first; DRatings then public Cipher access. ESPN full-game matchup predictor fields were verified September 27; preserve raw percentages and review personnel/settlement.",
+      "provisional": [
+        "bet_better"
+      ]
+    },
+    "MLB:spread": {
+      "capability": "CURRENT_SELECTIVE",
+      "exact": [
+        "stats_insider",
+        "dimers"
+      ],
+      "context": [
+        "dratings",
+        "bet_better",
+        "covers_oddsshark"
+      ],
+      "notes": "Run line. A dependable second separate free run-line model remains unverified."
+    },
+    "MLB:total": {
+      "capability": "CURRENT_SELECTIVE",
+      "exact": [
+        "stats_insider",
+        "dimers"
+      ],
+      "provisional": [
+        "ats_io",
+        "oddstrader"
+      ],
+      "context": [
+        "dratings",
+        "bet_better",
+        "covers_oddsshark"
+      ],
+      "notes": "Exact line is mandatory for exact-probability coverage; score totals remain context."
+    },
+    "NFL:moneyline": {
+      "capability": "CURRENT_EXAMPLE",
+      "exact": [
+        "dimers",
+        "nfelo"
+      ],
+      "context": [
+        "espn",
+        "prediction_tracker",
+        "covers_oddsshark"
+      ],
+      "notes": "nfelo market regression and uncertain model time must remain visible.",
+      "provisional": [
+        "bet_better",
+        "the_margin"
+      ]
+    },
+    "NFL:spread": {
+      "capability": "CURRENT_EXAMPLE",
+      "exact": [
+        "dimers",
+        "nfelo"
+      ],
+      "context": [
+        "bet_better",
+        "prediction_tracker",
+        "the_margin",
+        "covers_oddsshark"
+      ],
+      "notes": "Public NFL tabs first; dated Dimers articles are another access route, not another model."
+    },
+    "NFL:total": {
+      "capability": "CURRENT_EXAMPLE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "bet_better",
+        "prediction_tracker",
+        "the_margin",
+        "covers_oddsshark"
+      ],
+      "notes": "A second dependable free exact-total provider remains unverified."
+    },
+    "NCAAF:moneyline": {
+      "capability": "CURRENT_EXAMPLE",
+      "exact": [
+        "dratings",
+        "dimers",
+        "espn"
+      ],
+      "context": [
+        "talisman_red",
+        "prediction_tracker",
+        "covers_oddsshark"
+      ],
+      "notes": "DRatings includes FCS-involving games. CollegeFootballData pregame win probability is spread-derived, not independent team forecasting. From 2026-11-06T02:25:10Z, ESPN native pregame predictor.homeTeam/awayTeam.gameProjection fields are exact moneyline candidates after current event, personnel and settlement review. This verifies field capability, not calibration, independence or BET authority. Earlier reports retain ESPN context-only eligibility.",
+      "provisional": [
+        "bet_better",
+        "the_margin"
+      ],
+      "sourceEffectiveFrom": {
+        "espn": "2026-11-06T02:25:10Z"
+      }
+    },
+    "NCAAF:spread": {
+      "capability": "CURRENT_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "dratings",
+        "talisman_red",
+        "bet_better",
+        "prediction_tracker",
+        "the_margin",
+        "covers_oddsshark"
+      ],
+      "notes": "Public Dimers-origin exact-cover articles; syndication adds access only. Complete FCS coverage unverified."
+    },
+    "NCAAF:total": {
+      "capability": "CURRENT_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "dratings",
+        "talisman_red",
+        "bet_better",
+        "prediction_tracker",
+        "the_margin",
+        "covers_oddsshark"
+      ],
+      "notes": "Projected total points are not an Over/Under probability."
+    },
+    "CFL:moneyline": {
+      "capability": "CURRENT_EXAMPLE",
+      "exact": [
+        "dratings"
+      ],
+      "context": [
+        "cleanup_hitter",
+        "espn",
+        "covers_oddsshark"
+      ],
+      "notes": "Dedicated DRatings CFL win board; check UTC/local event date."
+    },
+    "CFL:spread": {
+      "capability": "EXACT_PROBABILITY_UNVERIFIED",
+      "exact": [],
+      "context": [
+        "dratings",
+        "cleanup_hitter",
+        "covers_oddsshark"
+      ],
+      "notes": "Keep the exact-cover gap explicit; no invented score-to-probability conversion. Qualified Pinnacle assessment remains available under existing rules."
+    },
+    "CFL:total": {
+      "capability": "EXACT_PROBABILITY_UNVERIFIED",
+      "exact": [],
+      "context": [
+        "dratings",
+        "cleanup_hitter",
+        "covers_oddsshark"
+      ],
+      "notes": "No free exact O/U probability verified. DRatings Bet Value components are not event probabilities."
+    },
+    "NBA:moneyline": {
+      "capability": "HISTORICAL_EXAMPLE_RECHECK_IN_SEASON",
+      "exact": [
+        "dunks_threes",
+        "dimers",
+        "espn"
+      ],
+      "provisional": [
+        "dratings",
+        "bet_better"
+      ],
+      "context": [
+        "covers_oddsshark",
+        "prediction_tracker"
+      ],
+      "notes": "DRatings is a proposed additional lookup; this guide did not verify a current NBA slate. From 2026-11-06T02:25:10Z, ESPN native pregame predictor.homeTeam/awayTeam.gameProjection fields are exact moneyline candidates after current event, personnel and settlement review. This verifies field capability, not calibration, independence or BET authority. Earlier reports retain ESPN context-only eligibility.",
+      "sourceEffectiveFrom": {
+        "espn": "2026-11-06T02:25:10Z"
+      }
+    },
+    "NBA:spread": {
+      "capability": "HISTORICAL_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "bet_better",
+        "covers_oddsshark",
+        "prediction_tracker"
+      ],
+      "notes": "Free dated public articles demonstrate field availability, not present slate coverage."
+    },
+    "NBA:total": {
+      "capability": "HISTORICAL_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "bet_better",
+        "covers_oddsshark",
+        "prediction_tracker"
+      ],
+      "notes": "Free exact-line selections; archive pre-tip values for prospective tracking."
+    },
+    "WNBA:moneyline": {
+      "capability": "UPCOMING_EXAMPLE",
+      "exact": [
+        "espn",
+        "dratings",
+        "dimers"
+      ],
+      "context": [
+        "covers_oddsshark"
+      ],
+      "notes": "ESPN/DRatings upcoming values; check injury weighting and calculation time.",
+      "provisional": [
+        "bet_better"
+      ]
+    },
+    "WNBA:spread": {
+      "capability": "HISTORICAL_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "dratings",
+        "bet_better",
+        "covers_oddsshark"
+      ],
+      "notes": "Sample article updated after tip; historic value cannot be represented as observed pregame."
+    },
+    "WNBA:total": {
+      "capability": "HISTORICAL_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "dratings",
+        "bet_better",
+        "covers_oddsshark"
+      ],
+      "notes": "Selected free access, not guaranteed whole-slate probabilities."
+    },
+    "NHL:moneyline": {
+      "capability": "HISTORICAL_AND_UPCOMING_EXAMPLES",
+      "exact": [
+        "dratings",
+        "moneypuck",
+        "dimers"
+      ],
+      "provisional": [
+        "puckcast",
+        "bet_better",
+        "playerwon",
+        "podium_oracle"
+      ],
+      "context": [
+        "espn",
+        "covers_oddsshark"
+      ],
+      "notes": "Include MoneyPuck in current non-commercial pregame research with MoneyPuck.com attribution. Verify exact event, observed pregame probability, full-game settlement and goalie assumptions; listing the route is not collected coverage."
+    },
+    "NHL:spread": {
+      "capability": "HISTORICAL_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "dratings",
+        "bet_better",
+        "covers_oddsshark"
+      ],
+      "notes": "Puck line; a second separate exact-line model remains unverified."
+    },
+    "NHL:total": {
+      "capability": "HISTORICAL_SELECTIVE",
+      "exact": [
+        "dimers"
+      ],
+      "context": [
+        "dratings",
+        "bet_better",
+        "covers_oddsshark"
+      ],
+      "notes": "Half-goal examples verified; integer totals require known push conventions."
+    }
   },
-  "aggregationPolicy": {"scope":"Aggregate applicable forecasts, native projections, personnel, Graham fair and market prices by exact contract; retain contrary evidence and access gaps.","researchSources":["prediction_tracker","bet_better","playerwon","covers_oddsshark","the_margin","podium_oracle","moneypuck"],"reviewOrder":["BET","LEAN","WAIT","PASS"],"authority":"Descriptive comparison only; no automatic fair, grade or stake.","syndication":"Catalogue entries and copies retain the original model family; a catalogue is not another model."}
+  "aggregationPolicy": {
+    "scope": "Aggregate applicable forecasts, native projections, personnel, Graham fair and market prices by exact contract; retain contrary evidence and access gaps.",
+    "researchSources": [
+      "prediction_tracker",
+      "bet_better",
+      "playerwon",
+      "covers_oddsshark",
+      "the_margin",
+      "podium_oracle",
+      "moneypuck"
+    ],
+    "reviewOrder": [
+      "BET",
+      "LEAN",
+      "WAIT",
+      "PASS"
+    ],
+    "authority": "Descriptive comparison only; no automatic fair, grade or stake.",
+    "syndication": "Catalogue entries and copies retain the original model family; a catalogue is not another model."
+  }
 }

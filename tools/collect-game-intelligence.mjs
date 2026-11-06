@@ -196,7 +196,10 @@ export function parseEspn(summary,event,observedAt,registry) {
   const url=`https://www.espn.com/${event.sport.toLowerCase()==='ncaaf'?'college-football':event.sport.toLowerCase()}/game/_/gameId/${summary.header.id}`;
   const records=[];
   const homeProjection=number(summary.predictor?.homeTeam?.gameProjection),awayProjection=number(summary.predictor?.awayTeam?.gameProjection);
-  const noTie=['MLB','NBA','WNBA','NHL'].includes(event.sport)&&homeProjection!==null&&awayProjection!==null&&Math.abs(homeProjection+awayProjection-100)<=.11;
+  const collegeFrom=registry.markets?.['NCAAF:moneyline']?.sourceEffectiveFrom?.espn;
+  const collegeNoTie=event.sport==='NCAAF'&&Number.isFinite(time(collegeFrom))&&time(observedAt)>=time(collegeFrom);
+  const noTie=(['MLB','NBA','WNBA','NHL'].includes(event.sport)||collegeNoTie)&&
+    homeProjection!==null&&awayProjection!==null&&Math.abs(homeProjection+awayProjection-100)<=.11;
   for(const side of ['home','away']) {
     const prediction=summary.predictor?.[`${side}Team`];
     const team=list(competition.competitors).find(c=>c.homeAway===side);
