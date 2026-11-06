@@ -1348,7 +1348,7 @@ function apply(run){
 
     const summary=el(d,'div','runnerSummary',txt(run.summary,'No summary supplied.'));box.appendChild(summary);
     const intelligence=globalThis.BettingEdgeIntelligence?.render(d,issuedMeterRun.gameIntelligence);
-    if(intelligence){const details=el(d,'details','runnerMarketReview');details.append(el(d,'summary','','GAME CONTEXT • LINEUPS AND MATCHUP NOTES'),intelligence);box.appendChild(details)}
+    if(intelligence){const details=el(d,'details','runnerMarketReview');details.append(el(d,'summary','','OUTSIDE VIEWS • LINEUPS AND MATCHUP NOTES'),intelligence);box.appendChild(details)}
 
     const refresh=el(d,'div','runnerRefresh'),latestReport=isLatestSessionRun(run);
     let refreshStatus=null,refreshBtn=null;
@@ -1390,6 +1390,8 @@ function apply(run){
     hideStaticMarket(market);
     const m=el(d,'div','box');m.id='runnerMarket';
     m.append(el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // ')));
+    const outside=el(d,'div','runnerSummary'),outsideLink=el(d,'a','','OPEN OUTSIDE FORECASTS AND PICKS');
+    outsideLink.href='./games.html';outsideLink.target='_top';outside.append(outsideLink,el(d,'div','small muted','Compare named forecasts, public source picks and opposing views.'));m.appendChild(outside);
     filterTools(d,run,m,'market');
     const wrap=el(d,'div','scroll'),table=el(d,'table','runnerMarketTable'),thead=el(d,'thead'),trh=el(d,'tr');
     ['CALL','MARKET','BOOK / PRICE','BET AT / PLAY TO','STATE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
