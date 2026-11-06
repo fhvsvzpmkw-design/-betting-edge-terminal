@@ -1,5 +1,6 @@
 // Forward-only NHL forecast opinions. Agreement is corroboration, not a fair
 // probability, an independence claim, or authority to place a wager.
+import {adaptiveResearchActive} from './strategy-research.mjs';
 export const NHL_FORECAST_CORROBORATION_FROM = '2026-10-15T12:11:48-07:00';
 export const NHL_FORECAST_CORROBORATION_POLICY = 'nhl-forecast-corroboration-v1';
 export const NHL_FORECAST_SOURCES = Object.freeze({
@@ -11,7 +12,7 @@ const list = v => Array.isArray(v) ? v : [];
 const close = (a,b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b)<1e-8;
 const nonempty = v => typeof v==='string' && v.trim().length>0;
 const ensure = (ok,message) => {if(!ok) throw new Error(`NHL corroboration: ${message}`);};
-export const nhlCorroborationApplies = (report,rec) => Date.parse(report?.ts)>=Date.parse(NHL_FORECAST_CORROBORATION_FROM) &&
+export const nhlCorroborationApplies = (report,rec) => !adaptiveResearchActive(report) && Date.parse(report?.ts)>=Date.parse(NHL_FORECAST_CORROBORATION_FROM) &&
   rec?.coreAssessment?.context?.sport==='NHL' && rec?.coreAssessment?.context?.marketDetail==='full_game_moneyline';
 
 export function inspectNhlCorroboration(report,rec) {

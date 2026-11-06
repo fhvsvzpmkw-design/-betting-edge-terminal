@@ -1,5 +1,6 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
 import {validCuratedRecord} from './curated-aggregation.mjs';
+import {eventStrategyResearch} from './strategy-research.mjs';
 export const EVENT_RESEARCH_VERSION = '2026-10-25.1';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 export const SOURCE_AGGREGATION_FROM = '2026-10-06T17:05:06Z';
@@ -233,7 +234,10 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       sharedResearchRequired:pending.length>0, personnelFollowUp, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
       sourceReviewPending:expandedSourceReview && sourceQueue.size>0,
-      forecastRetrieval, forecastReviews, curatedResearch, selections:event.selections};
+      forecastRetrieval, forecastReviews, curatedResearch,
+      strategyResearch:eventStrategyResearch({sport:event.sport,eventId:event.eventId,startTime:event.eventDate},
+        sidecar.gameIntelligenceInputs?.strategyResearch,list(sidecar.gameIntelligenceInputs?.facts).filter(f=>String(f.eventId)===String(event.eventId))),
+      selections:event.selections};
   }).map(event => ({...event,scheduleUrgency:scheduleUrgency(event,report.ts)}))
     .sort((a,b) => Number(b.scheduleUrgency.code==='SUNDAY_EARLY_NFL')-Number(a.scheduleUrgency.code==='SUNDAY_EARLY_NFL') ||
       (a.scheduleUrgency.code==='SUNDAY_EARLY_NFL' && b.scheduleUrgency.code==='SUNDAY_EARLY_NFL'
@@ -284,7 +288,7 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
       finding:source.finding || source.fact, priorReportPath,
       ...(priorCheckpointPath?{priorCheckpointPath,checkpointBlobSha,issued}:{}),requiresCurrentApplicabilityReview:true})),
     personnelFollowUp:event.personnelFollowUp || null,
-    forecastReviews:list(event.forecastReviews),curatedResearch:event.curatedResearch,
+    forecastReviews:list(event.forecastReviews),curatedResearch:event.curatedResearch,strategyResearch:event.strategyResearch,
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
       selectionId:row.selectionId, route:row.route, reviewState:row.reviewState,missingResearch:list(row.missingResearch),recordedBlocker:row.blocker||null,quote:row.quote, comparison:row.priceComparison,
       forecastAggregation:row.forecastAggregation||null,quarterbackFollowUp:row.quarterbackFollowUp || null,

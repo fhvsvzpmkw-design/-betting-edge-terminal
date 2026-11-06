@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {AUTHORITY, QUALIFIED, qualifyMarket, isFullGameAlternateTotalMarket} from './pinnacle-sharp-benchmark.mjs';
 import {validateForecastLean, validateForecastWait} from './forecast-lean.mjs';
+import {adaptiveResearchActive} from './strategy-research.mjs';
 
 // Applies only to new assessments; issued reports keep their original evidence.
 export const MARKET_ASSESSMENT_FROM = '2026-09-07T18:31:00-07:00';
@@ -76,6 +77,23 @@ export function marketComparison(priceDecimal, probability) {
 export function validateMarketAssessment(report, rec, item, ids) {
   if (rec.marketAssessment == null) return false;
   const label = `Market assessment ${rec.title || rec.feed?.selectionKey}`, m = rec.marketAssessment;
+  if(m.basis==='SOURCE_LED_OPINION') {
+    ensure(adaptiveResearchActive(report),`${label} source-led route predates activation`);
+    ensure(m.schema===1 && m.selectionKey===rec.feed?.selectionKey && rec.fairValueEvidence==null,`${label} source-led route requires exact identity without an adopted fair`);
+    ensure(m.referenceProbability==null && m.referencePriceDecimal==null && m.referenceGeneratedAt==null,`${label} source-led route cannot invent a market reference`);
+    ensure(validateForecastLean(report,rec,ids)||validateForecastWait(report,rec,ids),`${label} source-led route requires a reviewed forecast opinion`);
+    ensure(nonEmpty(m.settlementRationale)&&nonEmpty(m.limitations)&&nonEmpty(m.decisionRationale),`${label} source-led assessment requires settlement and current judgment`);
+    const review=m.informationReview;
+    ensure(review&&Date.parse(review.checkedAt)>=Date.parse(report.feedGeneratedAt)&&Date.parse(review.checkedAt)<=Date.parse(report.ts)&&
+      review.sourceIds?.length>0&&review.sourceIds.every(id=>['OFFICIAL','REPORTING'].includes(ids.get(id)?.kind))&&
+      ['NO_MATERIAL_CONFLICT','MATERIAL_REVIEW_COMPLETED','UNRESOLVED'].includes(review.state)&&nonEmpty(review.impact),`${label} requires a current source-linked information review`);
+    if(rec.pinnacleBenchmark?.state==='QUALIFIED') {
+      ensure(rec.pinnacleBenchmark.authority===AUTHORITY && rec.pinnacleBenchmark.executionAuthority===false,`${label} retains non-executable Pinnacle authority`);
+      const expected=marketComparison(Number(rec.feed.priceDecimal),rec.pinnacleBenchmark.noVigProbability);
+      ensure(Object.keys(expected).every(key=>typeof expected[key]==='number'?close(expected[key],rec.benchmarkComparison?.[key]):expected[key]===rec.benchmarkComparison?.[key]),`${label} retains the actual signed Pinnacle comparison`);
+    } else ensure(rec.benchmarkComparison==null,`${label} unavailable Pinnacle cannot acquire an invented comparison`);
+    return true;
+  }
   ensure(marketAssessmentEnabled(report), `${label} predates the completion amendment`);
   ensure(m?.schema === 1 && m.basis === 'QUALIFIED_PINNACLE', `${label} requires the qualified reference basis`);
   ensure(['PASS', 'LEAN', 'WAIT'].includes(rec.status) && /^\$?0(?:\.0+)?$/.test(String(rec.stake)), `${label} cannot authorize BET or stake`);
@@ -102,6 +120,13 @@ export function validateMarketAssessment(report, rec, item, ids) {
 }
 
 export function validateBoundMarketAssessment(report, rec, observer) {
+  if(rec.marketAssessment?.basis==='SOURCE_LED_OPINION' && rec.pinnacleBenchmark?.state!=='QUALIFIED') {
+    ensure(adaptiveResearchActive(report),'Source-led opinion predates activation');
+    let available=false;
+    try {exactMarketReference(report,rec.feed,observer);available=true;}catch {}
+    ensure(!available,'Source-led opinion must retain an available exact Pinnacle reference');
+    return null;
+  }
   const reference = exactMarketReference(report, rec.feed, observer), b = rec.pinnacleBenchmark;
   if (reference.referenceKind) {
     ensure(b.referenceKind === reference.referenceKind && b.bookmakerMarketId === reference.bookmakerMarketId, 'Market assessment requires exact alternate-total source identity');
@@ -109,7 +134,7 @@ export function validateBoundMarketAssessment(report, rec, observer) {
   for (const field of ['noVigProbability', 'noVigPriceAmerican', 'quoteChangedAt', 'limit']) ensure(b[field] === reference.selected[field], `Market assessment ${field} differs from bound observer`);
   if(b.quoteObservedAt!==undefined) ensure(b.quoteObservedAt===reference.selected.quoteObservedAt, 'Market assessment quoteObservedAt differs from bound observer');
   ensure(String(b.price) === String(reference.selected.priceAmerican) && String(b.pairedPrice) === String(reference.opposite.priceAmerican), 'Market assessment paired prices differ from bound observer');
-  ensure(rec.marketAssessment.referenceGeneratedAt === reference.generatedAt, 'Market assessment reference timestamp differs from bound observer');
+  if(rec.marketAssessment.basis!=='SOURCE_LED_OPINION')ensure(rec.marketAssessment.referenceGeneratedAt === reference.generatedAt, 'Market assessment reference timestamp differs from bound observer');
   return reference;
 }
 

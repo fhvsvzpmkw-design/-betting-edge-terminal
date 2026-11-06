@@ -12,6 +12,7 @@ import {exactMarketReference,marketComparison} from './market-price-assessment.m
 import {loadGrahamHandoffInputs} from './graham-fair-handoff.mjs';
 import {aggregateForecastComparisons,summarizeProjectionContext} from './forecast-aggregation.mjs';
 import {loadNovigCapture,novigReference,compareNovigPrice} from './novig-market-data.mjs';
+import {loadStrategyResearch,eventStrategyResearch} from './strategy-research.mjs';
 
 export const INTELLIGENCE_FROM = '2026-09-27T12:00:00-07:00';
 export const list = x => Array.isArray(x) ? x : [];
@@ -99,6 +100,7 @@ export function bindIntelligence({root,report,sidecar,feed,universe,liveBoard=fa
     personnelNewsDigest:personnelFacts.length?digest(personnelFacts):null,
     sources:list(capture?.sources),records,facts,curatedPicks:events.flatMap(event=>currentCuratedRecords(capture?.curatedPicks,event,report.ts)),quoteHistory:list(capture?.quoteHistory),internalModels:internalModels(root,events,report.ts,sidecar),
     knowledge:knowledge(root,unique(events.map(e=>e.sport))),
+    strategyResearch:loadStrategyResearch(root,report.ts),
     limitation:'Original observation times are preserved. Report decisions must assess current event, personnel and exact quote applicability.'};
   // Optional exchange observations are pinned separately from forecasts and
   // never enter forecastEvidence, consensus, candidate authority or gate rules.
@@ -226,6 +228,7 @@ export function buildGameIntelligence({report,sidecar={},feed,universe,forecastC
     const familyCount=unique(models.rows.map(r=>r.modelFamily)).length;
     return {...event,label:`${event.away} @ ${event.home}`,sourceOnly:selections.length===0,priceSnapshotAt:feed.generatedAt,externalModels:models.rows,consensus:models.consensus,
       projectionContext:models.projectionContext,curatedAggregation,
+      strategyResearch:eventStrategyResearch(event,inputs.strategyResearch,facts),
       internalModels:internal,facts,markets,
       knowledgeIds:list(inputs.knowledge).filter(k=>list(k.sports).includes('Cross-Sport')||list(k.sports).includes(event.sport)).map(k=>k.id),
       summary:{sources:unique(models.rows.map(r=>r.sourceId)).length,modelFamilies:familyCount,internalFamilies:internal.length?1:0,

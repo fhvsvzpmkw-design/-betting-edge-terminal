@@ -632,15 +632,19 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
     validatePersonnelSemantics({ ...report, recs: [decision] }, { ...sidecar, recommendations: [evidence] });
     const contractKey = `${selection.sport}|${selection.eventId}|${selection.marketDetail}|${quote.line ?? ''}`;
     const referenceSide = selection.marketClass === 'total' ? 'over' : 'home';
-    const fair = marketAssessment ? {key: `${contractKey}|MARKET_REFERENCE`, unit: 'selection_probability',
-      estimate: selection.side === referenceSide ? decision.marketAssessment.referenceProbability : 1 - decision.marketAssessment.referenceProbability}
-      : canonicalReceiptFair(selection, quote, decision.fairValueEvidence);
-    const prior = fairGroups.get(fair.key);
-    const basis = `${marketAssessment ? 'MARKET_REFERENCE' : 'MODEL'}|${fair.unit}`;
-    ensure(!fairBases.has(contractKey) || fairBases.get(contractKey) === basis, `${label} opposing selections must share a coherent fair unit/basis`);
-    fairBases.set(contractKey, basis);
-    if (prior) for (const field of marketAssessment ? ['estimate'] : ['estimate', 'low', 'high']) ensure(closeNumber(fair[field], prior[field]), `${label} opposing selections have incoherent shared market fair ${field}`);
-    else fairGroups.set(fair.key, fair);
+    if(decision.marketAssessment?.basis!=='SOURCE_LED_OPINION') {
+      // An unadopted source-led opinion has no shared numerical fair to invent
+      // or reconcile. Its one-direction rule and bound source replay still run.
+      const fair = marketAssessment ? {key: `${contractKey}|MARKET_REFERENCE`, unit: 'selection_probability',
+        estimate: selection.side === referenceSide ? decision.marketAssessment.referenceProbability : 1 - decision.marketAssessment.referenceProbability}
+        : canonicalReceiptFair(selection, quote, decision.fairValueEvidence);
+      const prior = fairGroups.get(fair.key);
+      const basis = `${marketAssessment ? 'MARKET_REFERENCE' : 'MODEL'}|${fair.unit}`;
+      ensure(!fairBases.has(contractKey) || fairBases.get(contractKey) === basis, `${label} opposing selections must share a coherent fair unit/basis`);
+      fairBases.set(contractKey, basis);
+      if (prior) for (const field of marketAssessment ? ['estimate'] : ['estimate', 'low', 'high']) ensure(closeNumber(fair[field], prior[field]), `${label} opposing selections have incoherent shared market fair ${field}`);
+      else fairGroups.set(fair.key, fair);
+    }
     const matchingCard = (report.recs || []).find(card => card.feed?.selectionKey === quote.selectionKey && String(card.feed?.eventId) === quote.eventId && card.book === quote.book);
     ensure(matchingCard && exactObject(matchingCard, decision), `${label} evaluated decision must match its published card; card-count curation is not permitted`);
     sports[selection.sport].evaluated++;
