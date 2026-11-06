@@ -1,138 +1,89 @@
-# Source-backed directional LEAN — October 1, 2026
+# Source-backed directional LEAN
 
-Status: OPERATIONAL for **new reports at/after 2026-10-01T12:00:00-07:00**. All five Main lanes inherit this through the shared scheduled authority. Governance v1.0 and Core 1.5 remain unchanged. Earlier issued reports keep their original decisions.
+Current analytical policy for new Main reports at/after **`2026-11-06T17:00:00Z`** (10:00 Pacific on the project's current America/Vancouver clock). Read [adaptive strategy research](ADAPTIVE_STRATEGY_RESEARCH.md) with [shared scheduled authority section 6](../BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md#6-assessment-routes-one-decision-contract). The original opinion route began October 1; the bounded historical policies below retain replay authority for issued reports. Governance v1.0, Core 1.5, the existing five tasks and issued History remain unchanged.
 
 ## Product decision
 
-LEAN is a directional opinion below BET strength. A real forecast supporting an exact price must receive an actual LEAN review, even when its interval or independence is insufficient for BET. An unknown calculation time, unavailable published confidence interval, disagreement with Pinnacle, or failed BET qualification is not by itself proof that there is no useful directional opinion.
+LEAN is a reasoned directional opinion below BET strength. Review an eligible exact published probability supporting the actual offered price, then choose LEAN/WAIT/PASS from source quality, current assumptions, recent and longer-run feedback, price and contrary evidence. No fixed two-source set, universal one-point gap or automatic positive-forecast default governs current forecast LEANs. Provider capability still comes from the current forecast registry and exact applicability checks; a catalogue listing alone is not eligibility.
 
-This adds a narrowly scoped route: retain the **qualified exact paired-market assessment**, and add `forecastLean` for a **current, exact, source-linked published outcome probability**. The model point must support the chosen supported-book price under its actual settlement/push convention. The producer must make and explain the preference. A quote-only edge is not an independent forecast; score projections and probabilities for another side, line or period cannot qualify.
+Review BET first through its supported-fair/range and risk requirements, then assess the zero-stake opinion separately. Missing an independent fair, published confidence interval, qualified Pinnacle pair or BET clearance does not itself reject the opinion. A quote-only discrepancy is not an independent forecast, and a score projection or team-win percentage cannot be recast as another contract's probability.
 
-No numeric LEAN/BET quota applies. Opposing cards continue to receive full coverage. Choose one side per exact market in the customer-facing opinion; the report evidence gate rejects opposing LEANs on an exact paired contract when this forecast-opinion route is used. Retain model disagreement in the analysis. A change in opinion across later runs must be explained with the changed price or evidence.
+Use one directional preference per exact paired market; preserve supporting and contrary models, common origins and source versions. A changed opinion on a later run needs the actual changed price or evidence. No card quota or automatic numerical weighting applies.
 
 ## Authoring
 
-### NHL source corroboration from October 15, 2026
+### Current source-led and qualified-market routes
 
-Effective for new reports at/after **`2026-10-15T12:11:48-07:00`**, this section supersedes the single-forecast default and price-WAIT treatment below for the **NHL full-game moneyline forecast-opinion route**. All five Main lanes use the same producer and publisher checks. Other sports, supported independent-fair decisions and the existing qualified market-only route retain their own rules.
+Work on an unfrozen draft with the exact executable `feed`, current `forecastReview`, genuine MODEL evidence and actual current information/personnel/settlement review. Use `createSourceLedForecastLean(report, rec, judgment)` from `tools/forecast-lean.mjs` when the forecast leads the opinion without adoption as independent fair. Use `createForecastLean` directly when retaining an already completed `QUALIFIED_PINNACLE` assessment. Both require producer judgment and preserve original forecast identity/probability.
 
-The fixed deciding source set is **MoneyPuck, DRatings and Dimers**, selected before examining an individual price. A forecast LEAN requires at least **two different sources** in this set to support the exact offered price, and at least one of those sources to exceed break-even by **1.00 probability point**. The selected anchor must be an approved source clearing that point. Preserve each original probability separately; no average, lower-of rule, numerical weighting, claimed independence or calibrated-profit estimate is introduced. Repeated/syndicated captures of the same provider count once. Conflicting currently eligible versions from one provider require reconciliation; choosing its most optimistic point cannot supply corroboration. Use original provider URLs for the deciding records.
-
-**PuckCast stays in research and comparison, and cannot originate or corroborate this forecast opinion.** The same applies to other sources outside the fixed set. A large lone forecast gap does not make up for missing corroboration. Preserve supporting and contrary records and the actual goalie/personnel applicability review.
-
-Pinnacle remains a separately labelled exact paired-price reference with its original signed gap. An unfavorable comparison is not a blanket veto, but requires producer-supplied `judgment.pinnacleReview = {rationale, decisionImpact}` explaining the actual disagreement and why a provisional opinion survives it. A generic positive-model statement is insufficient research. Builders bind this review to the actual negative gap, current judgment time and MARKET evidence; both the review and the two deciding forecast points/gaps must be visible. The ordinary unresolved-personnel recheck and $0 / NO BET requirements still apply.
-
-Use the existing `createForecastLean` helper with a genuine original record and producer judgment. It derives `forecastLean.corroboration = {schema:1, policyId:"nhl-forecast-corroboration-v1", forecastRecordIds, sourceIds}` from the exact current reviews. Include MODEL evidence for each deciding provider, linked to its original forecast URL. The publisher independently replays **all currently applicable approved source records**, including contrary versions, from `sidecar.forecastEvidence` and rejects invented, stale, omitted or altered corroboration. A producer-written eligible marker is insufficient.
-
-**WAIT requires a concrete condition, not merely failure to qualify for LEAN.** `createForecastWait` can name an exact better price that would meet both source corroboration and the one-point anchor threshold using two actual applicable approved forecasts. Its unrounded boundary is `max(1 / (anchorProbability - 0.01), 1 / secondProbability)`; the displayed American price rounds toward a better offer and must leave the second source strictly above break-even. The source-bound target preserves both records, current signed gaps, actual Pinnacle review and any named goalie/personnel recheck. A positive one-source gap can already exceed one point and still WAIT for this two-source price condition; it cannot use its old one-model target to imply clearance. Already corroborated one-point cases cannot be parked in this price-WAIT route. This remains `targetKind:LEAN_REASSESSMENT`, `actionableIfResolved:false`, no claimed independent wagering signal and no automatic promotion.
-
-A current positive point is required for this price WAIT, and another actual applicable approved source must establish the second part of its target. If no defensible concrete condition is available, review PASS with `directionalReview.reasonKind:INSUFFICIENT_CORROBORATION`, the actual source/record bindings and the provisional alternative considered. Missing research remains incomplete. Do not manufacture WAITs, hypothetical future forecasts or passing research. A later goalie confirmation or genuine forecast update can reopen the assessment; it must establish actual current applicability and the same two-source rule before a LEAN is authored.
-
-An earlier same-price LEAN may become PASS after this cutover for insufficient corroboration. Retain the exact previous-decision binding and explain the **policy change and current source disagreement** in `changedFinding`; never claim the price or source changed when it did not. A corroborated forecast PASS still needs the existing substantive `leanDefaultException`. Source agreement is a selectivity rule to evaluate prospectively, not evidence of an improved win rate. Issued history and the Guy Laflame hotline retain their existing authority.
-
-Run `node --test tests/nhl-forecast-corroboration.test.mjs` together with the existing forecast, candidate, evidence, Core, shared-pipeline and Guy regressions.
-
-### Meaningful forecast default from October 6, 2026
-
-Effective for new reports at/after `2026-10-06T15:53:55-07:00`, after BET assessment default to LEAN when a current eligible exact outcome probability exceeds break-even at the selected executable price by at least **1.00 probability point**, on an otherwise completed qualified market assessment. This is a product opinion threshold, not an estimated model error, calibrated profit bound or BET threshold. The producer still authors and sources the preference through `createForecastLean`; no advisory helper changes a card automatically.
-
-Use **PROVISIONAL LEAN**, $0 and NO BET when applicable starter/lineup/model assumptions remain unresolved; name the dependency and required recheck. Show contrary Pinnacle prices and known market dependence. Neither of those facts, a missing published interval nor ordinary lack of final lineups alone cancels the directional preference. Check which personnel/goaltending assumptions the forecast incorporates before treating an injury list as a second adverse adjustment. Preserve conflicting exact forecasts and choose one defensible opinion side per contract; material contrary forecast evidence may justify the exception below. Gaps below 1.00 point retain judgment and can remain PASS.
-
-### NHL forecast price WAIT from October 13, 2026
-
-For new reports at/after `2026-10-13T07:07:42-07:00`, the user reaffirmed the one-point LEAN threshold and chose WAIT for smaller positive hockey gaps. In the NHL full-game moneyline forecast-point route:
-
-| Current exact forecast gap | Opinion treatment |
-| --- | --- |
-| Zero or negative | Does not qualify forecast price WAIT; assess other actual evidence through existing rules. |
-| Positive, below 1.00 probability point | Source-bound WAIT for a meaningful price/forecast gap. |
-| At least 1.00 probability point | Existing meaningful forecast LEAN default, including its actual evidenced exception process. |
-
-This replaces discretionary sub-one-point forecast LEANs for this specific sport/contract. It changes neither baseball nor supported independent-fair decisions. Guy Laflame can continue choosing and ranking a MoneyPuck side; his choices do not determine VigScope grades or betting authority.
-
-Use `createForecastWait(report, rec, judgment)` on an unfrozen draft with the same completed qualified market assessment and exact current forecast review required for a forecast LEAN. Supply the original forecast record ID, MODEL source IDs, preference rationale, uncertainty, Pinnacle/other-source conflict review, limitations and explicit provisional state. If personnel is unresolved, supply `recheckCondition` naming the actual dependency and required check; the helper preserves it as `personnelRecheckCondition`.
-
-The helper records `forecastWait` with `basis:REVIEWED_FORECAST_PRICE_WAIT`, the unchanged probability/record ID, exact current gap, `targetKind:LEAN_REASSESSMENT` and the 1.00-point target. The exact decimal price condition is `1 / (publishedProbability - 0.01)`. Its visible American odds round toward a better price so that a displayed target genuinely clears the threshold. A fresh applicable forecast can also increase the gap at the current quote. Targets are re-evaluation conditions; they are never play-to betting prices.
-
-The WAIT retains $0, NO BET, no adopted independent fair, unquantified uncertainty and blocked BET authority. Its `waitQualification.mode:FORECAST_PRICE_WAIT` deliberately records `actionableIfResolved:false`, `leanReassessmentIfResolved:true` and no claimed independent signals. `cardEvidence.waitCondition` identifies the exact trigger, original source and all remaining BET requirements. Preserve the original signed Pinnacle comparison and information/Core uncertainty. This explicitly authorized opinion route is the only exception here to ordinary independent-signal/HIGH-error WAIT requirements.
-
-No helper alters the original card, forecast, receipt, sidecar, counts or history. Bind the new card to its exact evaluated receipt, synchronize derived evidence/status/counts through the existing controller and retain the actual source/applicability review. The producer must assess new reports normally; crossing the price target does not auto-promote a saved WAIT. A fresh LEAN removes the old WAIT receipt/condition.
-
-Publication checks re-evaluate the immutable bound forecast and current exact applicability for both LEAN and WAIT. Source IDs, probability, timing, personnel, settlement, threshold arithmetic, displayed trigger, zero stake, absence of independent-fair claims, sidecar/receipt agreement and one opinion side per contract remain enforced. Earlier issued reports, including the October 13 06:19 report, retain original bytes.
-
-MoneyPuck's displayed probability has observed market influence. Retain that dependence and Pinnacle comparison; do not count them as two independent forecasts or introduce an arbitrary calibrated weighted fair. Proposed weights require separate validation before live betting use.
-
-Run `node --test tests/forecast-wait.test.mjs tests/forecast-lean.test.mjs tests/forecast-lean-default.test.mjs tests/forecast-evidence.test.mjs` plus the existing candidate, market, evidence, core, shared-pipeline and Guy regressions.
-
-For a forecast-supported PASS meeting this default, add the following to the existing source-linked `candidateAssessment.decision.directionalReview`:
-
-```json
-{
-  "leanDefaultException": {
-    "basis": "INVALIDATED_FORECAST_ASSUMPTION",
-    "sourceIds": ["actual-model-or-personnel-source-id"],
-    "forecastRecordIds": ["each-qualifying-exact-forecast-id"],
-    "forecastAssumption": "The actual assumption used by the supporting forecast",
-    "observedConflict": "The sourced observation contradicting that assumption",
-    "rationale": "Why the directional preference is no longer credible",
-    "directionalImpact": "How the conflict defeats even a provisional opinion"
-  }
-}
-```
-
-This is a schema example, not evidence. `MATERIAL_CONTRARY_EVIDENCE` is the other permitted basis; it requires actual contrary MODEL/OFFICIAL/REPORTING sources and the same rationale, directional impact and qualifying record bindings. A MARKET source alone cannot override this default. Ordinary uncertainty and unsupported claims about a provider's assumptions are not invalidated assumptions. Source identity/time/event, original forecast applicability, price freshness and all existing publication checks still apply. Personnel-based rejections cannot coexist with `NO MATERIAL PERSONNEL SENSITIVITY`; correct the assessment and its derived copies rather than deleting an inconvenient fact. The guard returns incomplete review for an unsupported PASS; it never fabricates an automatic LEAN.
-
-October 6's issued 15:25 report is unchanged: Ottawa +102 supported by 1.80 points and Chicago +124 supported by 1.53 points illustrate the future default; Vegas -167 supported by 0.39 point illustrates a below-threshold judgment case. None of these arithmetic points establishes a BET or settled profit.
-
-Use `createForecastLean` in `tools/forecast-lean.mjs` on an **unfrozen draft** with an already complete qualified market assessment and current `forecastReview`. It requires producer judgment:
+Illustrative source-led handoff; every ID, finding, clock and dependency must come from the actual selection:
 
 ```js
-const opinion = createForecastLean(report, rec, {
+const opinion = createSourceLedForecastLean(report, rec, {
   forecastRecordId: 'the-real-bound-record-id',
   sourceIds: ['the-selection-specific-MODEL-source-id'],
-  rationale: 'Explain why this exact side is preferred at its recorded price.',
-  uncertainty: 'Name unknown model uncertainty, dependence or assumptions.',
-  conflictReview: 'Explain disagreement with Pinnacle and any other actual sources.',
-  limitations: 'State what this point cannot establish.',
+  rationale: 'Why this exact side is preferred at its recorded price.',
+  uncertainty: 'The actual unknown model error, dependence and assumptions.',
+  conflictReview: 'The strongest contrary forecast and any available signed Pinnacle disagreement.',
+  limitations: 'What the published point cannot establish.',
+  informationReview: {
+    checkedAt: report.ts,
+    sourceIds: ['the-actual-current-official-or-reporting-source-id'],
+    state: 'UNRESOLVED',
+    impact: 'The investigated material assumption still awaiting confirmation.'
+  },
+  settlementRationale: 'The exact market, line, period and compatible settlement/push basis.',
   provisional: true,
-  recheckCondition: 'Name the unresolved starter/lineup dependency and the required recheck.'
+  recheckCondition: 'The actual unresolved dependency and required recheck.'
 });
 ```
 
-The model source must use the original forecast URL and a selection-specific finding. Include a current official/reporting information review. If material personnel remains unresolved, the opinion must visibly say **PROVISIONAL LEAN**, name the dependency and recheck, and retain the unresolved information/Core state. Do not convert PARTIAL into CONFIRMED, claim an invented uncertainty band, erase a contrary market price, or use a provisional opinion to authorize risk. Material Stage 2 and quarterback follow-up requirements still apply where required by the real assessment; the new field does not waive them.
+The MODEL source must link the original forecast URL with a selection-specific finding. A completed unresolved material review requires **PROVISIONAL LEAN**, its named recheck and the genuine unresolved information/Core state. Retain Stage 2 and quarterback follow-up where the actual assessment requires them. Missing research remains incomplete; do not change PARTIAL into CONFIRMED or treat an injury list as a second adjustment without checking the model's assumptions.
 
-`forecastLean` records one original probability point, probability basis, immutable record ID, exact selection key, current judgment, MODEL source IDs, explicit `UNQUANTIFIED` forecast uncertainty, limitations and disagreement. `independentFairClaimed` is false. The existing market reference remains separately labelled in `fair`; `fairValueEvidence` stays null. Display the forecast point in support/analysis, rather than presenting it as an adopted fair. Do not describe the raw point's arithmetic advantage as established expected profit.
+The source-led helper sets `marketAssessment.basis:SOURCE_LED_OPINION`, adopts no reference probability or independent fair, labels `fair` as `Published forecast point: ... (independent fair unavailable)` and recomputes Core with `fairValueBasis:UNAVAILABLE` and BET authority blocked. Its forecast uncertainty remains `UNQUANTIFIED`. An available qualified exact Pinnacle comparison stays separately signed, visible and replayed. An unavailable comparison stays unavailable; never substitute another line or manufacture a reference.
 
-The result has `status:LEAN`, `stake:$0`, `playTo:NO BET`, no price watch, and the honest `MARKET_DERIVED_ONLY` Core context with BET authority blocked. The helper returns a draft and changes no original card, report count, sidecar, receipt or history. Bind the returned card to the exact receipt, update the matching sidecar status, `cardEvidence` and counts, and normalize its derived fields through the existing controller. Record the forecast disposition as CONTEXT with an explicit explanation that it supports a directional opinion but is not adopted independent fair.
+The qualified-market helper retains `marketAssessment.basis:QUALIFIED_PINNACLE`, the separately labelled `Market reference` and `MARKET_DERIVED_ONLY` Core context. Both routes keep `fairValueEvidence:null`, `independentFairClaimed:false`, `status:LEAN`, `stake:$0`, `playTo:NO BET` and no wagering price watch. Neither the raw point nor its arithmetic gap is established profit.
 
-If the candidate's personnel review uses `REVIEW_COMPLETED_UNRESOLVED`, give the real source IDs, materiality explanation, remaining uncertainty and provisional decision impact. The candidate completion layer now recognizes a properly validated provisional forecast LEAN without pretending personnel resolved. Missing actual research remains incomplete.
+Helpers return a new draft card, without updating the original report, sidecar, receipt, counts or History. Bind the card to its exact EVALUATED receipt, synchronize the matching sidecar, `cardEvidence` and counts through the existing controller, and retain current source/applicability review. Record an unadopted opinion forecast as CONTEXT with the reason it supports direction without supplying independent fair.
+
+### NHL forecast price WAIT
+
+The existing `createForecastWait` helper remains available for an eligible unconditional NHL full-game moneyline point with a positive price-support gap below one probability point. Its concrete reassessment target remains `1 / (publishedProbability - 0.01)`, with the displayed American odds rounded toward a better price. This retained helper target is not a current universal LEAN floor or a rule forcing every smaller positive gap into WAIT. A documented discretionary LEAN or reasoned PASS can also be appropriate under the current policy.
+
+Preserve the original record, current exact gap, `targetKind:LEAN_REASSESSMENT`, uncertainty and concrete trigger. Unresolved material assumptions require a provisional label and named personnel recheck included in that trigger. The matching `waitQualification` remains `mode:FORECAST_PRICE_WAIT`, `actionableIfResolved:false`, `leanReassessmentIfResolved:true`, with no claimed independent wagering signals; preserve `cardEvidence.waitCondition`. This is $0 / NO BET. Ordinary WAIT retains its separate independent-signal, actionability and HIGH-error requirements. Unfinished research is not WAIT.
+
+A price target only triggers fresh assessment. It cannot auto-promote a saved WAIT, carry a decision to another line or authorize BET. A newly authored LEAN removes the old forecast-WAIT receipt/condition. The October 15 two-source WAIT arithmetic remains historical replay only.
 
 ## BET follow-through
 
-For every promising eligible forecast/native fair, explicitly assess **BET first, then LEAN**, rather than defaulting to market PASS because the separate forecast has not been adopted. Where evidence permits, construct and source the actual uncertainty/sensitivity case, recheck decision-sensitive assumptions, calculate the conservative price boundary, and finish the existing BET tests. Missing a publisher's confidence interval alone starts this assessment; it is not an automatic model rejection.
+For promising eligible forecasts/native fairs, assess whether the actual current evidence can support an adopted fair and a source-grounded uncertainty/sensitivity range. Identify endpoints and assumptions, resolve decision-sensitive personnel and apply the existing conservative bound, independent-support, model-error, exact-price, exposure and staking requirements. A sensitivity range is not automatically a calibrated confidence interval. A source brand, vote count, streak, better payout or published point alone does not supply BET authority.
 
-When that work cannot establish BET, issue the justified source-backed opinion where this route qualifies. A PASS on a forecast-supported price needs a **directional rejection reason** explaining why the actual preference is not credible. “Not BET-grade”, “no published interval” or “Pinnacle disagrees” alone describes a BET limitation, not a complete rejection of an opinion. Strong unresolved contradictions, obsolete assumptions, inapplicable settlement, wrong-side forecasts and no defendable preference can still justify PASS/incomplete research.
-
-For a PASS on an eligible forecast-supported exact price, record `candidateAssessment.decision.directionalReview = {state:"REJECTED", rationale:"the actual source-grounded reason for rejecting the directional preference"}`. From the stated cutover the candidate completion gate requires this separate assessment; missing work is deferred as research incomplete. This is an assessment requirement, not an automatic LEAN or a count quota.
-
-This amendment creates no market-only BET authority and changes no stake/exposure limits. Completing a BET remains a real price and uncertainty decision. It is not inferred from product engagement, a streak, a tempting payout, or the exploratory movement study.
+If BET is unsupported, separately assess the directional preference. For an eligible forecast-supported PASS, retain `candidateAssessment.decision.directionalReview = {state:"REJECTED", rationale:"the actual source-grounded directional objection"}` and the existing source bindings/provisional-alternative review. The old one-point `leanDefaultException` is no longer mandatory after the current cutoff. `INSUFFICIENT_CORROBORATION` is a historical rejection kind for the former active NHL quota; do not use it to reject current opinions solely for missing that quota. Explain real source conflicts, invalid assumptions or the lack of a defensible preference. For a withdrawn earlier LEAN retain `previousDecision` and the actual `changedFinding`, without inventing movement.
 
 ## Publisher verification
 
-The report evidence gate checks selection identity, current producer judgment, zero risk, source linkage, exact eligible probability, price support and visible uncertainty/provisional wording. `forecastLean` must match between card and sidecar. The primary coverage gate independently re-evaluates the **original bound forecast record plus current report applicability** using `evaluateForecast`. A producer-written `ELIGIBLE_EXACT` field cannot bypass missing/stale/wrong-line/personnel/settlement checks.
+The existing gates check exact identity, original MODEL linkage, unstarted event, current producer judgment, source/applicability/personnel/settlement, positive exact-price support, visible uncertainty/provisional wording, zero risk and one opinion side per contract. `forecastLean` must match the sidecar and receipt. Current replay validates applicable original supporting and contrary probability records, not just a favorable anchor. A producer-written `ELIGIBLE_EXACT` flag cannot replace that replay.
 
-Market-reference pairing, quote freshness, Core recomputation, current personnel semantics, candidate completion, freeze and remote issuance verification remain enforced. No existing report is rewritten or reissued under the new rule.
+A qualified market route still requires its exact pinned pair and arithmetic. A source-led route does not require an unavailable pair, and must not invent reference fields. Both retain Core recomputation, candidate completion, original clocks, normal freeze/staged publication and remote issuance readback. Optional strategy feedback is not a new publication veto. Reassess each new run rather than carrying old grades, fair values or prices forward.
 
-Reassess on every new run. If the opinion no longer qualifies, remove `forecastLean` and record the newly justified status; do not carry its point or grade onto a different side, line or price without current review.
+## Historical policy windows
 
-## Morning baseline
+These windows describe replay, not current authoring. Compare absolute report instants; do not rewrite issued timestamps or assume a winter offset.
 
-October 1's 06:26, 08:12 and 09:42 reports each contained 70 PASS and zero LEAN/BET/WAIT. Atlanta had an eligible ESPN 59.7% moneyline point at 06:26 and 09:42. At 09:42, 1.95 decimal required 51.28% before model uncertainty, while Pinnacle's no-vig reference was 49.53%. The prior producer used that disagreement, unknown model time/dependence and unresolved starters/lineups to keep the point as context.
+| Window | Policy at that time |
+| --- | --- |
+| From `2026-10-01T12:00:00-07:00` | Original reviewed exact-probability opinion added to an already qualified market assessment. |
+| `2026-10-06T15:53:55-07:00` to before `2026-11-06T17:00:00Z` | One-point meaningful-forecast LEAN default and source-bound `leanDefaultException` for a qualifying PASS, subject to later NHL refinements. |
+| `2026-10-13T07:07:42-07:00` to before `2026-11-06T17:00:00Z` | NHL one-point LEAN floor and below-one-point forecast price WAIT, subject to October 15 corroboration. |
+| `2026-10-15T12:11:48-07:00` to before `2026-11-06T17:00:00Z` | NHL deciding set MoneyPuck/DRatings/Dimers, two supporting sources and approved one-point anchor; PuckCast research-only for this route. WAIT target met both source and one-point conditions. |
+| At/after `2026-11-06T17:00:00Z` | Current discretionary opinion and source-led expansion described above. Source eligibility, honest uncertainty, original replay and BET requirements remain. |
 
-That is a concrete candidate for a **provisional directional review** under the new route; it is not a current bet, an automatic promotion, or a retroactive changed grade. The 08:12 report had no exact eligible positive forecast. New runs must revalidate the actual source point, event assumptions and price. Buffalo's 0.23-point market discrepancy at 09:42 is not an independent forecast and does not gain automatic LEAN/BET status through this amendment.
+### Morning baseline
+
+October 1's 06:26, 08:12 and 09:42 reports each contained 70 PASS and no LEAN/BET/WAIT. At 09:42 Atlanta's ESPN 59.7% point, exact execution price and contrary Pinnacle reference motivated the original opinion review. The 08:12 report had no eligible exact positive forecast. These are historical examples, not current candidates or retroactive promotions. Current sources, assumptions and prices require fresh review.
 
 ## Validation
 
-Run `node --test tests/forecast-lean.test.mjs` plus the forecast, market assessment, candidate assessment, evidence, primary coverage, sidecar and shared pipeline regressions. The new synthetic tests exercise full primary publication validation, negative Pinnacle disagreement, provisional candidate completion, raw-source/applicability replay, false eligibility, no risk/fair promotion and immutable morning history.
+The October 1 rollout recorded 45 passing tests and unchanged readback of the three issued morning reports. The November 6 implementation added nine strategy-research cases and passed its targeted and historical regressions. These are implementation/historical-compatibility results, not evidence of winning performance or adoption by every in-flight draft.
 
-Pre-activation validation: **45 tests passed** across 12 test files, including nine new opinion-route cases. Each of the three October 1 issued morning reports also passed all **15 shared readback gates** under the updated code, without a byte change or retroactive regrading. This validates implementation and historical compatibility; the first real post-cutover opinion still needs fresh source/price review and ordinary publisher verification.
+When changing opinion code, use the existing strategy-research, forecast-LEAN/default/WAIT, forecast-evidence, market-assessment, candidate, coverage, sidecar and shared-pipeline regressions appropriate to the change. For historical details use the report's pinned authority blobs and Git history. Do not rerun or regrade an issued report to apply today's policy.

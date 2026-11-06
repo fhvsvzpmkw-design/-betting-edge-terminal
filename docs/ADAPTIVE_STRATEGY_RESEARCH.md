@@ -1,14 +1,28 @@
 # Adaptive strategy research
 
-Operational for new reports from **November 6, 2026, 09:00 Pacific**. The user authorized reconsidering old analytical restrictions, restoring previously reviewed strategies, and developing methods from saved results. This forward amendment governs research and opinion flexibility wherever older instructions conflict.
+Operational for new reports with `report.ts` at/after **`2026-11-06T17:00:00Z`** (10:00 Pacific on the project's current America/Vancouver clock). This is the exact cutoff in `tools/strategy-research.mjs`; the earlier 09:00 label was incorrect. The user authorized reconsidering old analytical restrictions, restoring previously reviewed strategies, and developing methods from saved results. This forward amendment governs research and opinion flexibility wherever older instructions conflict.
 
 ## Research authority
+
+Read the current [Core operating contract](../core/CORE_V1_5_OPERATING_CONTRACT.md), [governance contract](../BETTING_EDGE_CONTRACT.md) and [shared scheduled authority](../BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md) for release, execution and producer ordering. This document supplies the current analytical amendment; the [forecast opinion guide](FORECAST_DIRECTIONAL_LEANS.md), [candidate guide](CANDIDATE_ASSESSMENT.md) and [evidence guide](REPORT_EVIDENCE_REQUIREMENTS.md) describe its existing authoring fields. Dated reviews explain past decisions; they do not silently reinstate retired restrictions.
+
+| Older instruction | Current scope from the cutoff |
+| --- | --- |
+| Always obtain a qualified Pinnacle pair before a forecast opinion | Required for the qualified market route. A reviewed `SOURCE_LED_OPINION` LEAN can proceed without it; preserve any available exact comparison. |
+| NHL must have two of three named sources and a one-point LEAN gap | Historical replay only before the cutoff. Current source eligibility and actual supporting/contrary evidence still matter; no fixed source count or universal opinion threshold assigns the grade. |
+| Always default a positive one-point forecast to LEAN; require `leanDefaultException` for PASS | Historical default only. Current LEAN/WAIT/PASS is a documented judgment; a forecast-supported PASS still needs its source-grounded directional review. |
+| Every completed decision must adopt a numeric fair and range | BET and adopted-fair decisions retain their evidence requirements. Qualified market decisions and unadopted forecast opinions retain their own honest basis and zero-risk rules. |
+| Research is candidate-first and restricted to the fixed error-floor allowlist | Those are the frozen History Fit/Core component rules. Relevant reviewed methods may inform discovery before candidate formation through the separate living strategy catalogue. |
+| Results learning is entirely deferred | Source-form and versioned prospective strategy feedback are active. The full automated results/CLV loop, automatic numerical weights and personal-ledger calibration remain outside this release. |
+| Main routinely starts four researchers and two reviewers | Use the current reduced profiles in [the staffing guide](REPORT_RESEARCH_AGENTS.md), with the existing bounded exception process. Adaptive research adds no workers. |
+
+Keep the checksummed Research Library v1.8/R3, its policy and the pinned Core production/component manifests unchanged. Their version numbers, read-only status and graduated error-floor rules remain valid within those components. The separate strategy registry is editable and versioned; it is not a migration or blanket graduation of the frozen library.
 
 The coordinator may originate research questions, retrieve relevant previously reviewed methods, add permitted published strategies, test variants and revise analytical preferences. Begin with `research/strategy-registry.json` and the current event's `strategyResearch` in the existing work plan/dossier. The catalogue is a starting set, not an exclusive allowlist. Use relevant Research Library items before candidate formation; its legacy candidate-first presentation rule does not prohibit discovery.
 
 The initial set restores Wong's forecast/settlement/price methods and reviewed key-number reasoning, the existing independent Walters/Graham matchup work, movement/reversal studies, demand/recency research, native point projections, and forecast-versus-market comparisons. Investigate current team form and source performance. Read the linked corrections and contrary findings. A source methodology is distinct from current game evidence; a historical negative result is neither erased nor a universal ban on a newly defined test.
 
-Pinnacle is a labelled benchmark, not a prerequisite to research or a universal veto. Two-source agreement and the former one-point opinion cutoff are reviewable defaults, not mandatory qualification rules for forward forecast opinions. Examine supporting and contrary sources, their common origins, current assumptions, available prices and recent/long-run results. Do not select a provider solely because it supplies the desired answer. The coordinator retains responsibility for the actual opinion.
+Pinnacle is a labelled benchmark, not a prerequisite to research or a universal veto. The former fixed two-source set and one-point opinion cutoff are retired as qualification rules for forward forecast LEANs. Examine supporting and contrary sources, their common origins, current assumptions, available prices and recent/long-run results. Provider eligibility still follows the current forecast registry and exact applicability checks; ending the three-source quota does not make every listed provider eligible. Do not select a provider solely because it supplies the desired answer. The coordinator retains responsibility for the actual opinion.
 
 ## Actual opinion route
 
@@ -16,9 +30,11 @@ An eligible exact published outcome probability supporting the offered price may
 
 The source-led helper labels the published probability separately and evaluates Core with `fairValueBasis: UNAVAILABLE`: it adopts no independent fair or confidence interval and cannot authorize BET. An available exact Pinnacle reference remains visible, signed and replayed. An unavailable reference stays unavailable; do not manufacture another line or a comparison. The publisher now accepts this genuine source-led opinion without requiring a nonexistent Pinnacle pair.
 
-Forecast price WAIT remains available with its concrete price-reassessment condition. A weak lead need not become LEAN, and an unfinished investigation is not evidence of no value. Assess BET through the supported-fair route, then judge LEAN/WAIT/PASS on their own evidence. No pick quota applies.
+Forecast price WAIT remains available with its concrete price-reassessment condition. The existing NHL `createForecastWait` helper still implements a positive-gap-below-one-point case and a one-point reassessment target; that helper-specific arithmetic is not a universal LEAN floor or a rule forcing every smaller gap into WAIT. Ordinary WAIT retains its independent-signal/actionability checks. A weak lead need not become LEAN, and an unfinished investigation is not evidence of no value. Assess BET through the supported-fair route, then judge LEAN/WAIT/PASS on their own evidence. No pick quota applies.
 
 ## Saved learning in the current workflow
+
+Deployment and adoption are separate. Inspect the actual report instant and `sidecar.gameIntelligenceInputs.strategyResearch`; an in-flight draft first bound earlier can retain its original inputs. Use the existing controller's normal unfrozen input/research preparation when appropriate, preserving original observations; do not rewrite a frozen bundle, backdate issuance or request extra odds to manufacture adoption. Feedback must have `asOf <= report.ts`; unavailable optional feedback is disclosed, not a new publication veto. Derive local labels from America/Vancouver using the current schedule runtime, rather than guessing a winter offset.
 
 The existing collector saves `strategyTrials` within its normal immutable captures. The existing source grader writes `sourceForm` and `strategyLearning` within `data/game-intelligence/performance.json`. The next report pins available feedback in its game-intelligence inputs and puts relevant methods/results into each event's work plan. No recurring task, odds request, analyst group or separate prediction service is added.
 

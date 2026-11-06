@@ -2,6 +2,8 @@
 
 **Source review:** September 7, 2026. **Role:** methodology reference for the existing current-research process; not a new fair-value model or Research Library graduation.
 
+**Current use from `2026-11-06T17:00:00Z`:** [Adaptive strategy research](../ADAPTIVE_STRATEGY_RESEARCH.md) reintroduces these reviewed methods as inputs to discovery and versioned tests. The fair-construction sequence below applies when actually adopting a numerical fair, not to every zero-stake opinion. Preserve the source corrections, tested limitations and native settlement units; no historical book example becomes current-event evidence automatically.
+
 Stanford Wong, *Sharp Sports Betting*, Pi Yee Press, ISBN 9780935926446. The user-supplied EPUB lists copyright years 2001, 2006, 2009 and 2011. The source SHA-256 is `505a64f62592c191a1918276c64a447e3ce9819a938cb1afcf45417d918b9746`. These are original derived notes. The full EPUB remains outside this public repository.
 
 ## Research sequence
@@ -49,7 +51,7 @@ Chapter 7 requires a defined hypothesis and separate testing data, and discusses
 
 Chapters 12, 14 and 15 contain historical NFL estimates for home advantage, scoring margins and totals. Chapter 14 explicitly limits its conversion tables to the NFL. Revalidate empirical values for the relevant period and sport before use; do not transfer NFL numbers to MLB, CFL or NCAAF. Chapter 9's Poisson examples supply a possible modeling technique, not proof that a proposed distribution fits today's full-game market. Check assumptions and fit before using it.
 
-The book is a methodology source, not independent current-event support. Do not cite it as today's personnel evidence or use it to originate a fair, stake or BET. Props remain paused; current Core/Walters/Graham authorities and Research Library graduation rules continue to govern.
+The book is a methodology source, not independent current-event support. It may inform a tested, documented method applied to current sourced inputs, with supported fair/range evidence when a fair is adopted. The book alone cannot supply today's personnel facts, a numeric probability, stake or BET. Props remain paused; current Core and independent Walters/Graham authorities remain. Frozen Research Library graduation rules apply to that component, not as a global prohibition on the separate adaptive research process.
 
 ## Source locations and first application
 
@@ -69,4 +71,4 @@ Locators are relative to `OEBPS/` inside the supplied EPUB; pagination varies by
 The [full review and quantitative audit](../SHARP_SPORTS_BETTING_FULL_REVIEW_2026-09-07.md) supersedes the first pass: all 17 chapters and appendices were reviewed, all 138 Table 4 thresholds compared, all 10,280 displayed appendix probability positions audited, and chapter 17's printed game grades checked. The review distinguishes confirmed mathematical corrections from historical claims that remain externally unverified. [Reproducible calculations and optional EPUB audit](../../tools/audit-sharp-sports-betting.py) accompany the [results](../../research/audits/sharp-sports-betting-2026-09-07.json). The [Angels–Red Sox application](../SHARP_SPORTS_BETTING_TRIAL_2026-09-07.md) reproduces both moneylines and identifies the remaining numerical dependency. It is historical research, not an issued recommendation.
 
 
-**September 7 current-game follow-up:** Before resuming this date's remaining games, read the [midday application and retained numerical work](../SHARP_SPORTS_BETTING_TRIAL_2026-09-07.md#midday-follow-up--september-7-2026). It contains current source checks, pitcher/relief inputs, both-side moneyline calculations and exact unfinished dependencies for the five later games. Revalidate changing inputs and prices; none of its external-model comparisons is an issued decision or an adopted Core fair. Keep using the existing report/sidecar fields and current inventory rather than inheriting the morning blocked count.
+**Historical September 7 follow-up — not a current work queue:** The [midday application and retained numerical work](../SHARP_SPORTS_BETTING_TRIAL_2026-09-07.md#midday-follow-up--september-7-2026) records that date's checks, pitcher/relief inputs, both-side calculations and unfinished dependencies. Reuse methodology and disclosed limitations, not its expired game facts or prices. Its external-model comparisons remain historical research, not issued decisions or adopted current Core fair.
