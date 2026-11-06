@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-08:00-update-2026-11-06",
+  "executionRunId": "2026-11-06T08:30:00.000-07:00|2",
+  "workBinding": {
+    "candidateId": "2026-11-06T08:12:27.311-07:00|2",
+    "feedBlobSha": "f10d71b48a3587e85a939606554bff4afa09e72c",
+    "checkpointPath": "data/report-production/checkpoints/20261106-main-0800-081227.json",
+    "assignmentRevision": 2,
+    "finalMergedRevision": 31,
+    "initialCheckpointCommit": "75eb24c6453a80017253dc1054ac3ae24f1a225f",
+    "bindingNote": "The worker acknowledged the exact read-only checkpoint/feed/board binding after the remotely verified initial save. The coordinator later retimed the same unfrozen slot-2 run to 08:30 PT while preserving the feed and assignment scope."
+  },
+  "mode": "TARGETED_RESEARCH",
+  "reason": "The 08:00 update profile began coordinator-only. After screening the full 17-event inventory, one targeted researcher was used for the consequential NHL moneyline/goalie conflict and Guy shortlist across the three NHL events.",
+  "workers": [
+    {
+      "id": "/root/researcher_1",
+      "role": "targeted-complete-event-researcher",
+      "readOnly": true,
+      "freshContextBoundary": "The exact repository, branch, checkpoint, feed SHA, three NHL event IDs and current quote board were acknowledged before research. The worker performed no shared writes, odds collection or child delegation.",
+      "assignmentIds": [
+        "NHL|72909366",
+        "NHL|72909368",
+        "NHL|72909370",
+        "Guy early shortlist"
+      ],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": "2026-11-06T15:18:04.201Z",
+      "observedClockWindow": {
+        "acknowledgment": "Observed within the required 60-second window after launch",
+        "returnEvidenceClock": "2026-11-06T15:18:04.201Z"
+      },
+      "clockLimitation": "The collaboration runtime exposed the ordered acknowledgment but not its exact timestamp; no launch or acknowledgment clock is invented.",
+      "state": "RETURNED",
+      "completedReviews": 3,
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_ONE_TARGETED_RESEARCHER",
+      "workers": 1,
+      "question": "Do current goalies, lineup changes, rest/travel and contrary evidence support any of the Buffalo, Minnesota or Calgary NHL shortlist prices, including Guy's early Minnesota candidate?",
+      "expectedQualityBenefit": "Resolve the slate's only consequential goalie/source conflicts and independently challenge a possible Guy call without duplicating the coordinator's routine NBA and NCAAF update work.",
+      "releaseCondition": "The researcher returned source-backed reviews for all three NHL events; no expansion or second worker was needed."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "San Jose's starter remained conflicted between Yaroslav Askarov and Alex Nedeljkovic; Minnesota had the rest and five-on-five case, but its exact 1.40 price was below Guy's 1.43 minimum.",
+      "impact": "The coordinator retained Minnesota as PASS and did not stage a Guy call."
+    },
+    {
+      "finding": "Calgary's Dustin Wolf was confirmed, while Anaheim's starter remained conflicted and Anaheim carried back-to-back travel; Buffalo's goalies and possible returns also remained unconfirmed at a demanding exact price.",
+      "impact": "The coordinator preserved the personnel/rest evidence and strongest contrary cases, but neither Calgary nor Buffalo cleared a LEAN or BET route."
+    }
+  ],
+  "completedWork": {
+    "eventsResearched": 17,
+    "selectionsAssessed": 102,
+    "completedAssessments": 92,
+    "documentedShortfalls": 10,
+    "forecastBindingsReviewed": 58,
+    "independentReviews": 0,
+    "workerReturns": 1,
+    "coordinatorMergedEvents": 17,
+    "coordinatorDecisionCounts": {
+      "BET": 0,
+      "LEAN": 0,
+      "WAIT": 0,
+      "PASS": 92,
+      "BLOCKED": 10
+    },
+    "startupSaveState": "The initial controller checkpoint was committed and remotely verified before broad research; worker startup/return activity is consolidated in this final durable receipt."
+  },
+  "remainingWork": [
+    "Both spread sides remain exact-reference shortfalls for Oklahoma City-Memphis, Portland-Los Angeles Lakers, San Antonio-Sacramento, Virginia Tech-SMU and New Mexico-Nevada.",
+    "No producer assessment remains unfinished. Guy's Minnesota candidate has no release because the bound 1.40 price was below the 1.43 minimum and the San Jose starter conflict remained unresolved."
+  ],
+  "recordedAt": "2026-11-06T15:36:47.000Z"
+}
