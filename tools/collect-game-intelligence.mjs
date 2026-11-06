@@ -4,6 +4,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {collectCuratedSources} from './curated-sources.mjs';
+import {validCuratedRecord} from './curated-aggregation.mjs';
 import {isDeepStrictEqual} from 'node:util';
 import {mergedFeedEvents,derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
 import {forecastCandidate} from './forecast-evidence.mjs';
@@ -376,12 +378,19 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
       cache[key]=observedAt;sources.push({sourceId:'bet_better',scope:sport,state:count?'COLLECTED':'NO_EXACT_EVENT',records:count,checkedAt:observedAt,url});
     }catch(error){sources.push({sourceId:'bet_better',scope:sport,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url});}
   });
+  const sourceEvents=events.map(event=>{
+    const competitors=list(matches.get(event.eventId)?.competitions?.[0]?.competitors);
+    const labels=side=>{const team=competitors.find(c=>c.homeAway===side)?.team;return team?[team.displayName,team.shortDisplayName,team.location,team.abbreviation].filter(Boolean):[];};
+    return {...event,sourceAliases:{home:labels('home'),away:labels('away')}};
+  });
+  const curated=await collectCuratedSources({events:sourceEvents,get,prior:previousUsable?prior:null,registry,at,clock,force});
+  sources.push(...curated.sources);Object.assign(cache,curated.cache);
   for(const [sourceId,source] of Object.entries(registry.sources)){
-    if(['espn','nfelo','bet_better'].includes(sourceId)||sourceId==='moneypuck'&&moneyPuckActive||source.collection?.sports&&!events.some(event=>source.collection.sports.includes(event.sport)))continue;
+    if(['espn','nfelo','bet_better'].includes(sourceId)||registry.curatedAggregation?.enabled===true&&time(at)>=time(registry.curatedAggregation.effectiveFrom)&&['prediction_tracker','bettingpros'].includes(sourceId)||sourceId==='moneypuck'&&moneyPuckActive||source.collection?.sports&&!events.some(event=>source.collection.sports.includes(event.sport)))continue;
     sources.push({sourceId,state:'RESEARCH_OR_LICENSED_IMPORT',reason:source.collection?.reason||'No verified automated feed configured. Use a permitted source capture; do not infer coverage from the source name.',
       automatedReuse:source.automatedReuse||'NO_API_OR_LICENSE_ASSUMED',urls:source.routes||Object.values(source.sportBoards||{})});
   }
-  const capture={schema:1,collectedAt:clock(),feedGeneratedAt:feed.generatedAt,records,facts,quoteHistory,sources,requestCache:cache,
+  const capture={schema:1,collectedAt:clock(),feedGeneratedAt:feed.generatedAt,records,facts,quoteHistory,curatedPicks:curated.picks,sources,requestCache:cache,
     acquisition:{requests:requests.length,oddsApiRequests:0,modelCalls:0,receipts:requests}};
   capture.snapshotId=digest(capture);
   validateCapture(capture,registry);
@@ -406,9 +415,15 @@ export function mergeCapture(prior,incoming,registry){
     if(records.has(row.recordId)&&!isDeepStrictEqual(records.get(row.recordId),row))throw Error('Conflicting immutable source record');
     records.set(row.recordId,row);
   }
-  const importedSources=[...new Set(incoming.records.map(r=>r.sourceId))];
+  const curatedPicks=new Map(list(prior?.curatedPicks).map(row=>[row.recordId,row]));
+  for(const row of list(incoming.curatedPicks)){
+    if(!validCuratedRecord(row,null,incoming.collectedAt))throw Error('Invalid curated source import');
+    if(curatedPicks.has(row.recordId)&&!isDeepStrictEqual(curatedPicks.get(row.recordId),row))throw Error('Conflicting immutable curated source record');
+    curatedPicks.set(row.recordId,row);
+  }
+  const importedSources=[...new Set([...incoming.records,...list(incoming.curatedPicks)].map(r=>r.sourceId))];
   const output={schema:1,collectedAt:incoming.collectedAt,feedGeneratedAt:incoming.feedGeneratedAt||prior?.feedGeneratedAt||null,
-    records:[...records.values()],facts:[...list(prior?.facts),...list(incoming.facts)],quoteHistory:list(prior?.quoteHistory),
+    records:[...records.values()],curatedPicks:[...curatedPicks.values()],facts:[...list(prior?.facts),...list(incoming.facts)],quoteHistory:list(prior?.quoteHistory),
     sources:[...list(prior?.sources).filter(s=>!importedSources.includes(s.sourceId)),...importedSources.map(sourceId=>({sourceId,state:'COLLECTED',checkedAt:incoming.collectedAt,acquisition:'PERMITTED_STRUCTURED_IMPORT'}))],
     requestCache:prior?.requestCache||{},acquisition:{requests:0,oddsApiRequests:0,modelCalls:0,mode:'STRUCTURED_IMPORT'}};
   output.snapshotId=digest(output);return validateCapture(output,registry);

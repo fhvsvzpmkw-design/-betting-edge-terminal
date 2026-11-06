@@ -3,7 +3,7 @@
   const list=x=>Array.isArray(x)?x:[];
   const odds=root.VigScopeOddsFormat;
   const pct=x=>typeof x==='number'?(x*100).toFixed(1)+'%':'—';
-  const names={espn:'ESPN',mlb_official:'MLB official',nfelo:'nfelo',dimers:'Dimers',dratings:'DRatings',moneypuck:'MoneyPuck',fangraphs:'FanGraphs',stats_insider:'Stats Insider',dunks_threes:'Dunks & Threes',puckcast:'PuckCast',oddstrader:'OddsTrader',prediction_tracker:'The Prediction Tracker',bet_better:'Bet Better',playerwon:'PlayerWon',covers_oddsshark:'Covers / OddsShark',the_margin:'The Margin',podium_oracle:'Podium Oracle'};
+  const names={bettingpros:'BettingPros',espn:'ESPN',mlb_official:'MLB official',nfelo:'nfelo',dimers:'Dimers',dratings:'DRatings',moneypuck:'MoneyPuck',fangraphs:'FanGraphs',stats_insider:'Stats Insider',dunks_threes:'Dunks & Threes',puckcast:'PuckCast',oddstrader:'OddsTrader',prediction_tracker:'The Prediction Tracker',bet_better:'Bet Better',playerwon:'PlayerWon',covers_oddsshark:'Covers / OddsShark',the_margin:'The Margin',podium_oracle:'Podium Oracle'};
   const market=x=>/moneyline/.test(x)?'Moneyline':/spread|run_line|puck_line/.test(x)?'Spread':/total/.test(x)?'Total':x;
   const signed=n=>typeof n==='number'?(n>0?'+':'')+n:'—';
   const clock=x=>{try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(x))+' PT';}catch{return 'Time unavailable';}};
@@ -17,18 +17,54 @@
   `;d.head.appendChild(s);}
   function table(d,headers,rows){const wrap=node(d,'div',undefined,'gi-scroll'),t=node(d,'table'),head=node(d,'tr');for(const h of headers)head.append(node(d,'th',h));const thead=node(d,'thead');thead.append(head);t.append(thead);const body=node(d,'tbody');for(const cells of rows){const tr=node(d,'tr');for(const value of cells){const td=node(d,'td');if(value&&typeof value==='object'&&value.nodeType)td.append(value);else td.textContent=value??'—';tr.append(td);}body.append(tr);}t.append(body);wrap.append(t);return wrap;}
   function factText(f){if(f.finding)return f.finding;const x=f.details||{};if(f.kind==='OFFICIAL_PERSONNEL'){const a=x.probablePitchers?.away?.name||'not published',h=x.probablePitchers?.home?.name||'not published';return `Official probable pitchers: ${a} / ${h}. Published lineup entries: away ${list(x.lineups?.away).length}/9, home ${list(x.lineups?.home).length}/9. ${list(x.unresolved).length?'Final personnel checks remain unresolved.':'Review current applicability.'} Probable pitchers are not confirmed starters.`;}if(f.kind==='INJURIES')return `${x.team||''}: ${list(x.players).map(p=>`${p.name}: ${p.status}`).join('; ')||'No entries supplied'}`;if(f.kind==='TEAM_RECORD')return `${x.team||''}: ${list(x.records).map(r=>r.summary||r.displayValue).filter(Boolean).join(' / ')||'Not supplied'}`;if(f.kind==='VENUE')return `${x.name||'Venue not supplied'}${x.indoor===true?' · Indoors':''}${x.neutralSite?' · Neutral site':''}`;if(f.kind==='RECENT_GAMES')return `${x.team||''}: ${list(x.events).map(e=>[e.result,e.score,e.opponent].filter(Boolean).join(' ')).join('; ')}`;return JSON.stringify(x);}
+  function curated(d,g){
+    const c=g.curatedAggregation;if(!c?.groups?.length&&!c?.records?.length)return null;
+    const block=node(d,'details');block.append(node(d,'summary',`OUTSIDE CONSENSUS · ${c.originCount} named origins`));
+    if(!c.groups.length){
+      block.append(node(d,'p','Outside forecasts are available. A supported current price has not been captured for comparison; these are research views awaiting the next normal odds snapshot.','gi-meta'));
+      block.append(table(d,['ORIGIN','PUBLISHED VIEW','OBSERVED'],list(c.records).map(row=>[sourceLink(d,row.originName,row.url),
+        row.kind==='MODEL_PROJECTION'?`${g.home} projected ${signed(row.projection.homeSpread)}`:
+          `${row.excerpt}${row.priceAmerican!=null?' · '+signed(row.priceAmerican):''}`,clock(row.observedAt)])));
+      return block;
+    }
+    const reason={SOURCE_PICK_AT_DIFFERENT_LINE:'Pick was at a different line',ORIGINAL_PRICE_NOT_PUBLISHED:'Original price not published',
+      CURRENT_PRICE_WORSE_THAN_SOURCE_PICK:'Current price is worse than the pick price',CURRENT_PRICE_REFRESH_REQUIRED:'Current price needs refreshing',
+      PROBABILITY_SETTLEMENT_UNRESOLVED:'Probability settlement needs review',REFRESH_DUE:'Source needs refreshing',EVENT_STARTED:'Game has started'};
+    const rows=c.groups.map(group=>{
+      const evidence=node(d,'details');evidence.append(node(d,'summary','Sources and opposing views'));
+      for(const origin of list(group.origins)){
+        const box=node(d,'div',undefined,'gi-fact');box.append(node(d,'b',`${names[origin.name]||origin.name}: ${origin.direction.toLowerCase()}`));
+        for(const entry of list(origin.entries)){
+          let value=entry.basis==='PUBLISHED_SPREAD_POINT'?`${g.home} projected ${signed(entry.value)}`:
+            entry.basis==='PUBLISHED_TOTAL_POINT'?`Projected total ${entry.value}`:
+            /PROBABILITY/.test(entry.basis||'')?`Published probability ${pct(entry.value)}`:entry.value||entry.limitation;
+          if(entry.kind==='EXPERT_PICK')value=`${entry.value||'Published pick'}${entry.sourceLine!=null?' · original line '+signed(entry.sourceLine):''}${entry.sourcePriceAmerican!=null?' · original odds '+signed(entry.sourcePriceAmerican):''}`;
+          box.append(node(d,'div',value),sourceLink(d,`${names[entry.sourceId]||entry.sourceId} · ${clock(entry.observedAt)}`,entry.url));
+          if(entry.reason)box.append(node(d,'div',reason[entry.reason]||entry.reason,'gi-meta'));
+        }
+        evidence.append(box);
+      }
+      return [`${market(group.marketDetail)} · ${g[group.side]||group.side}`,`${group.line!=null?signed(group.line)+' · ':''}${odds?odds.fromDecimal(group.priceDecimal):'—'} · ${group.book||'—'}`,
+        `${group.supporting} support · ${group.opposing} oppose${group.mixed?' · '+group.mixed+' mixed':''}${group.context?' · '+group.context+' context':''}`,evidence];
+    });
+    block.append(table(d,['MARKET / SIDE','AVAILABLE LINE / ODDS','PUBLISHED VIEWS','DETAILS'],rows),node(d,'p','Related copies count once. These are outside opinions at the displayed line and price; source applicability and the final VigScope decision still require review. Agreement is not a win probability.','gi-meta'));
+    return block;
+  }
   function game(d,g,knowledge){
     const details=node(d,'details',undefined,'gi-game');details.id='game-intelligence-'+g.eventId;
     details.append(node(d,'summary',`${g.label} · ${g.sport} · ${clock(g.startTime)}`));
-    details.append(node(d,'div',`${g.summary.sources} outside sources · ${g.summary.modelFamilies} external model families · ${g.summary.internalFamilies} internal family · ${g.summary.exactReviewed} exact selections reviewed`,'gi-meta'));
+    details.append(node(d,'div',`${g.curatedAggregation?.originCount??g.summary.modelFamilies} outside origins · ${g.summary.internalFamilies} internal family · ${g.summary.exactReviewed} exact selections reviewed`,'gi-meta'));
+    const curatedPanel=curated(d,g);if(curatedPanel)details.append(curatedPanel);
     const rows=list(g.externalModels).map(r=>{
       const side=['home','away'].includes(r.side)?g[r.side]:r.side;
       const value=r.kind==='OUTCOME_PROBABILITY'?pct(r.probability):r.projection?.homeSpread!=null?`${g.home} ${signed(r.projection.homeSpread)}`:r.projection?JSON.stringify(r.projection):r.pick||'—';
       return [sourceLink(d,names[r.sourceId]||r.sourceId,r.url),`${market(r.marketDetail)}${r.line!=null?' '+signed(r.line):''}`,side,value,
         `${clock(r.observedAt)}${r.freshness==='REFRESH_DUE'?' · Refresh due':''}`];
     });
-    details.append(node(d,'h3','OUTSIDE MODELS'));
-    details.append(rows.length?table(d,['SOURCE','MARKET / LINE','SIDE','PUBLISHED VALUE','OBSERVED'],rows):node(d,'div','No captured outside prediction for this game yet.','gi-meta'));
+    if(rows.length||!g.curatedAggregation?.records?.length){
+      details.append(node(d,'h3','OUTSIDE MODELS'));
+      details.append(rows.length?table(d,['SOURCE','MARKET / LINE','SIDE','PUBLISHED VALUE','OBSERVED'],rows):node(d,'div','No captured outside prediction for this game yet.','gi-meta'));
+    }
     const ranges=list(g.consensus).filter(c=>c.families>1);
     for(const c of ranges)details.append(node(d,'div',`${market(c.marketDetail)} ${g[c.side]||c.side}${c.line!=null?' '+signed(c.line):''}: ${pct(c.min)}–${pct(c.max)} across ${c.families} families; median ${pct(c.median)}. Descriptive range, not a confidence interval.`,'gi-meta'));
     for(const c of list(g.projectionContext))details.append(node(d,'div',`${c.unit==='home_spread_points'?g.home+' projected spread':'Projected total'}: ${signed(c.min)} to ${signed(c.max)} across ${c.families} model families. Published point context; outcome probabilities require separate evidence.`,'gi-meta'));
@@ -37,7 +73,7 @@
     details.append(node(d,'div',`Odds snapshot ${clock(g.priceSnapshotAt)}. Verify an executable current price before acting.`,'gi-meta'));
     const quotes=list(g.markets).flatMap(m=>list(m.quotes).map(q=>[market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book||'—',odds?odds.fromDecimal(q.priceDecimal):'—',pct(q.breakEvenProbability),
       `${clock(q.observedAt||q.changedAt)}${q.priceState==='REFRESH_REQUIRED'?' · Refresh required':''}`]));
-    details.append(table(d,['MARKET','SIDE','LINE','BOOK','AMERICAN ODDS','BREAK-EVEN','OBSERVED'],quotes));
+    details.append(quotes.length?table(d,['MARKET','SIDE','LINE','BOOK','AMERICAN ODDS','BREAK-EVEN','OBSERVED'],quotes):node(d,'div','No supported current price is captured for this game. Outside views remain available for research.','gi-meta'));
     const agreement=list(g.markets).flatMap(m=>list(m.quotes).flatMap(q=>list(q.forecastAggregation?.groups).map(c=>[
       market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book||'—',
       `${c.supportingFamilies} support · ${c.opposingFamilies} oppose${c.mixedFamilies?' · '+c.mixedFamilies+' mixed':''}`,
@@ -56,15 +92,21 @@
   }
   function render(d,intelligence){
     if(!intelligence?.games)return null;style(d);const panel=node(d,'section',undefined,'gi-panel');panel.id='gameIntelligence';
-    panel.append(node(d,'h2','GAME INTELLIGENCE'),node(d,'div',`${intelligence.counts?.games||0} games · ${intelligence.counts?.withExternalModels||0} with outside models · ${intelligence.counts?.withInternalModels||0} with internal fair lines`),node(d,'p',`Snapshot ${clock(intelligence.asOf)}. Published forecasts, available prices and game research shown together.`,'gi-meta'));
+    const withOutside=intelligence.games.filter(g=>list(g.externalModels).length||list(g.curatedAggregation?.records).length).length;
+    panel.append(node(d,'h2','GAME INTELLIGENCE'),node(d,'div',`${intelligence.counts?.games||0} games · ${withOutside} with outside views · ${intelligence.counts?.withInternalModels||0} with internal fair lines`),node(d,'p',`Snapshot ${clock(intelligence.asOf)}. Published forecasts, available prices and game research shown together.`,'gi-meta'));
     if(intelligence.view==='CURRENT_GAME_BOARD'){
       const age=(Date.now()-Date.parse(intelligence.asOf))/60000;
       if(age>75)panel.append(node(d,'p',`This board was collected ${Math.floor(age)} minutes ago. Some games may have started and sources need refreshing. The Refresh board button reloads the latest saved collection.`,'gi-warning'));
     }
     const controls=node(d,'div',undefined,'gi-controls'),search=node(d,'input'),sport=node(d,'select');search.placeholder='Find a team or game';search.setAttribute('aria-label','Find a team or game');sport.setAttribute('aria-label','Filter sport');sport.append(node(d,'option','All sports'));for(const s of [...new Set(intelligence.games.map(g=>g.sport))])sport.append(node(d,'option',s));controls.append(search,sport);panel.append(controls);
     const games=node(d,'div');panel.append(games);const draw=()=>{games.replaceChildren();const visible=intelligence.games.filter(g=>(sport.value==='All sports'||g.sport===sport.value)&&g.label.toLowerCase().includes(search.value.toLowerCase()));for(const g of visible)games.append(game(d,g,intelligence.knowledge));if(!visible.length)games.append(node(d,'p','No matching games in this snapshot.','gi-meta'));};search.oninput=draw;sport.onchange=draw;draw();
-    const status=node(d,'details');status.append(node(d,'summary','SOURCE COVERAGE'));const grouped=new Map();for(const s of list(intelligence.sources)){if(!grouped.has(s.sourceId))grouped.set(s.sourceId,new Set());grouped.get(s.sourceId).add(s.state);}for(const [id,states] of grouped)status.append(node(d,'p',`${names[id]||id}: ${[...states].map(s=>({COLLECTED:'data collected',CACHED:'saved data reused',CONTEXT_ONLY:'game context available',UNAVAILABLE:'currently unavailable',RESEARCH_OR_LICENSED_IMPORT:'source research or permitted feed needed',NO_EXACT_EVENT:'no exact game match',EVENT_STARTED:'game already started'}[s]||s)).join('; ')}`));panel.append(status);
+    const status=node(d,'details');status.append(node(d,'summary','SOURCE COVERAGE'));const grouped=new Map();for(const s of list(intelligence.sources)){if(!grouped.has(s.sourceId))grouped.set(s.sourceId,new Set());grouped.get(s.sourceId).add(s.state);}for(const [id,states] of grouped)status.append(node(d,'p',`${names[id]||id}: ${[...states].map(s=>({COLLECTED:'data collected',CACHED:'saved data reused',CONTEXT_ONLY:'game context available',UNAVAILABLE:'currently unavailable',RESEARCH_OR_LICENSED_IMPORT:'source research or permitted feed needed',NO_EXACT_EVENT:'no exact game match',NO_CURRENT_PUBLIC_PICK:'no current public featured pick',EVENT_STARTED:'game already started'}[s]||s)).join('; ')}`));panel.append(status);
     if(intelligence.sourcePerformance){const p=intelligence.sourcePerformance;panel.append(node(d,'h3','SOURCE TRACKING'));panel.append(node(d,'p',`${p.counts?.graded||0} forecasts graded across ${p.counts?.events||0} games. Each source and market is counted once per game; repeated pulls do not add results.`,'gi-meta'));if(p.bySource?.length)panel.append(table(d,['SOURCE','MARKET','GRADED','BASIS VERIFIED','BRIER SCORE'],p.bySource.map(s=>[names[s.sourceId]||s.sourceId,market(s.marketDetail),s.graded,s.scored,s.brier==null?'Pending':s.brier.toFixed(4)])));}
+    const tracked=intelligence.sourcePerformance?.curatedSources;
+    if(tracked?.byOrigin?.length){panel.append(node(d,'h3','CURATED SOURCE TRACKING'),node(d,'p','First saved pregame opinion per source, game and market. Projection error and published-pick records are separate; these are not the cash betting ledger.','gi-meta'));
+      panel.append(table(d,['ORIGIN','SPORT / MARKET','GRADED','SOURCE RECORD'],tracked.byOrigin.map(s=>[s.name,`${s.sport} ${market(s.marketDetail)}`,s.graded,
+        s.kind==='MODEL_PROJECTION'?(s.meanAbsolutePointError==null?'Awaiting results':s.meanAbsolutePointError.toFixed(2)+' points mean error'):
+          `${s.wins}–${s.losses}–${s.pushes}${s.hypotheticalRoi==null?'':' · '+(s.hypotheticalRoi*100).toFixed(1)+'% hypothetical ROI ('+s.priced+' priced)'}`])));}
     return panel;
   }
   root.BettingEdgeIntelligence={render};

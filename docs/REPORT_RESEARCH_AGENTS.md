@@ -41,6 +41,10 @@ Every Graham coordinator and worker must retain the existing market-free context
 
 ## Main and Guy: staff by report slot
 
+### Curate existing analysis before expanding research
+
+Each existing complete-game owner is the aggregation editor for those games. Follow `docs/CURATED_SOURCE_AGGREGATION.md` and the event work plan's `curatedResearch`. Begin with captured named outside forecasts and public expert picks, retain their original line/price and source clocks, group syndicated origins once and explain the strongest contrary view. Use source performance only in its stated market, sample and metric. Do not build a new raw-statistical handicap model or start exhaustive whole-catalog searches during routine Main runs. Deepen only a consequential missing input or disagreement; perform essential current personnel and settlement review. Published picks without probabilities remain useful attributed directional evidence under the existing decision routes. Neither votes nor an expert's reputation supplies a fabricated fair, BET or stake.
+
 ### Price the opportunity before expanding research
 
 Each existing complete-game owner also owns opportunity pricing for those games. Lead meaningful candidate returns with the exact offered American price and break-even probability, qualified signed Pinnacle gap, applicable sourced model point or native fair, the strongest contrary finding, and the specific remaining question that could change the decision. Use the existing candidate/forecast fields; this is an assignment focus, not another receipt or completion gate. The coordinator uses these numerical comparisons to direct the existing deeper-review queue while completing supported market assessments across the slate.

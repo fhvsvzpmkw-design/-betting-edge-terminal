@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
+import {currentCuratedRecords,aggregateCuratedOpinions} from './curated-aggregation.mjs';
 import {isDeepStrictEqual} from 'node:util';
 import {mergedFeedEvents, majorSportKey} from './major-sport-market-coverage-gate.mjs';
 import {forecastCandidate, forecastMarketClass, forecastPriceComparison} from './forecast-evidence.mjs';
@@ -81,9 +82,12 @@ function knowledge(root,sports) {
 export function bindIntelligence({root,report,sidecar,feed,universe,liveBoard=false}) {
   if(!liveBoard&&time(report.ts)<time(INTELLIGENCE_FROM)) return null;
   if(sidecar.gameIntelligenceInputs) return sidecar.gameIntelligenceInputs;
-  const available=new Set(list(universe?.selections).map(s=>String(s.eventId)));
-  const events=[...mergedFeedEvents(feed).values()].map(eventIdentity).filter(e=>available.has(e.eventId));
   const capture=loadCapture(root,report.ts);
+  const available=new Set(list(universe?.selections).map(s=>String(s.eventId)));
+  if(liveBoard)for(const row of [...list(capture?.records),...list(capture?.curatedPicks)]){
+    if(Number.isFinite(time(row.observedAt))&&time(row.observedAt)<=time(report.ts)&&time(row.observedAt)<time(row.startTime)&&time(report.ts)<time(row.startTime))available.add(String(row.eventId));
+  }
+  const events=[...mergedFeedEvents(feed).values()].map(eventIdentity).filter(e=>available.has(e.eventId));
   const records=list(capture?.records).filter(row=>time(row.observedAt)<=time(report.ts)&&events.some(e=>sameEvent(row,e)));
   const news=readOptional(path.join(root,'data/game-intelligence/personnel-news.json'));
   const personnelFacts=news?.schema===1?list(news.facts).filter(row=>
@@ -91,9 +95,9 @@ export function bindIntelligence({root,report,sidecar,feed,universe,liveBoard=fa
     Number.isFinite(time(row.observedAt)) && time(row.observedAt)<=time(report.ts) && time(row.observedAt)<time(row.startTime) &&
     events.some(e=>sameEvent(row,e)&&row.home===e.home&&row.away===e.away)):[];
   const facts=[...list(capture?.facts),...personnelFacts].filter(row=>time(row.observedAt)<=time(report.ts)&&events.some(e=>sameEvent(row,e)));
-  const inputs={schema:1,asOf:report.ts,collectedAt:capture?.collectedAt||null,snapshotId:capture?.snapshotId||null,
+  const inputs={schema:1,asOf:report.ts,liveBoard,collectedAt:capture?.collectedAt||null,snapshotId:capture?.snapshotId||null,
     personnelNewsDigest:personnelFacts.length?digest(personnelFacts):null,
-    sources:list(capture?.sources),records,facts,quoteHistory:list(capture?.quoteHistory),internalModels:internalModels(root,events,report.ts,sidecar),
+    sources:list(capture?.sources),records,facts,curatedPicks:events.flatMap(event=>currentCuratedRecords(capture?.curatedPicks,event,report.ts)),quoteHistory:list(capture?.quoteHistory),internalModels:internalModels(root,events,report.ts,sidecar),
     knowledge:knowledge(root,unique(events.map(e=>e.sport))),
     limitation:'Original observation times are preserved. Report decisions must assess current event, personnel and exact quote applicability.'};
   // Optional exchange observations are pinned separately from forecasts and
@@ -164,7 +168,8 @@ export function projectGameIntelligence(intelligence,eventId){
 export function buildGameIntelligence({report,sidecar={},feed,universe,forecastCoverage,candidateAssessment,eventResearchPlan,observer}) {
   const inputs=sidecar.gameIntelligenceInputs;
   if(!inputs) return null;
-  const sourceEvents=mergedFeedEvents(feed),ids=unique(list(universe?.selections).map(s=>String(s.eventId)));
+  const sourceEvents=mergedFeedEvents(feed),ids=unique([...list(universe?.selections).map(s=>String(s.eventId)),
+    ...(inputs.liveBoard?[...list(inputs.records),...list(inputs.curatedPicks)].filter(row=>time(report.ts)<time(row.startTime)&&sourceEvents.has(String(row.eventId))).map(row=>String(row.eventId)):[])]);
   const records=[...list(inputs.records),...list(sidecar.forecastEvidence?.records)].filter((row,i,all)=>all.findIndex(x=>x.recordId===row.recordId)===i);
   const games=ids.map(id=>{
     const event=eventIdentity(sourceEvents.get(id)),selections=list(universe.selections).filter(s=>String(s.eventId)===id);
@@ -216,20 +221,21 @@ export function buildGameIntelligence({report,sidecar={},feed,universe,forecastC
         marketComparison:assessed?.marketComparison||null,nativeFairComparison:assessed?.nativeFairComparison||null,
         status:assessed?.status||null,reviewState:assessed?.reviewState||'UNASSESSED'};
     });
+    const curatedAggregation=aggregateCuratedOpinions({event,records:inputs.curatedPicks,models:models.rows,markets,asOf:report.ts});
     const internal=list(inputs.internalModels).filter(r=>sameEvent(r,event));
     const familyCount=unique(models.rows.map(r=>r.modelFamily)).length;
-    return {...event,label:`${event.away} @ ${event.home}`,priceSnapshotAt:feed.generatedAt,externalModels:models.rows,consensus:models.consensus,
-      projectionContext:models.projectionContext,
+    return {...event,label:`${event.away} @ ${event.home}`,sourceOnly:selections.length===0,priceSnapshotAt:feed.generatedAt,externalModels:models.rows,consensus:models.consensus,
+      projectionContext:models.projectionContext,curatedAggregation,
       internalModels:internal,facts,markets,
       knowledgeIds:list(inputs.knowledge).filter(k=>list(k.sports).includes('Cross-Sport')||list(k.sports).includes(event.sport)).map(k=>k.id),
       summary:{sources:unique(models.rows.map(r=>r.sourceId)).length,modelFamilies:familyCount,internalFamilies:internal.length?1:0,
         exactReviewed:list(forecastCoverage?.selections).filter(r=>String(r.eventId)===id&&r.coverage==='EXACT_ELIGIBLE').length,
         completed:plan?.completed||0,available:selections.length},
-      nextAction:'Review the combined forecasts, native projections, Graham fair, personnel and prices once for this game. Explain agreement and contrary evidence at the exact contract; assess BET first, then LEAN, WAIT or PASS under existing qualification rules.'};
+      nextAction:'Start with the curated outside opinions, reconcile source origins and current prices, then review combined forecasts, native projections, Graham fair and personnel once for this game. Explain agreement and contrary evidence at the exact contract; assess BET first, then LEAN, WAIT or PASS under existing qualification rules.'};
   }).sort((a,b)=>time(a.startTime)-time(b.startTime)||a.eventId.localeCompare(b.eventId));
   return {schema:1,version:'2026-09-27.1',asOf:report.ts,collectedAt:inputs.collectedAt,snapshotId:inputs.snapshotId,
     decisionAuthority:false,sources:inputs.sources,games,knowledge:inputs.knowledge,
     counts:{games:games.length,withExternalModels:games.filter(g=>g.externalModels.length).length,
-      withInternalModels:games.filter(g=>g.internalModels.length).length,observations:games.reduce((n,g)=>n+g.externalModels.length,0)},
+      withInternalModels:games.filter(g=>g.internalModels.length).length,withCuratedSources:games.filter(g=>g.curatedAggregation.records.length).length,curatedRecords:games.reduce((n,g)=>n+g.curatedAggregation.records.length,0),observations:games.reduce((n,g)=>n+g.externalModels.length,0)},
     limitation:'Source agreement is descriptive. Current price, applicable research and uncertainty determine the issued decision.'};
 }

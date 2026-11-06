@@ -1,5 +1,7 @@
 # Expanded forecast intake and aggregation
 
+**Current Main approach:** `CURATED_SOURCE_AGGREGATION.md` adds public named-model and featured-expert collection to the existing shared dossier. Curate captured outside work first and use further discovery for consequential gaps, rather than repeating the whole catalogue. Raw picks and point projections retain native types and original prices; counts do not set probabilities, fairs, grades or stakes.
+
 Effective from 2026-10-06 10:05:06 America/Vancouver. Applies to all five Main lanes through `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md`. Historical captures, reports and decisions retain their original evidence and timing.
 
 Customer value includes possible BETs, directional LEANs and resolution of genuinely close or conflicting cases. Review BET first, then LEAN, WAIT or PASS under the existing decision contracts. More source names do not by themselves justify stronger confidence or more cards.
@@ -8,7 +10,7 @@ Customer value includes possible BETs, directional LEANs and resolution of genui
 
 | Source | Useful fields and scope | Current intake |
 |---|---|---|
-| [The Prediction Tracker](https://www.thepredictiontracker.com/) | NFL/NCAAF spreads and totals; NBA routes; catalogs multiple original systems | Research or permitted import. Preserve the original model family; a catalog is not an independent model or proof of live forecasts. |
+| [The Prediction Tracker](https://www.thepredictiontracker.com/) | NFL/NCAAF spreads and totals; NBA routes; catalogs multiple original systems | Public publisher-linked CSV collection for six predefined named originals, plus permitted import. Preserve originating families; the catalogue is not an extra independent model. |
 | [Bet Better](https://betbetter.world/predicted-scores/nfl) | NFL/NCAAF/MLB/NBA/WNBA/NHL score projections and published home win probability when available | Public score CSV under CC BY 4.0, with attribution. One shared request per sport; no locked picks endpoint. Empty/missing rows remain unavailable. |
 | [PlayerWon](https://www.playerwon.ca/) | NHL published win probabilities | Research or permitted import; no established free commercial feed. Related versions count as one family. |
 | [Covers / OddsShark](https://www.covers.com/picks/nhl) | Projected scores and matchup context across supported sports | Research or permitted import. Book-implied percentages and expert picks are separate from computer model probabilities. |
@@ -26,7 +28,7 @@ The registry owns precise URLs, fields, market roles and access limitations. Fre
 
 Other permitted findings use `tools/import-forecast-evidence.mjs` / the standard `forecastCapture` contract, or a permitted structured game-intelligence import. Capture permission does not establish decision eligibility. Revalidate current personnel, settlement and event assumptions. Record real inaccessibility, missing exact fields and stopped research rather than fabricating an attempt.
 
-Prediction Tracker is a discovery catalog and context route. For an original model, reuse its registered originating source ID or add a verified original source entry with its actual family and permissions before import. Do not override a registered family to invent independence; a catalog-only record remains catalog context.
+Prediction Tracker remains a catalogue rather than an extra independent model. Its new public CSV collection preserves named-origin native spread points under curatedPicks. Registered DRatings and ESPN families are reused so direct and catalogue copies count together. Numeric exact-probability imports still require their original registered source and the existing applicability/settlement review. Do not relabel the catalogue average or an expert pick as a calibrated probability.
 
 The event work plan includes applicable unattempted source routes even when ESPN or a completed market decision already exists. Share one retrieval across the event's selections. Captured fields awaiting review come first. Finish supported decisions incrementally; source coverage gaps do not veto unrelated completed cards.
 

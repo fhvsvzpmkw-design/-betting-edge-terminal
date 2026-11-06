@@ -1,4 +1,5 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
+import {validCuratedRecord} from './curated-aggregation.mjs';
 export const EVENT_RESEARCH_VERSION = '2026-10-25.1';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 export const SOURCE_AGGREGATION_FROM = '2026-10-06T17:05:06Z';
@@ -215,11 +216,16 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
         queued.questions.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side, line:row.line, role:source.role});
       }
     }
+    const curatedPicks=list(sidecar.gameIntelligenceInputs?.curatedPicks).filter(row=>validCuratedRecord(row,null,report.ts)&&
+      String(row.eventId)===String(event.eventId)&&time(row.startTime)===time(event.eventDate)&&
+      (row.sport===event.sport||event.sport==='NBA_WNBA'&&['NBA','WNBA'].includes(row.sport)));
+    const curatedResearch={records:curatedPicks,originCount:new Set(curatedPicks.map(row=>row.originId)).size,
+      instruction:'Use the captured outside models and public expert picks first. Preserve origin, native units, original line/price and strongest contrary view. Resolve only consequential source/personnel gaps, then author the existing exact-price decision. Missing source probability does not erase a sourced pick; never invent its probability or treat consensus as betting authority.'};
     const forecastRetrieval = {state:'RETRIEVAL_QUEUE_NOT_EXECUTED',
       selectionsWithoutExactForecast:forecastRows.filter(row => !list(row.eligibleExactRecordIds).length).length,
       attempts:forecastRows.flatMap(row => list(row.attempts).map(attempt => ({selectionId:row.selectionId,...attempt}))),
       nextSources:[...sourceQueue.values()],
-      instruction:'Review all applicable unattempted source routes once for this event, including when ESPN is already present. Respect documented collection/reuse limits. Record real access/field gaps, capture permitted numeric findings and compare agreement plus contrary evidence at each exact price. Assess BET first, then LEAN, WAIT or PASS; listing a source is not completed retrieval.'};
+      instruction:'Start with captured curated opinions and existing forecast records. Use remaining source routes for a consequential gap or conflict, including when ESPN is already present. Respect documented collection/reuse limits. Record real access/field gaps, capture permitted numeric findings and compare agreement plus contrary evidence at each exact price. Assess BET first, then LEAN, WAIT or PASS; listing a source is not completed retrieval.'};
     return {eventKey:event.eventKey, sport:event.sport, eventId:event.eventId, eventDate:event.eventDate,
       label:event.label || `${event.sport} event ${event.eventId}`, available:event.selections.length,
       completed:event.selections.length-pending.length, pending:pending.length,
@@ -227,7 +233,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       sharedResearchRequired:pending.length>0, personnelFollowUp, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
       sourceReviewPending:expandedSourceReview && sourceQueue.size>0,
-      forecastRetrieval, forecastReviews, selections:event.selections};
+      forecastRetrieval, forecastReviews, curatedResearch, selections:event.selections};
   }).map(event => ({...event,scheduleUrgency:scheduleUrgency(event,report.ts)}))
     .sort((a,b) => Number(b.scheduleUrgency.code==='SUNDAY_EARLY_NFL')-Number(a.scheduleUrgency.code==='SUNDAY_EARLY_NFL') ||
       (a.scheduleUrgency.code==='SUNDAY_EARLY_NFL' && b.scheduleUrgency.code==='SUNDAY_EARLY_NFL'
@@ -278,7 +284,7 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
       finding:source.finding || source.fact, priorReportPath,
       ...(priorCheckpointPath?{priorCheckpointPath,checkpointBlobSha,issued}:{}),requiresCurrentApplicabilityReview:true})),
     personnelFollowUp:event.personnelFollowUp || null,
-    forecastReviews:list(event.forecastReviews),
+    forecastReviews:list(event.forecastReviews),curatedResearch:event.curatedResearch,
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
       selectionId:row.selectionId, route:row.route, reviewState:row.reviewState,missingResearch:list(row.missingResearch),recordedBlocker:row.blocker||null,quote:row.quote, comparison:row.priceComparison,
       forecastAggregation:row.forecastAggregation||null,quarterbackFollowUp:row.quarterbackFollowUp || null,
@@ -295,7 +301,7 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
     sourceLeadCount:event.sourceLeads.length, personnelFollowUpState:event.personnelFollowUp?.state || null,
     routes:event.selections.reduce((counts,row) => ({...counts,[row.route]:(counts[row.route] || 0)+1}),{}),
     nextForecastSources:event.forecastSources.map(source => source.sourceId),
-    capturedForecastsAwaitingReview:event.forecastReviews.length,sourceReviewPending:event.sourceReviewPending,nextAction:event.nextAction
+    capturedForecastsAwaitingReview:event.forecastReviews.length,curatedOrigins:event.curatedResearch?.originCount||0,sourceReviewPending:event.sourceReviewPending,nextAction:event.nextAction
   }));
   return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,sports:plan.sports,sundayNfl:plan.sundayNfl,
     nextEventId:(outputEvents.find(event=>event.pending>0) || outputEvents[0])?.eventId || null,forecastReviewCounts:plan.forecastReviewCounts,

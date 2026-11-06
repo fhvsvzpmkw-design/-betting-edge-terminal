@@ -1,5 +1,7 @@
 # Betting Edge Scheduled Report Authority
 
+**November 5 curated aggregation:** Main research now follows `docs/CURATED_SOURCE_AGGREGATION.md`. Existing game owners act as aggregation editors: start with captured outside forecasts and public expert picks, preserve originating families, compare the actual line/price and strongest contrary view, and investigate consequential current assumptions. This supersedes exhaustive repeated catalogue searches and new raw-statistical model building as routine Main work. The shared collector now reads the publisher-linked Prediction Tracker exports and BettingPros public featured pick; full BettingPros expert and Juice Reel account/paid feeds are not connected. Keep point projections and picks in their native units under `curatedPicks`; they are not invented probabilities or automatic betting fairs. The work plan, report dossier and current board expose source support, opposition, original prices and prospective source feedback. Assess actual supported BETs first, then the existing qualified LEAN/WAIT/PASS routes; no majority assigns a status or stake. Keep reduced staffing, current source clocks, essential personnel/settlement checks, independent Graham ownership, schedules, budgets and issued History. Missing optional collection is not a new publication veto.
+
 **Status:** OPERATIONAL
 **Authority version:** 1.2
 **Operating revision:** 2026-11-04.MainAgentUsageBudget
