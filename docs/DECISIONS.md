@@ -517,3 +517,17 @@ Mark the older universal numerical-fair requirement, fixed NHL corroboration, on
 Deployment, a new feedback artifact, actual ordinary-run adoption and successful betting performance are separate findings. Inspect the current report instant and pinned inputs; retain original source clocks and use the existing unfrozen preparation flow where appropriate. Missing optional feedback creates no publication veto. Preserve prospectively captured method versions, negative results and correlated-sample limitations; revise future definitions transparently rather than rewrite prior trials.
 
 **Reason:** Prevent old analytical instructions from silently regaining authority while preserving data integrity, reproducible history and wagering controls.
+
+## D-049 — Turn positive source leads into individual directional judgments
+
+**Date:** 2026-11-06. **Status:** USER AUTHORIZED; PREPARED FOR THE EXISTING 18:15 PRODUCER.
+
+The user requested actionable results after the 15:15 issue produced 83 PASS decisions and 19 evidence shortfalls. Its twelve exact positive forecast-price leads all received identical generic directional rejection wording. The current adaptive rules were loaded; this is a follow-through and evidence-specificity failure, not evidence that every lead has betting value.
+
+Expose each exact positive point, American execution price, source comparison boundary, signed benchmark conflict and earlier rejection in the existing event work plan. Resolve NBA/WNBA inventory to its actual source league for methods and performance feedback. The brief is advisory; it cannot assign a grade/stake, establish an independent fair or change publication completion. Preserve all existing validations and issued bytes.
+
+Research the consequential named uncertainty and make the actual individual decision. Missing BET intervals, ordinary unconfirmed lineups, unknown model independence/calculation time and Pinnacle disagreement do not alone reject an otherwise eligible zero-stake provisional opinion. A valid WAIT needs its existing qualification and concrete trigger; unfinished research stays incomplete; PASS needs a real directional objection. Preserve the current exact source eligibility/replay, separate BET requirements and the absence of a pick quota.
+
+The November 6 Late handoff uses the existing typed forecast follow-up queue and prepared event review, with fresh normal intake required. It prepares Portland/Arizona provisional source-led cases and a New Mexico price/QB-role objection; it does not carry old quotes/grades or prescribe those outcomes after changed evidence. Retain the existing task, schedule, staffing and odds budget. Ordinary-run adoption and the actual published selections require separate readback.
+
+**Reason:** Make the broader research policy produce usable individual judgments and specific rechecks, instead of repeating a general rejection across unrelated opportunities.

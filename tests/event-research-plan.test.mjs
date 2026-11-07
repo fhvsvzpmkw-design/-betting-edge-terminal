@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {buildEventResearchPlan} from '../tools/event-research-plan.mjs';
+import {opinionResearchBrief} from '../tools/opinion-research-brief.mjs';
 const report = {ts:'2026-09-20T18:25:00-07:00'};
 const source = {id:'official-A', eventId:'A', sport:'MLB', kind:'OFFICIAL',
   url:'https://example.org/event/A', finding:'Synthetic pitcher and lineup check.', checkedAt:'2026-09-20T18:20:00-07:00'};
@@ -233,3 +234,46 @@ staleDiagnostics.filter(row=>row.eventId==='sf-atl' && row.state==='BLOCKED').fo
 const preciseBlockerPlan=buildEventResearchPlan({report:sundayInput.report,candidateAssessment:{selections:staleDiagnostics},sidecar:{primaryAnalysis:{receipts:sweepReceipts}}});
 assert.equal(preciseBlockerPlan.events.at(-1).producerReviewPending,0,'the current exact recorded blocker takes precedence over stale candidate diagnostics');
 console.log('Sunday work queue: early NFL priority, stable start-time fallback, Pacific/DST boundary and inventory preservation passed.');
+
+// Favorable forecasts remain visible as research opportunities even after a
+// market-only PASS. This view has no authority to change that decision.
+const opinionAt='2026-11-06T23:00:00Z',opinionStart='2026-11-07T03:00:00Z';
+const opinionQuote={eventId:'late',selectionKey:'late|ml|away||',marketKey:'ml',side:'away',line:null,
+  book:'DraftKings',priceDecimal:2.3,quoteObservedAt:'2026-11-06T22:55:00Z'};
+const opinionRow={...make('away','full_game_moneyline','late'),sport:'NBA_WNBA',eventDate:opinionStart,
+  title:'Synthetic Away Moneyline',quote:opinionQuote,state:'EVALUATED',status:'PASS',reviewState:'COMPLETE',
+  marketComparison:{direction:'UNFAVORABLE',edgeProbabilityPoints:-1.4},forecastComparisons:[{
+    recordId:'positive',sourceId:'espn',modelFamily:'ESPN_MATCHUP_PREDICTOR',eventId:'late',side:'away',line:null,
+    marketDetail:'full_game_moneyline',priceDecimal:2.3,direction:'SUPPORTS_PRICE',probability:.453,
+    probabilityBasis:'UNCONDITIONAL',breakEvenProbability:1/2.3,edgeProbabilityPoints:(.453-1/2.3)*100,
+    referenceBreakEvenPriceDecimal:1/.453,marketDependence:'NOT_FULLY_AUDITED'}]};
+const opinionInputs={records:[{recordId:'positive',sport:'NBA',eventId:'late',startTime:opinionStart,
+  observedAt:'2026-11-06T22:50:00Z',forecastAt:null,url:'https://www.espn.com/fixture',limitation:'Unknown calculation time.'}]};
+const opinionReceipt={selectionId:opinionRow.selectionId,state:'EVALUATED',candidateAssessment:{decision:{directionalReview:{
+  reasonKind:'PERSONNEL_DEPENDENCY',rationale:'Generic prior concern.',dependency:'Unconfirmed lineup.'}}}};
+const opinionBefore=JSON.stringify({opinionRow,opinionInputs,opinionReceipt});
+const brief=opinionResearchBrief({report:{ts:opinionAt},row:opinionRow,receipt:opinionReceipt,inputs:opinionInputs});
+assert.equal(brief.decisionAuthority,false);
+assert.equal(brief.quote.priceAmerican,'+130');
+assert.equal(brief.forecasts[0].comparisonBoundaryAmerican,'+121');
+assert.equal(brief.forecasts[0].observedAt,'2026-11-06T22:50:00Z');
+assert.equal(brief.forecasts[0].forecastAt,null);
+assert.equal(brief.benchmark.signedProbabilityPoints,-1.4);
+assert.equal(brief.recordedRejection.dependency,'Unconfirmed lineup.');
+assert.match(brief.instruction,/not standalone reasons/);
+for(const bad of [{side:'home'},{line:2},{priceDecimal:2.2},{eventId:'foreign'},{marketDetail:'full_game_primary_total'}])
+  assert.equal(opinionResearchBrief({report:{ts:opinionAt},row:{...opinionRow,forecastComparisons:[{...opinionRow.forecastComparisons[0],...bad}]}}),null);
+assert.equal(opinionResearchBrief({report:{ts:'2026-11-06T16:59:00Z'},row:opinionRow}),null);
+assert.equal(opinionResearchBrief({report:{ts:opinionStart},row:opinionRow}),null);
+const previous={reportTs:'2026-11-06T22:00:00Z',reportPath:'prior.json',row:{quote:opinionQuote,
+  decision:{status:'PASS',analysis:'Prior unchanged market concern.',feed:{...opinionQuote,eventDate:opinionStart}}}};
+assert.equal(opinionResearchBrief({report:{ts:opinionAt},row:opinionRow,prior:previous}).previousDecision.status,'PASS');
+assert.equal(opinionResearchBrief({report:{ts:opinionAt},row:opinionRow,prior:{...previous,reportTs:'2026-11-07T01:00:00Z'}}).previousDecision,null);
+const opinionPlan=buildEventResearchPlan({report:{ts:opinionAt},candidateAssessment:{selections:[opinionRow]},
+  sidecar:{primaryAnalysis:{receipts:[opinionReceipt]},gameIntelligenceInputs:opinionInputs},
+  forecastCoverage:{selections:[{eventId:'late',sport:'NBA',startTime:opinionStart,nextRoutes:[{sourceId:'fixture'}]}]}});
+assert.equal(opinionPlan.counts.completed,1);
+assert.equal(buildResearchWorkPlan(opinionPlan).events[0].positiveForecastOpportunities,1);
+assert.equal(buildResearchWorkPlan(opinionPlan,{eventId:'late'}).events[0].opinionResearch[0].currentDecision,'PASS');
+assert.equal(JSON.stringify({opinionRow,opinionInputs,opinionReceipt}),opinionBefore,'briefs never mutate source data or decisions');
+console.log('Source-supported opinion briefs: exact prices, original clocks, prior decisions, no grade changes and historical exclusion passed.');
