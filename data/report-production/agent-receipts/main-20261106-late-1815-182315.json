@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-18:15",
+  "executionRunId": "2026-11-06T18:36:20-07:00|5",
+  "workBinding": {
+    "candidateId": "2026-11-06T18:36:20-07:00|5",
+    "feedBlobSha": "73d65d9af9678ee8bc0ea8fe4a0e01fe4932feb2",
+    "checkpoint": "data/report-production/checkpoints/20261106-late-1815-182315.json",
+    "checkpointRevision": 24,
+    "operatingRevision": "2026-11-06.ActionableOpinionFollowThrough"
+  },
+  "mode": "AGENTS_COMPLETE",
+  "reason": "The 18:15 update began coordinator-first. One targeted independent reviewer was assigned because three carried opinion leads required a current-price and opposing-case challenge before the coordinator issued two LEANs and one consequential PASS.",
+  "workers": [
+    {
+      "role": "targeted independent reviewer",
+      "actualId": "/root/late_opportunity_reviewer",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": [
+        "73696980|ml|away",
+        "70898996|ml|home",
+        "70899038|ml|away"
+      ],
+      "assignmentBinding": {
+        "candidateIdAtLaunch": "2026-11-06T18:28:30-07:00|5",
+        "feedBlobSha": "73d65d9af9678ee8bc0ea8fe4a0e01fe4932feb2",
+        "checkpointRevisionAtLaunch": 2,
+        "finalCoordinatorRevision": 24
+      },
+      "launchObservedAt": null,
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "clockTelemetry": "Exact worker clock seconds were not retained; the coordinator observed the bound acknowledgment inside the required 60-second window and received the completed review before final reconciliation.",
+      "state": "RETURNED",
+      "returnedWork": "Current-price review of Portland, Arizona and New Mexico moneylines; break-even comparisons, opposing Pinnacle evidence, personnel/QB sensitivity and concrete recheck conditions. The coordinator revalidated the findings against the retimed final candidate before staging."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "ONE_TARGETED_REVIEWER",
+      "workers": 1,
+      "reason": "The full inventory was screened by the coordinator; only the three exact original-provider opportunity leads had a material unresolved issuance question.",
+      "namedQuestion": "Do current prices and material availability evidence support Portland ML and Arizona ML as source-led LEANs while retaining New Mexico ML as PASS?",
+      "expectedQualityBenefit": "Independent verification of the positive source points, strongest contrary case, price sensitivity and QB/personnel recheck triggers.",
+      "releaseCondition": "SATISFIED"
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "workers": 1,
+      "reason": "The targeted reviewer returned complete work and the remaining inventory had no consequential unresolved challenge requiring another launch.",
+      "expectedQualityBenefit": "Avoid idle worker usage while preserving coordinator review of all 24 available primary selections.",
+      "releaseCondition": "SATISFIED"
+    }
+  ],
+  "qualityFindings": [
+    "Portland +132 retained a source-led LEAN after correcting the ESPN probability to 44.1%; its edge over the 43.10% break-even price was approximately 1.00 percentage point, with Pinnacle remaining a contrary signal.",
+    "Arizona -255 retained a source-led LEAN at a 71.83% break-even probability versus the 73.8% source forecast; New Mexico -417 remained PASS because the roughly 0.86-point cushion was too thin for unresolved Fa'avae/Moga quarterback-role uncertainty.",
+    "The reviewer supplied concrete price and availability recheck conditions; no BET bound was established and no stake was issued."
+  ],
+  "decisionCorrections": [
+    {
+      "issue": "Portland source probability",
+      "resolution": "Corrected the current ESPN probability from 45.3% to 44.1% before final price comparison; LEAN status remained supported at +132."
+    },
+    {
+      "issue": "New Mexico positive source point versus QB uncertainty",
+      "resolution": "Retained the positive opinion research but rejected a LEAN at -417 because the margin over break-even was too small for the unresolved quarterback role."
+    }
+  ],
+  "completedWork": {
+    "acknowledgments": 1,
+    "targetedReviews": 1,
+    "opportunityLeadsReviewed": 3,
+    "eventResearch": 4,
+    "checkpointedEvents": 4,
+    "forecastReviews": 24,
+    "decisions": {
+      "BET": 0,
+      "LEAN": 2,
+      "WAIT": 0,
+      "PASS": 18
+    }
+  },
+  "remainingWork": {
+    "events": 0,
+    "reviews": 0,
+    "producerUnfinished": 0,
+    "documentedSourceShortfalls": 4,
+    "sourceShortfallScope": "Portland and New Mexico spread sides lacked a qualified exact paired reference or an eligible calibrated exact forecast.",
+    "merge": "coordinator only",
+    "publication": "DURABLY_VERIFIED"
+  },
+  "publication": {
+    "workflowRunId": 42326442954,
+    "workflowConclusion": "success",
+    "reportPath": "data/history/runs/2026-11-06/late-183620.json",
+    "sidecarPath": "data/history/research-fit/2026-11-06/late-183620.json",
+    "reportBlobSha": "63b0f15421a30b4fa40f5e0d0b7fdbb653fc9c67",
+    "sidecarBlobSha": "8e62f177b576f5b00f087f4c2ed9b50a71c15d54"
+  },
+  "recordedAt": "2026-11-07T02:05:49.433Z"
+}
