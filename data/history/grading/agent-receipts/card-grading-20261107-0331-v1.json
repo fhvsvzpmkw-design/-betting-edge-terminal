@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "grading",
+  "taskId": "Card Grading",
+  "executionRunId": "42364470373",
+  "workBinding": {
+    "requestId": "card-grading-fallback-20261107-0331-v1",
+    "requestCommit": "0183f437623309813c0e8c2fc0d5fe1791f91d65",
+    "targetDate": "2026-11-06",
+    "exceptionEventId": "70898886",
+    "firstIssuedDate": "2026-10-27",
+    "startTime": "2026-10-28T00:00:00Z",
+    "currentReason": "identity_conflict",
+    "immutableIdentity": "Sam Houston State Bearkats @ Missouri State Bears",
+    "conflictingIssuedPresentation": "Milwaukee Brewers @ Tampa Bay Rays",
+    "issuedBindings": [
+      {
+        "run": "evening-154315",
+        "rows": "24-29",
+        "blobSha": "6a419053833e5b3e83e22642bb1965ebf0f6d367"
+      },
+      {
+        "run": "final_morning-094833",
+        "rows": "26-29",
+        "blobSha": "e069796eeab0b1121828a1e8bbf1c29c65b2c756"
+      },
+      {
+        "run": "main-083240",
+        "rows": "28-31",
+        "blobSha": "3e0c0573298e97d988edceb112222231c95cab2d"
+      }
+    ]
+  },
+  "mode": "AGENTS_READY",
+  "reason": "One genuine historical identity-conflict exception remains; one read-only researcher acknowledged the exact binding and is rechecking supported identity/settlement paths.",
+  "workers": [
+    {
+      "role": "exception researcher",
+      "actualId": "/root/grading_exception_70898886",
+      "assignmentId": "grading-exception-70898886-20261107",
+      "boundary": "read-only; no spawning, live odds, re-handicapping, shared writes, issued-record changes, ledgers, or invented grades",
+      "launchedAt": null,
+      "acknowledgedAt": null,
+      "returnAt": null,
+      "state": "WORKING",
+      "clockNote": "Startup and acknowledgment were coordinator-observed before the grading workflow queued at 2026-11-07T10:33:40Z; exact collaboration timestamps were not exposed."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "selectedWorkers": 1,
+      "decision": "Use the normal single exception researcher; no reviewer or expansion.",
+      "namedQuestion": "Does current durable evidence expose any supported deterministic identity or settlement path for event 70898886?",
+      "expectedQualityBenefit": "Detect a newly supported path or confirm the exact blocker without duplicating deterministic grading.",
+      "releaseCondition": "Return the current immutable bindings, source facts and repair prerequisite, then release."
+    }
+  ],
+  "qualityFindings": [],
+  "completedWork": [
+    "Authority 1.1 and settlement policy verified; native 2026-11-06 receipt confirmed missing; previous request/workflow confirmed complete; exact fallback request committed."
+  ],
+  "remainingWork": [
+    "Researcher return",
+    "Exact workflow success",
+    "Durable receipt and output-blob readback",
+    "Latest main index reconciliation"
+  ],
+  "recordedAt": "2026-11-07T10:33:51Z"
+}
