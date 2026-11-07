@@ -649,6 +649,7 @@ jobs:
             }
 
             if (sport === 'basketball') {
+              if (/\b(?:nba g league|g league|development league)\b/.test(text)) return false;
               return /\bnba\b|\bwnba\b|\bncaa\b|college/.test(text);
             }
 
@@ -792,6 +793,7 @@ jobs:
           function categoryKey(event) {
             const sport = sportSlug(event);
             const text = leagueText(event);
+            if (sport === 'basketball' && /\b(?:nba g league|g league|development league)\b/.test(text)) return 'BASKETBALL_OTHER';
 
             // League abbreviations are meaningful only within their sport.
             // Montenegro/Czech soccer also has leagues named "CFL".

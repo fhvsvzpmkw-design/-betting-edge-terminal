@@ -57,10 +57,11 @@ function temporaryDraft(state,callback){
   try{return callback({report,sidecar});}finally{fs.rmSync(dir,{recursive:true,force:true});}
 }
 function summary(state){
-  return {schema:1,run:state.identity,phase:state.phase,revision:state.revision,completion:reportRunHealth(state),
+  const completion=reportRunHealth(state);
+  return {schema:1,run:state.identity,phase:state.phase,revision:state.revision,completion,
     oddsSnapshot:state.report.oddsSnapshot||null,
     counts:state.report.counts,research:{available:state.sidecar.primaryAnalysis?.receipts?.length??null,evaluated:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='EVALUATED').length??null,blocked:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED').length??null,
-      unfinished:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED'&&row.blocker?.reason==='RESEARCH_INCOMPLETE').length??null},
+      unfinished:state.sidecar.primaryAnalysis?.receipts?completion.remainingWork.producerUnfinished:null},
     checkpointBytes:Buffer.byteLength(serializeReportDocument(state,'REPORT_CHECKPOINT')),checkpointDecodedBytes:Buffer.byteLength(json(state)),
     validation:state.validation?{state:state.validation.state,gates:state.validation.receipts?.length}:null,
     frozen:state.frozen?{blobSha:state.frozen.blobSha,bytes:state.frozen.bytes}:null,

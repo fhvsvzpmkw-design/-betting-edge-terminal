@@ -10,6 +10,7 @@ import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
 import {validateCardEvidenceBundle} from './card-evidence-identity.mjs';
 import {attachPublisherCoverageSummary, validateReportCoverageSummary} from './report-coverage-summary.mjs';
 import {attachPublicationEvidenceAudit, validateCandidateCompletion} from './report-evidence-repair.mjs';
+import {RESEARCH_COMPLETION_FROM} from './research-completion.mjs';
 import {validateSelectionLabels} from './selection-label-gate.mjs';
 import {validateForecastWait} from './forecast-lean.mjs';
 
@@ -391,12 +392,16 @@ function publish(root,reportFile,sidecarFile){
   const {report,paths,sidecar} = readPublicationBundle(reportFile,sidecarFile,{root});
   const {file:indexFile,index} = loadIndex(root);
   const decisionFingerprint=normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs});
-  attachPublisherCoverageSummary({root,report,sidecar});
+  const currentCompletion=Date.parse(report.ts)>=Date.parse(RESEARCH_COMPLETION_FROM);
+  if(!currentCompletion)attachPublisherCoverageSummary({root,report,sidecar});
   attachPublisherInstrumentTelemetry({root,index,report,sidecar});
   const existingReportPath = path.join(root,paths.reportPath), existingSidecarPath = path.join(root,paths.sidecarPath);
   attachPublicationEvidenceAudit({root,report,sidecar,
     existingReport:fs.existsSync(existingReportPath) ? readJson(existingReportPath) : null,
     existingSidecar:fs.existsSync(existingSidecarPath) ? readJson(existingSidecarPath) : null});
+  // Use the publisher's fresh assessment, not optional or stale producer
+  // diagnostics. Older retries retain their original property order and rules.
+  if(currentCompletion)attachPublisherCoverageSummary({root,report,sidecar});
   assert(normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs})===decisionFingerprint,'VigScope meter telemetry derivation must not mutate betting decisions or recommendation content');
   const reportAbs = path.join(root,paths.reportPath);
   const sidecarAbs = path.join(root,paths.sidecarPath);

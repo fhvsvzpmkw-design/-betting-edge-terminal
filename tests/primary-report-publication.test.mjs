@@ -5,7 +5,8 @@ import path from 'node:path';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {derivePrimarySelectionInventory} from '../tools/major-sport-market-coverage-gate.mjs';
 
-for(const observedMode of [false,true]) {
+for(const forwardCompletion of [false,true]) for(const observedMode of [false,true]) {
+const reportDay=forwardCompletion?"2026-11-07":"2026-09-06",eventDay=forwardCompletion?"2026-11-08":"2026-09-07";
 const root=fs.mkdtempSync(path.join(os.tmpdir(),`primary-report-publication-${observedMode ? 'observed' : 'legacy'}-`));
 const tool=path.resolve('tools/report-publication.mjs');
 const read=file=>JSON.parse(fs.readFileSync(file,'utf8'));
@@ -18,27 +19,40 @@ try{
   const policyRaw=fs.readFileSync('data/major-sport-market-coverage-v1.json','utf8');
   write('data/major-sport-market-coverage-v1.json',policyRaw);
   const authoritySha=hash(policyRaw);
-  const report={ts:'2026-09-06T18:21:30-07:00',feedGeneratedAt:'2026-09-07T01:08:00Z',slot:'late',label:'Synthetic publication fixture',bankroll:100,risk:0,counts:{bet:0,lean:0,wait:0,pass:0},recs:[],summary:'Primary selections: 6 available; 0 evaluated; 6 evidence-blocked; 0 unavailable. Player-prop analysis paused.'};
-  const makeFeed=(ts,home=2.2)=>({generatedAt:ts,...(observedMode ? {quoteObservationVersion:1} : {}),events:[{id:'fixture',home:'Fixture Home',away:'Fixture Away',date:'2026-09-07T02:00:00Z',sport:{slug:'baseball'},league:{slug:'usa-mlb'},bookmakers:Object.fromEntries(['Bet365','DraftKings'].map(book=>[book,['ml','spread','totals'].map(marketKey=>{
+  const report={ts:`${reportDay}T18:21:30-07:00`,feedGeneratedAt:`${eventDay}T01:08:00Z`,slot:'late',label:'Synthetic publication fixture',bankroll:100,risk:0,counts:{bet:0,lean:0,wait:0,pass:0},recs:[],summary:'Primary selections: 6 available; 0 evaluated; 6 evidence-blocked; 0 unavailable. Player-prop analysis paused.'};
+  const makeFeed=(ts,home=2.2)=>({generatedAt:ts,...(observedMode ? {quoteObservationVersion:1} : {}),events:[{id:'fixture',home:'Fixture Home',away:'Fixture Away',date:`${eventDay}T02:00:00Z`,sport:{slug:'baseball'},league:{slug:'usa-mlb'},bookmakers:Object.fromEntries(['Bet365','DraftKings'].map(book=>[book,['ml','spread','totals'].map(marketKey=>{
     const sides=marketKey==='totals'?['over','under']:['home','away'];const line=marketKey==='ml'?null:marketKey==='spread'?-1.5:8.5;
     return {marketKey,updatedAt:observedMode ? new Date(Date.parse(ts)-3*60*60*1000).toISOString() : ts,...(observedMode ? {observedAt:ts} : {}),odds:[{...(line===null?{}:{hdp:line}),[sides[0]]:marketKey==='ml'?home:1.91,[sides[1]]:1.91,selectionKeys:Object.fromEntries(sides.map(side=>[side,`fixture|${marketKey}|${side}||${line??''}`]))}]};
   })]))}]});
-  const feed=makeFeed(report.feedGeneratedAt),baseline=makeFeed('2026-09-07T00:08:00Z',2.0);
+  const feed=makeFeed(report.feedGeneratedAt),baseline=makeFeed(`${eventDay}T00:08:00Z`,2.0);
   const feedRaw=JSON.stringify(feed,null,2)+'\n',feedSha=hash(feedRaw),baselineSha=hash(JSON.stringify(baseline));
   write('data/live-odds.json',feedRaw);
-  const oddsIndex={entries:[{generatedAt:baseline.generatedAt,snapshotBlobSha:baselineSha,indexedAtUtc:'2026-09-07T00:09:00Z'}]};
+  const oddsIndex={entries:[{generatedAt:baseline.generatedAt,snapshotBlobSha:baselineSha,indexedAtUtc:`${eventDay}T00:09:00Z`}]};
   const oddsRaw=JSON.stringify(oddsIndex,null,2)+'\n';write('data/history/odds-index.json',oddsRaw);hash(oddsRaw);
   write('run-history.json',{schema_version:2,runs:[],updated_at:''});
   const inventory=derivePrimarySelectionInventory(report,feed,policy);
   assert.equal(inventory.selections.length,6,'all six exact sides reach publication in both clock modes');
   const sidecar=read('data/history/research-fit/2026-09-05/late-182130.json');
-  sidecar.reportReference={slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,reportPath:'data/history/runs/2026-09-06/late-182130.json'};
+  sidecar.reportReference={slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,reportPath:`data/history/runs/${reportDay}/late-182130.json`};
   sidecar.provenance.feedBlobSha=feedSha;
   sidecar.primaryAnalysis={schema:1,feedGeneratedAt:feed.generatedAt,receipts:inventory.selections.map(selection=>({selectionId:selection.selectionId,quote:selection.quotes[0],state:'BLOCKED',blocker:{reason:'FAIR_MODEL_UNAVAILABLE',checkedAt:report.ts,missing:`Synthetic fixture ${selection.selectionId} has no model.`,impact:'No value assessment or wager.',attempts:[{eventId:'fixture',checkedAt:report.ts,url:'https://example.org/models/fixture',finding:`Synthetic ${selection.side} ${selection.marketDetail} model is absent.`}]}}))};
   const audit=sidecar.coverageAudit;audit.feedGeneratedAt=feed.generatedAt;audit.authorityBlobSha=authoritySha;
   audit.sports=Object.fromEntries(Object.entries(inventory.sports).map(([sport,row])=>[sport,{gamesInScope:row.gamesInScope,gamesEvaluated:row.gamesInScope,primary:{...row.primary,evaluated:0,blocked:row.primary.available},props:{state:'PAUSED_BY_SCOPE',returned:0,screened:0,seriousDeepReviewed:0,excludedByScope:0}}]));
   audit.availabilityLimitations=[];audit.totals={gamesInScope:1,gamesEvaluated:1,primaryRequired:6,primaryAvailable:6,primaryEvaluated:0,primaryBlocked:6,primaryUnavailable:0,propsReturned:0,propsScreened:0,seriousPropsDeepReviewed:0,propsExcludedByScope:0};
   audit.presentation={mode:'UNBOUNDED_ANALYSIS_OUTPUT',allEvaluatedPublished:true,fillerAdded:0};
+  if(forwardCompletion){
+    // Synthetic current paired reference creates one actual unfinished review.
+    // No cached candidateAssessment is supplied to the frozen producer files.
+    const observer={schema:3,mode:'official-sharp-benchmark',status:'ok',authoritative:true,
+      benchmarkAuthority:'OFFICIAL_NON_EXECUTABLE_SHARP_BENCHMARK',executionAuthority:false,generatedAt:report.ts,
+      fixtures:[{fixtureId:'fixture-ref',primaryMatch:{eventId:'fixture'},startTime:feed.events[0].date,
+        pinnacle:{bookmakerIsActive:true,suspended:false,markets:[{bookmakerMarketId:'line/a/b/c/d/0/moneyline',marketActive:true,
+          outcomes:['home','away'].map(side=>({outcomeId:side,players:[{playerId:'0',bookmakerOutcomeId:side,
+            bookmakerChangedAt:report.ts,price:1.9,priceAmerican:'-111',active:true,mainLine:true,limit:1000}]}))}]}}]};
+    const raw=JSON.stringify(observer);write('data/oddspapi-observer.json',raw);
+    Object.assign(sidecar.provenance,{pinnacleObserverPath:'data/oddspapi-observer.json',pinnacleObserverBlobSha:hash(raw)});
+    delete report.candidateAssessment;delete sidecar.candidateAssessment;
+  }
   const save=()=>{write('input-report.json',report);write('input-sidecar.json',sidecar);};save();
   const inputBefore=fs.readFileSync(path.join(root,'input-report.json'),'utf8');
   assert.deepEqual(read(path.join(root,'input-sidecar.json')).primaryAnalysis.receipts,sidecar.primaryAnalysis.receipts,'candidate JSON staging preserves both quote clocks and receipt identities');
@@ -66,6 +80,13 @@ try{
   assert.deepEqual(stored.coverageSummary.selections,{required:6,available:6,evaluated:0,blocked:6,unavailable:0});
   assert.equal(stored.coverageSummary.source.feedBlobSha,feedSha);
   assert.equal(stored.coverageSummary.source.feedGeneratedAt,feed.generatedAt);
+  if(forwardCompletion){
+    assert.equal(stored.candidateAssessment.counts.unfinished,1,'fresh publisher review finds the positive exact market');
+    assert.equal(stored.coverageSummary.researchCompletion.unfinished,1,'a source-gap label and missing producer cache cannot hide work');
+    assert.equal(stored.coverageSummary.researchCompletion.state,'INCOMPLETE');
+    assert.match(stored.summary,/^ANALYSIS INCOMPLETE: 0 evaluated; 1 unfinished\./);
+  }
+
   if(observedMode){
     assert.equal(stored.coverageSummary.source.quoteObservationVersion,1);
     assert.equal(stored.coverageSummary.source.quoteFreshnessClock,'observedAt');
@@ -75,7 +96,7 @@ try{
     assert.ok(!Object.hasOwn(stored.coverageSummary.source,'quoteObservationVersion'));
     assert.ok(!Object.hasOwn(stored.coverageSummary.source,'quoteFreshnessClock'));
   }
-  const persistedReceipts=read(path.join(root,'data/history/research-fit/2026-09-06/late-182130.json')).primaryAnalysis.receipts;
+  const persistedReceipts=read(path.join(root,`data/history/research-fit/${reportDay}/late-182130.json`)).primaryAnalysis.receipts;
   assert.deepEqual(persistedReceipts,receipts,'published JSON keeps exact bound quote and observation provenance');
   for(const receipt of persistedReceipts){
     assert.equal(receipt.quote.quoteUpdatedAt,feed.events[0].bookmakers.Bet365[0].updatedAt);
@@ -97,7 +118,7 @@ try{
   result=call('verify');assert.equal(result.status,0,result.stderr);
   assert.equal(fs.readFileSync(storedPath,'utf8'),storedBefore,'historical verification uses the original pinned policy content');
   result=call('publish');assert.notEqual(result.status,0);assert.match(result.stderr,/authorityBlobSha does not match current operational authority/,'new publication cannot substitute its old authority');
-  const storedSidecarPath=path.join(root,'data/history/research-fit/2026-09-06/late-182130.json');
+  const storedSidecarPath=path.join(root,`data/history/research-fit/${reportDay}/late-182130.json`);
   const storedSidecar=read(storedSidecarPath),unresolvable=structuredClone(storedSidecar);
   const pendingTamper=structuredClone(storedSidecar);pendingTamper.primaryAnalysis.receipts[0].blocker.reason='RESEARCH_INCOMPLETE';
   write(path.relative(root,storedSidecarPath),pendingTamper);result=call('verify');
@@ -116,7 +137,7 @@ try{
   stored.coverageSummary.selections.evaluated=6;write(sidecar.reportReference.reportPath,stored);
   result=call('verify');assert.notEqual(result.status,0);assert.match(result.stderr,/coverage summary does not reproduce/,'read-back catches misleading evaluated count');
   if(process.env.PRIMARY_REPORT_PREVIEW){write(sidecar.reportReference.reportPath,JSON.parse(storedBefore));fs.copyFileSync(storedPath,process.env.PRIMARY_REPORT_PREVIEW);}
-  console.log(`PRIMARY REPORT PUBLICATION (${observedMode ? 'observation v1' : 'legacy'}): staged JSON and quote provenance verified; preflight/publish bypass rejected; six current selections, truthful coverage and meters; immutable retry, pinned policy replay, and read-back tamper checks pass.`);
+  console.log(`PRIMARY REPORT PUBLICATION (${forwardCompletion?'forward completion; ':''}${observedMode ? 'observation v1' : 'legacy'}): staged JSON and quote provenance verified; preflight/publish bypass rejected; six current selections, truthful coverage and meters; immutable retry, pinned policy replay, and read-back tamper checks pass.`);
 }finally{fs.rmSync(root,{recursive:true,force:true});}
 
 }

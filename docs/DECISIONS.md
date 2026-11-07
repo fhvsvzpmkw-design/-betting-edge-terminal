@@ -531,3 +531,17 @@ Research the consequential named uncertainty and make the actual individual deci
 The November 6 Late handoff uses the existing typed forecast follow-up queue and prepared event review, with fresh normal intake required. It prepares Portland/Arizona provisional source-led cases and a New Mexico price/QB-role objection; it does not carry old quotes/grades or prescribe those outcomes after changed evidence. Retain the existing task, schedule, staffing and odds budget. Ordinary-run adoption and the actual published selections require separate readback.
 
 **Reason:** Make the broader research policy produce usable individual judgments and specific rechecks, instead of repeating a general rejection across unrelated opportunities.
+
+## D-050 — Connect candidate work to completion and publication
+
+**Date:** 2026-11-07. **Status:** IMPLEMENTED; DEPLOYMENT ACCEPTANCE PENDING.
+
+The user requested a code review because source gaps and errors recur. The November 7 09:30 issue published four decisions but also retained 46 required candidate reviews marked unfinished; its completion metadata said COMPLETE. Generic source/personnel labels hid that work from the controller's stopping signal, and publication attached completion before deriving its fresh candidate assessment.
+
+Use one read-only exact-current candidate-work classification in controller health/status and forward publication disclosure. Match the report/feed, assessment time, unique selection, receipt state and exact assessed quote. Advance those required reviews in the existing event queue, with Sunday early NFL priority and stable start-time ordering. Finish the actual individual judgment through the current source-led or supported market/fair route; do not turn a source-gap reason into completion or invent a grade. Attach new publication completion after its fresh evidence/candidate audit. Partial publication remains allowed.
+
+From `2026-11-07T20:10:00Z` (13:10 Pacific), separate NBA G League from NBA in new acquisition/coverage and account for bound unfinished candidates in new completion metadata. Preserve historical inventory semantics, issued metadata/bytes and every wagering control. Retain supported NCAAF scope and disclose unreturned prices accurately. Give unassessed inventory its bound matchup names, and resolve staffing from the current reduced guide/policy. All five enabled Main prompts already resolve current main and the shared authority; no schedule, new task, extra worker or odds request is introduced.
+
+See [the production code audit](reviews/2026-11-07-production-code-audit.md) for the traced findings, exact failed-run replay, behavioral tests and ordinary-run acceptance. Implementation/deployment and a future producer actually completing its eligible game reviews remain distinct evidence.
+
+**Reason:** Stop incomplete analytical work from disappearing between planning, controller continuation and a successful publication, while preserving independently completed decisions and reproducible History.
