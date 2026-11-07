@@ -115,12 +115,13 @@ test('rendered cards keep checks visible and the full research behind accessible
     set textContent(value){this._text=String(value);this.children=[];}
     get textContent(){return this._text+this.children.map(node=>node.textContent).join(' ');}
     append(...nodes){this.children.push(...nodes);}
+    prepend(...nodes){this.children.unshift(...nodes);}
     appendChild(node){this.children.push(node);return node;}
     setAttribute(key,value){this.attributes[key]=String(value);}
   }
   const d={createElement:tag=>new Element(tag),createTextNode:value=>{const node=new Element('#text');node.textContent=value;return node;}};
   const context={console,Intl,Date,URLSearchParams,document:d,location:{hash:''},localStorage:{getItem:()=>null}};
-  for(const file of ['odds-format.js','selection-label.js','card-summary.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets',file),'utf8'),context);
+  for(const file of ['odds-format.js','selection-label.js','card-summary.js','card-insights.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets',file),'utf8'),context);
   const runtime=fs.readFileSync(path.join(__dirname,'../assets/runner-core-runtime.js'),'utf8');
   vm.runInNewContext(runtime.slice(0,runtime.indexOf('\nactiveRun=payload();'))+'\nglobalThis.renderCard=card;globalThis.loadReport=run=>{activeRun=run};})();',context);
   context.loadReport(report);
@@ -132,14 +133,18 @@ test('rendered cards keep checks visible and the full research behind accessible
     assert.doesNotMatch(text,/WRONG_MARKET_OR_SIDE|WRONG_LINE|SOURCE_EXACT_CAPABILITY_UNVERIFIED/);
     assert.match(text,/UNRESOLVED:/);
     const evidence=nodes.find(node=>node.className==='runnerEvidence');
-    assert.ok(evidence.textContent.includes('FULL RESEARCH & SOURCES'));
+    assert.ok(evidence.textContent.includes('ORIGINAL REPORT & SOURCES'));
     assert.ok(evidence.textContent.includes('SUPPORT'),'the research is retained, not deleted');
     const button=nodes.find(node=>node.className==='runnerBtn'),expanded=nodes.find(node=>node.className==='runnerExpanded');
     assert.equal(button.attributes['aria-controls'],expanded.id);
     assert.ok(!ids.has(expanded.id));ids.add(expanded.id);
+    assert.ok(!all(expanded).some(node=>node.className==='runnerInsights'),'game details render on demand');
     button.onclick();assert.equal(expanded.hidden,false);assert.equal(button.attributes['aria-expanded'],'true');
-    assert.match(visible(card),/FULL RESEARCH & SOURCES/);
+    assert.match(visible(card),/GAME INSIGHTS/);
+    assert.match(visible(card),/ORIGINAL REPORT & SOURCES/);
+    assert.doesNotMatch(visible(card),/RECORDED DECISION:|MOVEMENT:/,'details do not repeat the headline decision and movement');
     assert.doesNotMatch(visible(card),/WRONG_MARKET_OR_SIDE/,'audit prose still requires the research drawer');
+    button.onclick();button.onclick();assert.equal(all(expanded).filter(node=>node.className==='runnerInsights').length,1,'reopening details keeps one game snapshot');
     if(rec.meta.includes('Away @ Home'))assert.doesNotMatch(text,/Away @ Home|Away Moneyline|Home Moneyline/,'same-event team names repair placeholders');
   }
   assert.equal(JSON.stringify(report),before);
