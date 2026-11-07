@@ -534,7 +534,7 @@ The November 6 Late handoff uses the existing typed forecast follow-up queue and
 
 ## D-050 — Connect candidate work to completion and publication
 
-**Date:** 2026-11-07. **Status:** IMPLEMENTED; DEPLOYMENT ACCEPTANCE PENDING.
+**Date:** 2026-11-07. **Status:** DEPLOYED; SIX SERVER CHECKS PASSED; ORDINARY-RUN ACCEPTANCE OPEN.
 
 The user requested a code review because source gaps and errors recur. The November 7 09:30 issue published four decisions but also retained 46 required candidate reviews marked unfinished; its completion metadata said COMPLETE. Generic source/personnel labels hid that work from the controller's stopping signal, and publication attached completion before deriving its fresh candidate assessment.
 

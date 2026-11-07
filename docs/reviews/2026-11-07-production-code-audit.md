@@ -2,7 +2,7 @@
 
 Baseline: authoritative main `e4844b06962ea5b72b65409d6603553b5d91030e`. Review the actual Main path against the current shared authority, adaptive research amendment and reduced staffing policy. The five enabled Main task prompts already resolve current main and that authority; their schedules and staffing were retained.
 
-Status: corrections implemented; all 67 targeted tests passed across 21 suites. Remote checks and deployment readback pending.
+Status: DEPLOYED to authoritative main. All 67 targeted tests passed across 21 suites, and all six final-head repository checks succeeded. [PR #138](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/pull/138) merged as `57795b24d5754c4bacd0cd5924236a26e54acad6`; all 19 reviewed file hashes were read back exactly. The original report blob `ad64d01de9ec91f1833396d23fe65800aa814b7e` and research blob `55b2fe0c18a0d141ce287f4ca00c3ecff7c43620` remain unchanged. The next ordinary producer's actual game-review follow-through remains the live acceptance item.
 
 ## Scope and method
 
