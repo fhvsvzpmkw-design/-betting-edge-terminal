@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-08:00",
+  "executionRunId": "2026-11-07T08:20:30-07:00|2",
+  "workBinding": {
+    "candidateId": "2026-11-07T08:20:30-07:00|2",
+    "feedBlobSha": "1bb96a9c1f5c950e1625c6c739b7eb5d43169492",
+    "checkpoint": "data/report-production/checkpoints/20261107-main-081000.json",
+    "checkpointRevision": 139,
+    "operatingRevision": "2026-11-06.ActionableOpinionFollowThrough"
+  },
+  "mode": "AGENTS_COMPLETE",
+  "reason": "The 08:00 update began coordinator-first with zero workers. One targeted complete-event researcher was launched after the full current inventory screen identified three newly priced events with no prior-lane assessment.",
+  "workers": [
+    {
+      "role": "targeted complete-event researcher",
+      "actualId": "/root/main_0800_new_events",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": [
+        "73719560",
+        "70924492",
+        "72909388"
+      ],
+      "assignmentBinding": {
+        "candidateIdAtLaunch": "2026-11-07T08:10:00-07:00|2",
+        "feedBlobSha": "1bb96a9c1f5c950e1625c6c739b7eb5d43169492",
+        "checkpointRevisionAtLaunch": 1,
+        "finalCoordinatorRevision": 139
+      },
+      "launchObservedAt": null,
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "clockTelemetry": "Exact worker message seconds were not retained; the coordinator observed the exact candidate/feed/revision/event acknowledgment inside the required 60-second window and received the complete review before final reconciliation.",
+      "state": "RETURNED",
+      "returnedWork": "Complete moneyline, spread/puck-line and total review for Spurs at Trail Blazers, Abilene Christian at Tarleton State and Canucks at Oilers, including original forecast records, current personnel reporting, contrary Pinnacle evidence, history fit and concrete recheck conditions."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "ONE_TARGETED_RESEARCHER",
+      "workers": 1,
+      "reason": "Only three newly priced events required a fresh complete-event assessment; the other 127 events were reconciled by the coordinator against their original source clocks and current exact quotes.",
+      "namedQuestion": "Do the three new events contain a supported current-price opinion or a genuine source-specific shortfall across all available market families?",
+      "expectedQualityBenefit": "Independent contract-orientation verification, current personnel review and a challenge to possible Portland and Edmonton moneyline opinions.",
+      "releaseCondition": "SATISFIED"
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "workers": 1,
+      "reason": "The targeted researcher returned complete work and no consequential unresolved gap required another launch under the 08:00 update profile.",
+      "expectedQualityBenefit": "Avoid idle launches while retaining coordinator review of all 774 available primary selections.",
+      "releaseCondition": "SATISFIED"
+    }
+  ],
+  "qualityFindings": [
+    "Corrected the normalized NBA spread orientation: San Antonio is -5.5 and Portland is +5.5 even though raw selection keys retain the home-oriented line convention.",
+    "Portland +180 retained a provisional source-led LEAN: ESPN 39.8% versus 35.71% break-even, with Pinnacle 33.33% and the back-to-back/injury-report state retained as contrary and uncertainty.",
+    "Edmonton -312 retained a provisional source-led LEAN: MoneyPuck 78.73% versus 75.76% break-even, with Pinnacle 75.70% nearly neutral and unresolved starting goalies retained as material uncertainty.",
+    "All six Abilene Christian–Tarleton selections remained documented source shortfalls because no qualified exact paired reference or applicable calibrated exact-event forecast was available after current official team review."
+  ],
+  "decisionCorrections": [
+    {
+      "issue": "NBA spread contract orientation",
+      "resolution": "Mapped the raw home-oriented line to the displayed contracts before assessing Spurs -5.5 and Portland +5.5; neither spread side received an issued decision."
+    },
+    {
+      "issue": "Opinion versus BET authority",
+      "resolution": "Retained Portland and Edmonton only as zero-stake LEANs with no independent fair, uncertainty interval, BET bound or profit claim."
+    }
+  ],
+  "completedWork": {
+    "acknowledgments": 1,
+    "targetedReviews": 1,
+    "eventsScreened": 130,
+    "eventResearch": 3,
+    "checkpointedEvents": 130,
+    "availableSelections": 774,
+    "forecastReviews": 158,
+    "decisions": {
+      "BET": 0,
+      "LEAN": 2,
+      "WAIT": 0,
+      "PASS": 0
+    }
+  },
+  "remainingWork": {
+    "events": 0,
+    "reviews": 0,
+    "producerUnfinished": 0,
+    "documentedSourceShortfalls": 772,
+    "sourceShortfallScope": "Selection-specific gaps include unresolved current personnel/role dependencies, unavailable qualified exact references and unavailable calibrated exact-event forecasts; all are recorded in the saved receipts.",
+    "merge": "coordinator only",
+    "publication": "PENDING_STAGED_PUBLISHER"
+  },
+  "publication": null,
+  "recordedAt": "2026-11-07T15:23:30Z"
+}
