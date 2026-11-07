@@ -2,6 +2,7 @@
 import {validCuratedRecord} from './curated-aggregation.mjs';
 import {eventStrategyResearch} from './strategy-research.mjs';
 import {opinionResearchBrief} from './opinion-research-brief.mjs';
+import {unfinishedCandidateReviews} from './research-completion.mjs';
 export const EVENT_RESEARCH_VERSION = '2026-10-25.1';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 export const SOURCE_AGGREGATION_FROM = '2026-10-06T17:05:06Z';
@@ -112,6 +113,8 @@ const actionFor = route => ({
  */
 export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAssessment = {}, forecastCoverage = {}, priorReceipts = new Map(), checkpointResearch = new Map()} = {}) {
   const inventory = list(candidateAssessment.selections), receipts = list(sidecar.primaryAnalysis?.receipts);
+  const candidatePending=new Set(unfinishedCandidateReviews({ts:report.ts,feedGeneratedAt:report.feedGeneratedAt},
+    {primaryAnalysis:sidecar.primaryAnalysis,candidateAssessment}).map(row=>row.selectionId));
   const expandedSourceReview = time(report.ts) >= time(SOURCE_AGGREGATION_FROM);
   const groups = new Map(), warnings = [], seen = new Set();
   for (const row of inventory) {
@@ -127,7 +130,9 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     if (!event.label && row.eventLabel) event.label = row.eventLabel;
     const recordedMissing=receipt?.blocker?.missing || row.blocker?.missing;
     event.selections.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side,
-      producerReviewPending:row.state!=='EVALUATED' && producerReviewPlaceholder(recordedMissing || list(row.missingResearch).join(',')),
+      candidateReviewPending:candidatePending.has(row.selectionId),
+      producerReviewPending:candidatePending.has(row.selectionId) ||
+        row.state!=='EVALUATED' && producerReviewPlaceholder(recordedMissing || list(row.missingResearch).join(',')),
       state:row.state, status:row.status || null, route, reviewState:row.reviewState || null, missingResearch:list(row.missingResearch), quote:row.quote || null, assessedQuote:row.assessedQuote || null,
       exactOptions:list(row.options).map(option => ({quote:option.quote, marketComparison:option.marketComparison || null,
         forecastAggregation:option.forecastAggregation||null})),
@@ -234,6 +239,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       label:event.label || `${event.sport} event ${event.eventId}`, available:event.selections.length,
       completed:event.selections.length-pending.length, pending:pending.length,
       producerReviewPending:pending.filter(row=>row.producerReviewPending).length,
+      candidateReviewsPending:pending.filter(row=>row.candidateReviewPending).length,
       sharedResearchRequired:pending.length>0, personnelFollowUp, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
       sourceReviewPending:expandedSourceReview && sourceQueue.size>0,
@@ -246,6 +252,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     .sort((a,b) => Number(b.scheduleUrgency.code==='SUNDAY_EARLY_NFL')-Number(a.scheduleUrgency.code==='SUNDAY_EARLY_NFL') ||
       (a.scheduleUrgency.code==='SUNDAY_EARLY_NFL' && b.scheduleUrgency.code==='SUNDAY_EARLY_NFL'
         ? Number(b.producerReviewPending>0)-Number(a.producerReviewPending>0) : 0) ||
+      Number(b.candidateReviewsPending>0)-Number(a.candidateReviewsPending>0) ||
       (time(a.eventDate) || Infinity)-(time(b.eventDate) || Infinity) || a.eventKey.localeCompare(b.eventKey));
   const rows = events.flatMap(event => event.selections), pending = rows.filter(row => row.route !== 'COMPLETED');
   const routes = {};
@@ -286,7 +293,7 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
   const capturedReviews = list(plan.events).reduce((count,event) => count + list(event.forecastReviews).length,0);
   const events = list(plan.events).filter(event => event.pending > 0 || list(event.forecastReviews).length > 0 || event.sourceReviewPending || list(event.opinionResearch).length > 0).map(event => ({
     eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,scheduleUrgency:event.scheduleUrgency,
-    pending:event.pending, completed:event.completed,producerReviewPending:event.producerReviewPending || 0,sourceReviewPending:event.sourceReviewPending===true,
+    pending:event.pending, completed:event.completed,producerReviewPending:event.producerReviewPending || 0,candidateReviewsPending:event.candidateReviewsPending || 0,sourceReviewPending:event.sourceReviewPending===true,
     sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath,priorCheckpointPath,checkpointBlobSha,issued}) => ({
       id:source.id, url:source.url, observedAt:source.checkedAt || source.asOf,
       finding:source.finding || source.fact, priorReportPath,
@@ -302,11 +309,11 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
       sourceId:source.sourceId,urls:source.urls,questions:source.questions,collectionMode:source.collectionMode,
       automatedReuse:source.automatedReuse,usageUrl:source.usageUrl,notes:source.notes})),
     nextAction:event.forecastReviews?.length ? 'Review the captured forecast fields and current applicability before repeating source discovery or treating this event as fully reviewed. Completed market cards remain publishable under their own evidence rules.' : event.personnelFollowUp?.required ? event.personnelFollowUp.instruction : event.sourceReviewPending ? event.forecastRetrieval.instruction :
-      'Revalidate event facts, then finish a supported exact paired-market review before opening another event. Escalate decision-changing news. Record genuine remaining gaps; do not wait for whole-slate forecast coverage.'
+      'Revalidate named event facts, review captured forecasts and any qualified market comparison, then finish the exact source-led opinion or supported market/fair assessment before opening another event. Escalate decision-changing news and record genuine remaining gaps.'
   }));
   if (eventId !== null && !events.some(event => String(event.eventId) === String(eventId))) throw new Error('No pending event matches --event-id');
   const outputEvents = eventId !== null ? events.filter(event => String(event.eventId) === String(eventId)) : events.map(event => ({
-    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,scheduleUrgency:event.scheduleUrgency, pending:event.pending, completed:event.completed,producerReviewPending:event.producerReviewPending,
+    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,scheduleUrgency:event.scheduleUrgency, pending:event.pending, completed:event.completed,producerReviewPending:event.producerReviewPending,candidateReviewsPending:event.candidateReviewsPending,
     sourceLeadCount:event.sourceLeads.length, personnelFollowUpState:event.personnelFollowUp?.state || null,
     routes:event.selections.reduce((counts,row) => ({...counts,[row.route]:(counts[row.route] || 0)+1}),{}),
     nextForecastSources:event.forecastSources.map(source => source.sourceId),

@@ -10,14 +10,14 @@ export function inspectPrimaryFeedHealth(report, feed, availableSelections) {
   const sourceEvents = new Map((feed?.events || []).map(event=>[String(event.id ?? event.eventId),event]));
   const forward = at >= Date.parse(PRIMARY_FEED_MANIFEST_FROM);
   const pending = row => categories.has(row.category) &&
-    (!forward || !sourceEvents.has(String(row.eventId)) || majorSportKey(sourceEvents.get(String(row.eventId))) !== null) &&
+    (!forward || !sourceEvents.has(String(row.eventId)) || majorSportKey(sourceEvents.get(String(row.eventId)),{at:report.ts}) !== null) &&
     Number.isFinite(Date.parse(row.startTime || row.date)) &&
     Date.parse(row.startTime || row.date) > at && day(row.startTime || row.date) === day(at);
   const rows = (feed?.diagnostics?.coreMarketAvailability || []).filter(pending);
   const omitted = (feed?.diagnostics?.primaryEventsNotPriced || []).filter(pending);
   const events = new Set([...rows,...omitted].map(row => String(row.eventId)));
   if(forward)for(const event of sourceEvents.values()){
-    const sport=majorSportKey(event);
+    const sport=majorSportKey(event,{at:report.ts});
     if(sport&&pending({category:sport==='NBA_WNBA'?'NBA':sport,startTime:event.date||event.identity?.startTime,eventId:event.id??event.eventId}))events.add(String(event.id??event.eventId));
   }
   const discoveryErrors=forward?(feed?.errors||[]).filter(row=>row.stage==='events'&&['baseball','ice-hockey','basketball','american-football'].includes(row.sport)):[];

@@ -340,6 +340,16 @@ assert.deepEqual(categoryIsolation.feed.diagnostics.coreSelectedByCategory,{CFL:
 assert.deepEqual(new Set(categoryIsolation.feed.diagnostics.coreMarketAvailability.map(row=>row.eventId)),new Set(actualMajors.map(row=>row.id)));
 assert.deepEqual(new Set(categoryIsolation.calls.find(url=>url.pathname.endsWith('/odds/multi')).searchParams.get('eventIds').split(',').slice(0,2)),new Set(actualMajors.map(row=>row.id)));
 
+// Development-league names contain NBA but do not receive NBA primary scope.
+const basketballIdentity = await run({
+  candidates:[event('nba-g-league',0.2,'basketball','USA - NBA G League Tip-Off Tournament'),event('nba-first-team',5,'basketball','USA - NBA')],
+  main:(e,book)=>({...e,bookmakers:{[book]:completeMarkets()}}),
+  supplemental:()=>{throw Error('Complete markets need no supplemental pull');}
+});
+assert.equal(basketballIdentity.feed.diagnostics.coreSelectedByCategory.NBA,1);
+assert.equal(basketballIdentity.feed.diagnostics.coreSelectedByCategory.BASKETBALL_OTHER,1);
+assert.deepEqual(basketballIdentity.feed.diagnostics.coreMarketAvailability.map(row=>row.eventId),['nba-first-team']);
+
 // October 27: imminent ancillary games plus a paid-plan denial must not spend
 // the run on tennis while selected NHL/NBA/MLB games remain unrequested.
 const majors = [

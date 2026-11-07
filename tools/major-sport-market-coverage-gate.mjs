@@ -14,6 +14,7 @@ import { evaluate as evaluateCore, loadProductionFramework, matchCondition, vali
 import {localDateKey, evaluatedDecisionLookup} from './coverage-validation-lookups.mjs';
 import {validatePrimaryFeedHealth} from './primary-feed-health.mjs';
 import {majorSportKey} from './primary-sport-identity.mjs';
+import {researchCompletion,RESEARCH_COMPLETION_FROM} from './research-completion.mjs';
 export {majorSportKey} from './primary-sport-identity.mjs';
 
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
@@ -198,7 +199,7 @@ export function deriveBoundCoverage(report, feed, policy) {
   const sportKeys = policy.coverageAudit.sportKeys;
   const games = Object.fromEntries(sportKeys.map(sport => [sport, new Map()]));
   for (const event of feed?.events || []) {
-    const sport = majorSportKey(event);
+    const sport = majorSportKey(event,{at:report.ts});
     if (!sport) continue;
     const id = eventId(event);
     const startMs = parseMs(event?.date || event?.identity?.startTime);
@@ -308,7 +309,9 @@ export function derivePrimarySelectionInventory(report, feed, policy, {validateH
           const quotes = results.map(result => result.quotes?.[side]).filter(Boolean);
           if (!quotes.length) { unavailable++; limitations.set(selectionId, unavailableReason(results, side)); continue; }
           available++;
-          selections.push({ selectionId, sport, eventId: id, eventDate: event.date || event.identity?.startTime, marketClass: spec.market, marketDetail: spec.marketDetail, side, quotes });
+          selections.push({ selectionId, sport, eventId: id, eventDate: event.date || event.identity?.startTime,
+            ...(event.away && event.home ? {eventLabel:`${event.away} at ${event.home}`} : {}),
+            marketClass: spec.market, marketDetail: spec.marketDetail, side, quotes });
         }
       }
     }
@@ -494,6 +497,7 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
 // Callers validate the receipts before using this publisher-owned disclosure.
 export function describeResearchCompletion(report, sidecar) {
   if (parseMs(report.ts) < Date.parse(PARTIAL_RESEARCH_FROM)) return null;
+  if (parseMs(report.ts) >= Date.parse(RESEARCH_COMPLETION_FROM)) return researchCompletion(report,sidecar);
   const receipts = sidecar?.primaryAnalysis?.receipts || [];
   const unfinished = receipts.filter(receipt => receipt?.state === 'BLOCKED' && receipt.blocker?.reason === 'RESEARCH_INCOMPLETE').length;
   const evaluated = receipts.filter(receipt => receipt?.state === 'EVALUATED').length;
