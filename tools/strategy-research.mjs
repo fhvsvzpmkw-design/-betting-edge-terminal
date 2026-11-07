@@ -46,13 +46,18 @@ export function sourceFormFeedback(rows) {
 
 export function eventStrategyResearch(event, inputs, facts = []) {
   if (!inputs) return null;
-  const methods = list(inputs.methods).filter(m=>list(m.sports).some(s=>s==='ALL'||s===event.sport));
+  // Inventory groups NBA/WNBA, while source feedback and methods use the actual
+  // league. Resolve it only from this exact event's preserved source facts.
+  const exactFacts = list(facts).filter(f=>String(f.eventId)===String(event.eventId) && time(f.startTime)===time(event.startTime));
+  const basketballSports = [...new Set(exactFacts.map(f=>f.sport).filter(s=>['NBA','WNBA'].includes(s)))];
+  const sport = event.sport==='NBA_WNBA' && basketballSports.length===1 ? basketballSports[0] : event.sport;
+  const methods = list(inputs.methods).filter(m=>list(m.sports).some(s=>s==='ALL'||s===sport));
   return {schema:1,registryDigest:inputs.registryDigest,
     methods:methods.map(({id,version,kind,name,question,limitation})=>({id,version,kind,name,question,limitation})),
     registryPath:'research/strategy-registry.json',
-    sourceForm:list(inputs.feedback?.sourceForm).filter(row=>row.sport===event.sport),
-    performance:list(inputs.feedback?.strategies?.byMethod).filter(row=>row.sport===event.sport),
-    curatedPerformance:list(inputs.feedback?.curatedSources?.byOrigin).filter(row=>row.sport===event.sport),
+    sourceForm:list(inputs.feedback?.sourceForm).filter(row=>row.sport===sport),
+    performance:list(inputs.feedback?.strategies?.byMethod).filter(row=>row.sport===sport),
+    curatedPerformance:list(inputs.feedback?.curatedSources?.byOrigin).filter(row=>row.sport===sport),
     recentGameFacts:list(facts).filter(row=>row.kind==='RECENT_GAMES'),
     feedbackAsOf:inputs.feedback?.asOf||null,instruction:inputs.instruction};
 }

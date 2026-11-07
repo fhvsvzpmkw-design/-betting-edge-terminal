@@ -46,6 +46,22 @@ test('positive forecasts are captured without Pinnacle or two sources; stale, wr
   assert.equal(build({quotes:[{...quote,observedAt:'2026-11-06T15:00:00Z'}]}).length,0);
 });
 
+test('shared basketball inventory retains exact NBA or WNBA method and performance feedback',()=>{
+  const inputs={methods:[{id:'nba-only',sports:['NBA']},{id:'wnba-only',sports:['WNBA']},{id:'both',sports:['ALL']}],
+    feedback:{sourceForm:[{sport:'NBA',games:122},{sport:'WNBA',games:22}],
+      strategies:{byMethod:[{sport:'NBA',methodId:'nba-method'}]},curatedSources:{byOrigin:[{sport:'NBA',originId:'nba-origin'}]}}};
+  const inventory={...event,sport:'NBA_WNBA'};
+  const fact={...inventory,sport:'NBA',kind:'TEAM_RECORD'};
+  const view=eventStrategyResearch(inventory,inputs,[fact]);
+  assert.deepEqual(view.methods.map(m=>m.id),['nba-only','both']);
+  assert.equal(view.sourceForm[0].games,122);
+  assert.equal(view.performance[0].methodId,'nba-method');
+  assert.equal(view.curatedPerformance[0].originId,'nba-origin');
+  assert.deepEqual(eventStrategyResearch(inventory,inputs,[{...fact,sport:'WNBA'}]).methods.map(m=>m.id),['wnba-only','both']);
+  for(const facts of [[],[{...fact,eventId:'another'}],[{...fact,startTime:'2026-11-07T22:00:00Z'}],[fact,{...fact,sport:'WNBA'}]])
+    assert.equal(eventStrategyResearch(inventory,inputs,facts).sourceForm.length,0,'do not guess a league from absent, conflicting or different-event evidence');
+});
+
 test('first captured price survives repeat appearances and method revisions receive separate identities',()=>{
   const trials=build(),laterAt='2026-11-06T17:10:00Z',later=build({at:laterAt,quotes:[{...quote,priceDecimal:2.2}]});
   assert.equal(trials[0].trialId,later[0].trialId);

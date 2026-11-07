@@ -1,6 +1,7 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
 import {validCuratedRecord} from './curated-aggregation.mjs';
 import {eventStrategyResearch} from './strategy-research.mjs';
+import {opinionResearchBrief} from './opinion-research-brief.mjs';
 export const EVENT_RESEARCH_VERSION = '2026-10-25.1';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 export const SOURCE_AGGREGATION_FROM = '2026-10-06T17:05:06Z';
@@ -134,6 +135,8 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       forecastAggregation:row.forecastAggregation||null,quarterbackFollowUp:row.quarterbackFollowUp || null,
       opinionReview:row.opinionReview || null,nextAction:actionFor(route), producerRoutingRationale:receipt?.researchRouting?.rationale || null});
     event.selections.at(-1).forecastCaptureReviews = list(row.forecastLeadReview?.leads).filter(lead => lead.state === 'REVIEW_REQUIRED');
+    if (identity && matches.length <= 1) event.selections.at(-1).opinionResearch = opinionResearchBrief({report,row,receipt,
+      prior:priorReceipts instanceof Map ? priorReceipts.get(row.selectionId) : null,inputs:sidecar.gameIntelligenceInputs});
     if (!identity || matches.length > 1) continue;
     const collect = (record, priorReportPath = null, checkpoint = null) => {
       for (const block of personnelBlocksOf(record)) for (const source of list(block?.officialSources)) {
@@ -235,6 +238,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
       sourceReviewPending:expandedSourceReview && sourceQueue.size>0,
       forecastRetrieval, forecastReviews, curatedResearch,
+      opinionResearch:event.selections.map(row => row.opinionResearch).filter(Boolean),
       strategyResearch:eventStrategyResearch({sport:event.sport,eventId:event.eventId,startTime:event.eventDate},
         sidecar.gameIntelligenceInputs?.strategyResearch,list(sidecar.gameIntelligenceInputs?.facts).filter(f=>String(f.eventId)===String(event.eventId))),
       selections:event.selections};
@@ -280,7 +284,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
 // large repeated per-selection evidence payload must not hide the next work.
 export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
   const capturedReviews = list(plan.events).reduce((count,event) => count + list(event.forecastReviews).length,0);
-  const events = list(plan.events).filter(event => event.pending > 0 || list(event.forecastReviews).length > 0 || event.sourceReviewPending).map(event => ({
+  const events = list(plan.events).filter(event => event.pending > 0 || list(event.forecastReviews).length > 0 || event.sourceReviewPending || list(event.opinionResearch).length > 0).map(event => ({
     eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,scheduleUrgency:event.scheduleUrgency,
     pending:event.pending, completed:event.completed,producerReviewPending:event.producerReviewPending || 0,sourceReviewPending:event.sourceReviewPending===true,
     sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath,priorCheckpointPath,checkpointBlobSha,issued}) => ({
@@ -289,6 +293,7 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
       ...(priorCheckpointPath?{priorCheckpointPath,checkpointBlobSha,issued}:{}),requiresCurrentApplicabilityReview:true})),
     personnelFollowUp:event.personnelFollowUp || null,
     forecastReviews:list(event.forecastReviews),curatedResearch:event.curatedResearch,strategyResearch:event.strategyResearch,
+    opinionResearch:list(event.opinionResearch),
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
       selectionId:row.selectionId, route:row.route, reviewState:row.reviewState,missingResearch:list(row.missingResearch),recordedBlocker:row.blocker||null,quote:row.quote, comparison:row.priceComparison,
       forecastAggregation:row.forecastAggregation||null,quarterbackFollowUp:row.quarterbackFollowUp || null,
@@ -305,7 +310,8 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
     sourceLeadCount:event.sourceLeads.length, personnelFollowUpState:event.personnelFollowUp?.state || null,
     routes:event.selections.reduce((counts,row) => ({...counts,[row.route]:(counts[row.route] || 0)+1}),{}),
     nextForecastSources:event.forecastSources.map(source => source.sourceId),
-    capturedForecastsAwaitingReview:event.forecastReviews.length,curatedOrigins:event.curatedResearch?.originCount||0,sourceReviewPending:event.sourceReviewPending,nextAction:event.nextAction
+    capturedForecastsAwaitingReview:event.forecastReviews.length,curatedOrigins:event.curatedResearch?.originCount||0,
+    positiveForecastOpportunities:event.opinionResearch.length,sourceReviewPending:event.sourceReviewPending,nextAction:event.nextAction
   }));
   return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,sports:plan.sports,sundayNfl:plan.sundayNfl,
     nextEventId:(outputEvents.find(event=>event.pending>0) || outputEvents[0])?.eventId || null,forecastReviewCounts:plan.forecastReviewCounts,
