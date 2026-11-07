@@ -9,6 +9,7 @@ const QuoteObservation=globalThis.BettingEdgeQuoteObservation;
 const OddsFormat=globalThis.VigScopeOddsFormat;
 const SelectionLabel=globalThis.BettingEdgeSelectionLabel;
 const CardSummary=globalThis.BettingEdgeCardSummary;
+const CardInsights=globalThis.BettingEdgeCardInsights;
 const BOOK_PRIORITY=['Bet365','FanDuel','DraftKings'];
 function feedBooks(feed){return Array.isArray(feed?.bookmakers)?feed.bookmakers.filter(book=>BOOK_PRIORITY.includes(book)):BOOK_PRIORITY}
 const VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1';
@@ -1213,7 +1214,7 @@ function card(d,r){
   if(!identityProblem&&['BET','LEAN','WAIT'].includes(status)&&target)c.appendChild(el(d,'div','runnerPickAction',`${status==='WAIT'?'WATCH FOR':'PLAY TO'}: ${target}${status==='BET'?' • STAKE '+txt(r.stake,'$0'):''}`));
   const expanded=el(d,'div','runnerExpanded');expanded.hidden=true;expanded.id='runnerCardDetails'+(++cardDetailSequence);
   const evidence=el(d,'details','runnerEvidence');
-  evidence.appendChild(el(d,'summary','','FULL RESEARCH & SOURCES'));
+  evidence.appendChild(el(d,'summary','','ORIGINAL REPORT & SOURCES'));
 
   if(r.priceComparison){
     const pc=r.priceComparison,panel=el(d,'div','comparisonPanel');
@@ -1250,11 +1251,8 @@ function card(d,r){
     evidence.appendChild(el(d,'div','runnerDetail open',`GRAHAM ${r.grahamFairReview.disposition}: ${r.grahamFairReview.decisionImpact}`));
   }
   if(r.analysis)evidence.appendChild(el(d,'div','runnerDetail open',r.analysis));
-  const notes=el(d,'div','runnerCardNotes');
-  if(!identityProblem&&concise?.comparisons.length)notes.appendChild(el(d,'p','','Gaps are percentage-point comparisons with the issued price. Pinnacle is a market reference; forecasts are published model estimates. Neither is a calibrated profit estimate.'));
-  if(r.move)notes.appendChild(el(d,'p','',`MOVEMENT: ${r.move}`));
-  if(r.marketAssessment?.decisionRationale)notes.appendChild(el(d,'p','',`RECORDED DECISION: ${r.marketAssessment.decisionRationale}`));
-  expanded.append(notes,evidence);
+  if(!identityProblem&&CardInsights)expanded.appendChild(CardInsights.render(d,r,activeRun));
+  expanded.appendChild(evidence);
   const b=el(d,'button','runnerBtn','▶ VIEW DETAILS');b.type='button';b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls',expanded.id);
   b.onclick=()=>{expanded.hidden=!expanded.hidden;b.setAttribute('aria-expanded',String(!expanded.hidden));b.textContent=expanded.hidden?'▶ VIEW DETAILS':'▼ HIDE DETAILS'};
   c.append(b,expanded);

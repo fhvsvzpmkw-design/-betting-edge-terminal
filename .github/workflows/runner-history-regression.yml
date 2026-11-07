@@ -12,9 +12,11 @@ on:
       - assets/runner-core-runtime.js
       - assets/runner-picks-ui.css
       - assets/card-summary.js
+      - assets/card-insights.js
       - assets/selection-label.js
       - tools/selection-label-gate.mjs
       - tests/card-summary.test.cjs
+      - tests/card-insights.test.cjs
       - tests/selection-copy.test.mjs
       - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
@@ -63,9 +65,11 @@ on:
       - assets/runner-core-runtime.js
       - assets/runner-picks-ui.css
       - assets/card-summary.js
+      - assets/card-insights.js
       - assets/selection-label.js
       - tools/selection-label-gate.mjs
       - tests/card-summary.test.cjs
+      - tests/card-insights.test.cjs
       - tests/selection-copy.test.mjs
       - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
@@ -124,6 +128,7 @@ jobs:
         run: |
           node --check assets/runner-core-runtime.js
           node --check assets/card-summary.js
+          node --check assets/card-insights.js
           node --check assets/selection-label.js
           node --check assets/preferences-framework.js
           node --check assets/syndicate-roster.js
@@ -151,7 +156,7 @@ jobs:
         run: node tests/runner-picks-ui.test.mjs
       - name: Verify concise card evidence and exact selection copy
         run: |
-          node --test tests/card-summary.test.cjs
+          node --test tests/card-summary.test.cjs tests/card-insights.test.cjs
           node tests/selection-copy.test.mjs
       - name: Run permanent Main Betting Edge schedule regression
         run: node tests/main-schedule.test.mjs
