@@ -275,5 +275,8 @@ const opinionPlan=buildEventResearchPlan({report:{ts:opinionAt},candidateAssessm
 assert.equal(opinionPlan.counts.completed,1);
 assert.equal(buildResearchWorkPlan(opinionPlan).events[0].positiveForecastOpportunities,1);
 assert.equal(buildResearchWorkPlan(opinionPlan,{eventId:'late'}).events[0].opinionResearch[0].currentDecision,'PASS');
+const completedOpinionPlan=buildEventResearchPlan({report:{ts:opinionAt},candidateAssessment:{selections:[opinionRow]},sidecar:{primaryAnalysis:{receipts:[opinionReceipt]}}});
+assert.equal(buildResearchWorkPlan(completedOpinionPlan).events[0].positiveForecastOpportunities,1,'completed market PASS and no remaining source route cannot hide the positive-point brief');
+assert.equal(completedOpinionPlan.counts.pending,0,'advisory visibility does not reopen completion or block publication');
 assert.equal(JSON.stringify({opinionRow,opinionInputs,opinionReceipt}),opinionBefore,'briefs never mutate source data or decisions');
 console.log('Source-supported opinion briefs: exact prices, original clocks, prior decisions, no grade changes and historical exclusion passed.');
