@@ -1251,10 +1251,10 @@ function card(d,r){
     evidence.appendChild(el(d,'div','runnerDetail open',`GRAHAM ${r.grahamFairReview.disposition}: ${r.grahamFairReview.decisionImpact}`));
   }
   if(r.analysis)evidence.appendChild(el(d,'div','runnerDetail open',r.analysis));
-  if(!identityProblem&&CardInsights)expanded.appendChild(CardInsights.render(d,r,activeRun));
   expanded.appendChild(evidence);
+  let insightsRendered=false;
   const b=el(d,'button','runnerBtn','▶ VIEW DETAILS');b.type='button';b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls',expanded.id);
-  b.onclick=()=>{expanded.hidden=!expanded.hidden;b.setAttribute('aria-expanded',String(!expanded.hidden));b.textContent=expanded.hidden?'▶ VIEW DETAILS':'▼ HIDE DETAILS'};
+  b.onclick=()=>{if(!insightsRendered&&!identityProblem&&CardInsights){expanded.prepend(CardInsights.render(d,r,activeRun));insightsRendered=true}expanded.hidden=!expanded.hidden;b.setAttribute('aria-expanded',String(!expanded.hidden));b.textContent=expanded.hidden?'▶ VIEW DETAILS':'▼ HIDE DETAILS'};
   c.append(b,expanded);
   return c
 }
