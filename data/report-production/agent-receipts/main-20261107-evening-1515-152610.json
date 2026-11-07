@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-15:15",
+  "executionRunId": "2026-11-07T15:26:10-07:00|4",
+  "workBinding": {
+    "candidateId": "2026-11-07T15:26:10-07:00|4",
+    "feedBlobSha": "1a8e1459421642fbe103113c229e73e736ab6d54",
+    "checkpoint": "data/report-production/checkpoints/20261107-evening-1515.json",
+    "checkpointRevisionAtAssignment": 1,
+    "operatingRevision": "2026-11-06.ActionableOpinionFollowThrough"
+  },
+  "mode": "BROAD_ROUTINE",
+  "reason": "The current 15:15 inventory contains 39 available complete events and 234 current selections, including four consequential prior-lane price and lineup leads. The full routine pool of one complete-event researcher and one critical reviewer was useful.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "actualId": "/root/evening_researcher",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": ["72909372", "72909374", "72909376", "72909378", "72909380", "72909382", "72909384", "72909386", "72909388", "73719550", "73719552", "73719554", "73719556", "73719558", "73719560"],
+      "assignmentBinding": {
+        "candidateId": "2026-11-07T15:26:10-07:00|4",
+        "feedBlobSha": "1a8e1459421642fbe103113c229e73e736ab6d54",
+        "checkpointRevision": 1
+      },
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "state": "RUNNING"
+    },
+    {
+      "role": "critical reviewer",
+      "actualId": "/root/evening_reviewer",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": ["73719560", "72909382", "72909386", "72909388", "76310078"],
+      "assignmentBinding": {
+        "candidateId": "2026-11-07T15:26:10-07:00|4",
+        "feedBlobSha": "1a8e1459421642fbe103113c229e73e736ab6d54",
+        "checkpointRevision": 1
+      },
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "state": "RUNNING"
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "TWO_ROUTINE_WORKERS",
+      "workers": 2,
+      "reason": "The 39-event queue includes 15 NHL/NBA events with current lineup or goalie sensitivity and four consequential source-led price conflicts requiring independent challenge.",
+      "releaseCondition": "PENDING"
+    }
+  ],
+  "qualityFindings": [],
+  "publication": {"state": "NOT_STAGED"},
+  "recordedAt": "2026-11-07T22:29:30Z"
+}
