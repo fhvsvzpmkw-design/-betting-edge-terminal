@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-open-0600",
+  "executionRunId": "2026-11-08T06:10:09.752-07:00|1",
+  "workBinding": {
+    "candidateId": "2026-11-08T06:10:09.752-07:00|1",
+    "feedBlobSha": "26d42e182e7e6a59c43aa6b0d1cbf8dfd86d9c77",
+    "checkpointPath": "data/report-production/checkpoints/20261108-open-061009.json",
+    "checkpointRevisionAtAssignment": 1,
+    "authorityRevision": "2026-11-07.ForecastContractContinuations"
+  },
+  "mode": "DELEGATED",
+  "reason": "The 06:00 broad profile permits one complete-event researcher and one critical reviewer. The 26-event queue has 156 available selections and an urgent Sunday NFL kickoff at 07:30 PT.",
+  "workers": [
+    {
+      "role": "COMPLETE_EVENT_RESEARCHER",
+      "id": "/root/open_0600_researcher_20261108",
+      "assignmentId": "O0600-R1",
+      "assignment": "NFL event 71474296 across moneyline, spread and total",
+      "boundary": "READ_ONLY_EXACT_BOUND_NO_DELEGATION",
+      "launchedAt": "2026-11-08T13:14:00Z",
+      "acknowledgedAt": "2026-11-08T13:14:43Z",
+      "state": "ACKNOWLEDGED_RUNNING",
+      "returnedAt": null,
+      "returnedWork": null,
+      "error": null
+    },
+    {
+      "role": "INDEPENDENT_CRITICAL_REVIEWER",
+      "id": "/root/open_0600_reviewer_20261108",
+      "assignmentId": "O0600-V1",
+      "assignment": "Independent challenge of NFL event 71474296",
+      "boundary": "READ_ONLY_EXACT_BOUND_NO_DELEGATION",
+      "launchedAt": "2026-11-08T13:14:00Z",
+      "acknowledgedAt": "2026-11-08T13:14:43Z",
+      "state": "ACKNOWLEDGED_RUNNING",
+      "returnedAt": null,
+      "returnedWork": null,
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_ROUTINE_BROAD_POOL",
+      "workers": 2,
+      "reason": "One urgent complete event plus an independent challenge can improve source-backed depth without exceeding the routine cumulative launch limit.",
+      "releaseCondition": "Release after event-specific research and critical review return; no expansion unless a named consequential gap remains."
+    }
+  ],
+  "qualityFindings": [],
+  "completedWork": {
+    "eventsResearched": 0,
+    "reviewsReturned": 0,
+    "findingsAdopted": 0,
+    "findingsRejected": 0
+  },
+  "remainingWork": [
+    "Urgent NFL event 71474296 research and review returns",
+    "Coordinator review of the remaining 25 events and 150 selections",
+    "Guy shortlist source/price availability resolution",
+    "Event checkpoints, final preparation, publication and readback"
+  ],
+  "recordedAt": "2026-11-08T13:14:43.872Z"
+}
