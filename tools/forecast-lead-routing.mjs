@@ -1,8 +1,9 @@
 // Route actual typed source captures and keep prose-only probabilities in the
 // producer's work queue. A prose lead is never eligible forecast evidence.
 import {createHash} from 'node:crypto';
+import {isDeepStrictEqual} from 'node:util';
 import {importForecastCapture} from './import-forecast-evidence.mjs';
-import {forecastCandidate, forecastRoutes,loadForecastSourceRegistry} from './forecast-evidence.mjs';
+import {forecastCandidate, forecastRoutes,loadForecastSourceRegistry,FORECAST_CONTRACT_ROUTING_FROM} from './forecast-evidence.mjs';
 import {FORECAST_FOLLOW_UP_FROM} from './forecast-follow-ups.mjs';
 
 export const FORECAST_ROUTING_FROM = '2026-10-01T18:47:44-07:00';
@@ -25,7 +26,7 @@ function sourceIdFor(source, registry) {
 }
 
 export function collectForecastLeads({report, sidecar, selection, receipt, feed, forecastFollowUps = [], registry = loadForecastSourceRegistry(),developmentReplay=false}) {
-  const candidate = forecastCandidate(selection, {receipt, feed});
+  const candidate = forecastCandidate(selection, {receipt, feed,at:report.ts});
   const record = receipt?.decision || receipt?.candidateDraft?.decision;
   const event = list(feed?.events).find(row => String(row.eventId || row.id || row.identity?.eventId) === candidate.eventId);
   const team = record?.title || event?.[candidate.side]?.name || event?.[candidate.side];
@@ -112,7 +113,7 @@ export function collectForecastLeads({report, sidecar, selection, receipt, feed,
 export function inspectForecastLeadReview({report, sidecar, selection, receipt, forecast, feed, registry, forecastFollowUps = [], developmentReplay = false}) {
   if (!active(report, developmentReplay)) return {required:false, complete:true, leads:[], missing:[]};
   const leads = collectForecastLeads({report, sidecar, selection, receipt, feed, registry, forecastFollowUps,developmentReplay});
-  const candidate = forecastCandidate(selection, {receipt, feed}), missing = [];
+  const candidate = forecastCandidate(selection, {receipt, feed,at:report.ts}), missing = [];
   const dispositions = list(receipt?.candidateAssessment?.forecastLeadDispositions);
   const sources = new Map(sourcesOf(receipt).map(source => [source.id, source]));
   const results = leads.map(lead => {
@@ -180,12 +181,25 @@ export function routeForecastCaptures({report, sidecar, universe, feed, registry
     captures.push(attempt.forecastCapture);
   }
   let routed = output;
-  const imported = [];
+  const imported = [],reusedRecordIds=new Set();
   for (const capture of captures) {
+    // An embedded capture can survive retime and removal of its old event.
+    // Already imported identical bytes are history, not a new import request.
+    // Current eligibility is still replayed separately; new or conflicting
+    // records/reviews/attempts must take the ordinary strict importer path.
+    const evidence=routed.forecastEvidence;
+    const identities={records:r=>r.recordId,revalidations:r=>`${r.recordId}|${r.forReportAt}|${r.checkedAt}`,attempts:r=>r.attemptId};
+    const retained=time(report.ts)>=time(FORECAST_CONTRACT_ROUTING_FROM) && capture?.schema===1 && list(capture.records).length>0 &&
+      Object.entries(identities).every(([field,identity])=>list(capture[field]).every(row=>{
+        const matches=list(evidence?.[field]).filter(existing=>identity(existing)===identity(row));
+        return matches.length>0 && matches.every(existing=>isDeepStrictEqual(existing,row));
+      }));
+    if(retained){capture.records.forEach(record=>reusedRecordIds.add(record.recordId));continue;}
     const result = importForecastCapture({report, sidecar:routed, capture, universe, feed, registry});
     routed = result.sidecar;
     imported.push(...result.diagnostics);
   }
   if (routed.forecastEvidence) delete routed.forecastEvidence.pendingCaptures;
-  return {sidecar:routed, imported:[...new Map(imported.map(row => [row.recordId, row])).values()], applied:true};
+  return {sidecar:routed, imported:[...new Map(imported.map(row => [row.recordId, row])).values()],
+    ...(time(report.ts)>=time(FORECAST_CONTRACT_ROUTING_FROM)?{reusedRecordIds:[...reusedRecordIds]}:{}),applied:true};
 }

@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {isDeepStrictEqual} from 'node:util';
 import {createHash} from 'node:crypto';
 import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
-import {forecastCandidate, evaluateForecast, loadForecastSourceRegistry} from './forecast-evidence.mjs';
+import {forecastCandidate, evaluateForecast, loadForecastSourceRegistry,FORECAST_CONTRACT_ROUTING_FROM} from './forecast-evidence.mjs';
 const list = value => Array.isArray(value) ? value : [];
 const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 
@@ -28,7 +28,13 @@ export function importForecastCapture({report, sidecar, capture, universe, feed,
     const matches = selections.filter(selection => String(selection.eventId) === String(record.eventId) &&
       selection.marketDetail === record.marketDetail && selection.side === record.side);
     if (matches.length !== 1) throw Error('Capture must map to exactly one available selection: '+record.recordId);
-    const candidate = forecastCandidate(matches[0], {feed});
+    const selection=matches[0];
+    const exactQuote=Date.parse(report.ts)>=Date.parse(FORECAST_CONTRACT_ROUTING_FROM) &&
+      list(selection.quotes).find(quote=>{
+        const line=quote.marketKey==='ml'?null:quote.marketKey==='spread'&&quote.side==='away'?-quote.line:quote.line;
+        return record.line==null?line==null:typeof record.line==='number' && typeof line==='number' && Math.abs(record.line-line)<1e-8;
+      });
+    const candidate = forecastCandidate(exactQuote?{...selection,quote:exactQuote}:selection, {feed,at:report.ts});
     const review = evaluateForecast(record, candidate, {asOf:report.ts, registry, revalidations:evidence.revalidations});
     if (review.eligibility === 'INELIGIBLE') throw Error(`${record.recordId}: ${review.reasons.join(', ')}`);
     diagnostics.push({recordId:record.recordId, selectionId:candidate.selectionId, eligibility:review.eligibility, reasons:review.reasons});

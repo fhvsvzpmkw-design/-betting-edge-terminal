@@ -22,6 +22,7 @@ const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const eventId = event => String(event?.eventId || event?.identity?.eventId || event?.id || '');
 const ATTEMPT_OUTCOMES = new Set(['FOUND', 'INACCESSIBLE', 'STALE', 'WRONG_LINE', 'WRONG_MARKET', 'MISSING_PROBABILITY', 'INELIGIBLE', 'NOT_FOUND']);
 export const OBSERVED_FORECAST_FROM = '2026-09-27T12:00:00-07:00';
+export const FORECAST_CONTRACT_ROUTING_FROM = '2026-11-08T00:55:00Z';
 
 export function loadForecastSourceRegistry(root = path.resolve(HERE, '..')) {
   return read(path.join(root, 'research/forecast-source-registry.json'));
@@ -66,7 +67,7 @@ export function forecastRoutes(sport, marketDetail, registry = loadForecastSourc
 
 // A feed spread line is HOME-oriented for both sides. Forecasts always record
 // the selected team's handicap; never compare away +1.5 with feed home +1.5.
-export function forecastCandidate(selection, {receipt = null, feed = null} = {}) {
+export function forecastCandidate(selection, {receipt = null, feed = null, at = feed?.generatedAt} = {}) {
   const parts = String(selection.selectionId || '').split('|');
   const event = list(feed?.events).find(row => eventId(row) === String(selection.eventId || parts[1]));
   const quote = receipt?.quote || selection.quote || list(selection.quotes)[0] || {};
@@ -75,7 +76,11 @@ export function forecastCandidate(selection, {receipt = null, feed = null} = {})
   const line = marketClass === 'moneyline' ? null : num(quote.line) === null ? null : marketClass === 'spread' && side === 'away' ? -num(quote.line) : num(quote.line);
   const inventorySport = selection.sport || parts[0];
   const decisionSport = receipt?.decision?.coreAssessment?.context?.sport;
-  const routedSport = inventorySport === 'NBA_WNBA' && ['NBA', 'WNBA'].includes(decisionSport)
+  const boundSport = sportFor(inventorySport, event);
+  const exactEvent = sameTime(event?.date || event?.identity?.startTime,
+    selection.startTime || selection.eventDate || receipt?.decision?.feed?.eventDate);
+  const routedSport = time(at) >= time(FORECAST_CONTRACT_ROUTING_FROM) && exactEvent && ['NBA','WNBA'].includes(boundSport)
+    ? boundSport : inventorySport === 'NBA_WNBA' && ['NBA', 'WNBA'].includes(decisionSport)
     ? decisionSport
     : sportFor(inventorySport, event);
   return {selectionId: selection.selectionId, sport: routedSport, eventId: String(selection.eventId || parts[1] || quote.eventId || ''),
@@ -183,7 +188,7 @@ export function validateBoundForecastLean({report, sidecar, selection, receipt, 
   if (a==null) return false;
   const records=list(sidecar.forecastEvidence?.records).filter(r=>r.recordId===a.forecastRecordId);
   if (records.length!==1) throw new Error('Forecast LEAN requires one immutable bound record');
-  const raw=records[0], candidate=forecastCandidate(selection,{receipt,feed});
+  const raw=records[0], candidate=forecastCandidate(selection,{receipt,feed,at:report.ts});
   const actual=evaluateForecast(raw,candidate,{asOf:report.ts,revalidations:sidecar.forecastEvidence?.revalidations});
   if (actual.eligibility!=='ELIGIBLE_EXACT' || actual.comparison?.direction!=='SUPPORTS_PRICE' || actual.probability!==a.probability || actual.probabilityBasis!==a.probabilityBasis)
     throw new Error(`Forecast LEAN bound record/applicability does not qualify: ${actual.reasons.join(', ')}`);
@@ -247,10 +252,19 @@ export function buildForecastCoverage({report, sidecar, universe, feed = null, p
   }
   const records = [...byId.values()].filter(record => !conflicts.has(record.recordId));
   const rows = list(inventory.selections || inventory).map(selection => {
-    const receipt = receipts.find(row => row.selectionId === selection.selectionId), candidate = forecastCandidate(selection, {receipt, feed});
+    const receipt = receipts.find(row => row.selectionId === selection.selectionId), candidate = forecastCandidate(selection, {receipt, feed,at:now});
     const route = forecastRoutes(candidate.sport, candidate.marketDetail, registry, now);
     const relevant = records.filter(record => String(record.eventId || '') === candidate.eventId);
     const reviews = relevant.map(record => evaluateForecast(record, candidate, {asOf: now, revalidations: evidence.revalidations, registry}));
+    // Books may offer different primary lines for this inventory side. Retain
+    // exact alternative-contract reviews for triage without making a field
+    // eligible for the receipt's different line or copying it to a decision.
+    const quoteReviews = time(now) >= time(FORECAST_CONTRACT_ROUTING_FROM) ? list(selection.quotes)
+      .filter(quote => quote.selectionKey !== candidate.selectionKey)
+      .map(quote => ({quote:structuredClone(quote),records:relevant.map(record => evaluateForecast(record,
+        forecastCandidate(selection,{receipt:{...receipt,quote},feed,at:now}),
+        {asOf:now,revalidations:evidence.revalidations,registry})).filter(row=>row.eligibility==='ELIGIBLE_EXACT')}))
+      .filter(row=>row.records.length) : [];
     const eligibleExactRecordIds = reviews.filter(row => row.eligibility === 'ELIGIBLE_EXACT').map(row => row.recordId);
     const contextRecordIds = reviews.filter(row => row.eligibility === 'CONTEXT_ONLY').map(row => row.recordId);
     // Legacy MODEL findings are existing leads, not safely reconstructible
@@ -275,11 +289,12 @@ export function buildForecastCoverage({report, sidecar, universe, feed = null, p
       startTime: candidate.startTime, marketDetail: candidate.marketDetail, side: candidate.side, line: candidate.line,
       state: candidate.state, coverage: eligibleExactRecordIds.length ? 'EXACT_ELIGIBLE' : contextRecordIds.length ? 'CONTEXT_ONLY' : 'GAP',
       route, attempts, eligibleExactRecordIds, contextRecordIds, records: reviews, legacyModelLeads, gapReasons,
+      ...(time(now)>=time(FORECAST_CONTRACT_ROUTING_FROM)?{quoteReviews}:{}),
       externalModelFamilyCount: unique(reviews.filter(row => row.eligibility === 'ELIGIBLE_EXACT').map(row => row.modelFamily)).length,
       independentModelCount: null,
       adoptedFairValueRecordIds: eligibleExactRecordIds.filter(id => list(receipt?.decision?.fairValueEvidence?.forecastRecordIds).includes(id)),
       blocker: blocker ? {reason: blocker.reason, missing: blocker.missing, impact: blocker.impact, attempts: list(blocker.attempts), followUp: blocker.nextAction || blocker.followUp || null} : null,
-      nextAction: eligibleExactRecordIds.length ? 'Apply exact source/price agreement and conflict in the existing assessment; no automatic promotion.' : legacyModelLeads.length && !reviews.length ? 'Review recorded MODEL leads first; extract the actual exact field, preserve original times and record current applicability before new retrieval.' : nextRoutes.length ? 'Retrieve the next suitable configured source and record the actual result; retain qualified existing market-reference assessment.' : 'Record the specific remaining gap or targeted follow-up; score context supplies no invented probability.',
+      nextAction: eligibleExactRecordIds.length ? 'Apply exact source/price agreement and conflict in the existing assessment; no automatic promotion.' : quoteReviews.length ? 'Review the eligible original field for the other offered exact contract. Reassess that line and price; do not transfer its probability to the receipt’s different line.' : legacyModelLeads.length && !reviews.length ? 'Review recorded MODEL leads first; extract the actual exact field, preserve original times and record current applicability before new retrieval.' : nextRoutes.length ? 'Retrieve the next suitable configured source and record the actual result; retain qualified existing market-reference assessment.' : 'Record the specific remaining gap or targeted follow-up; score context supplies no invented probability.',
       nextRoutes};
   });
   const count = selections => ({available: selections.length, blocked: selections.filter(row => row.state === 'BLOCKED').length,
