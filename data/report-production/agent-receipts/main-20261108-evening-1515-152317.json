@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-15:15",
+  "executionRunId": "2026-11-08T15:27:58-07:00|4",
+  "workBinding": {
+    "candidateId": "2026-11-08T15:27:58-07:00|4",
+    "feedBlobSha": "62ca68b7b4874fa31946da3c44843a9b02b60b20",
+    "checkpoint": "data/report-production/checkpoints/20261108-evening-152317.json",
+    "checkpointRevision": 3,
+    "operatingRevision": "2026-11-07.ForecastContractContinuations"
+  },
+  "mode": "AGENTS_IN_PROGRESS",
+  "reason": "The 15:15 broad profile launched one complete-event researcher and one independent reviewer after the exact 11-event inventory and remotely verified initial checkpoint. The queue was sized to the routine two-worker limit.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "actualId": "/root/evening_researcher",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": ["72909398", "72909396", "72909400", "72909402"],
+      "assignmentBinding": {"candidateIdAtLaunch":"2026-11-08T15:23:17-07:00|4","feedBlobSha":"62ca68b7b4874fa31946da3c44843a9b02b60b20","checkpointRevisionAtLaunch":1},
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "state": "RETURNED",
+      "returnedWork": "Four complete NHL event reviews across moneyline, puck line and total with official preview checks, original MoneyPuck and Bet Better clocks, Support/Contrary, History Fit and named goalie gaps."
+    },
+    {
+      "role": "independent critical reviewer",
+      "actualId": "/root/evening_reviewer",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": ["71516004", "GUY_EARLY_SHORTLIST"],
+      "assignmentBinding": {"candidateIdAtLaunch":"2026-11-08T15:23:17-07:00|4","feedBlobSha":"62ca68b7b4874fa31946da3c44843a9b02b60b20","checkpointRevisionAtLaunch":1},
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "state": "IN_PROGRESS",
+      "returnedWork": "Interim corrections identified snapshot-acceptance timing and a Tampa Bay away-spread sign inconsistency."
+    }
+  ],
+  "scalingDecisions": [
+    {"decision":"ROUTINE_TWO_WORKER_POOL","workers":2,"reason":"Eleven events warranted one four-event NHL researcher and one independent NFL/Guy reviewer; the coordinator retained the six NBA events and final merge.","releaseCondition":"IN_PROGRESS"},
+    {"decision":"NO_EXPANSION","workers":2,"reason":"No documented consequential gap yet requires launch beyond the routine cumulative limit.","releaseCondition":"CURRENT"}
+  ],
+  "qualityFindings": [
+    "The reviewer found the initial report timestamp preceded snapshot acceptance by 41.845 seconds; the controller retimed the candidate before any decisions were saved.",
+    "The reviewer found a Tampa Bay–Chicago away-spread sign inconsistency; that exact contract remains unsaved pending identity reconciliation.",
+    "The NHL researcher found only a marginal Tampa Bay moneyline directional case and named current goalie/personnel limitations across all four games."
+  ],
+  "decisionCorrections": [
+    {"issue":"Snapshot acceptance ordering","resolution":"Retimed the unfrozen run to 15:27:58 PT and remotely verified the updated checkpoint before exact benchmark use."},
+    {"issue":"Tampa Bay–Chicago away-spread orientation","resolution":"Held the exact selection unresolved rather than saving the wrong-sign contract."}
+  ],
+  "recordedAt": "2026-11-08T22:31:30Z"
+}
