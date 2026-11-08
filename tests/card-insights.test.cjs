@@ -67,6 +67,32 @@ class Element{
   append(...nodes){this.children.push(...nodes);}appendChild(node){this.children.push(node);return node;}setAttribute(k,v){this.attributes[k]=v;}
 }
 const document={createElement:t=>new Element(t)};
+test('away spread insights use the selected handicap rather than the home-oriented feed line',()=>{
+  const {rec,run}=fixture(),detail='full_game_primary_puck_line';
+  Object.assign(rec.feed,{marketKey:'spread',side:'away',line:1.5,selectionKey:'game|spread|away||1.5'});
+  rec.coreAssessment.context.marketDetail=detail;
+  Object.assign(rec.forecastReview.records[0],{side:'away',line:-1.5,marketDetail:detail,sourceId:'dimers',publisher:'Dimers'});
+  const before=JSON.stringify({rec,run}),view=insights.describe(rec,run);
+  assert.equal(view.views.length,1);assert.equal(view.views[0].probability,.58);
+  assert.match(insights.render(document,rec,run).textContent,/Dimers: 58.0%/);
+  assert.equal(JSON.stringify({rec,run}),before);
+  rec.forecastReview.records[0].line=1.5;
+  assert.equal(insights.describe(rec,run).views.length,0,'opposing handicap cannot supply this insight');
+});
+test('integer-contract insights preserve the issued push-adjusted break-even comparison',()=>{
+  const {rec,run}=fixture(),model=rec.forecastReview.records[0],detail='full_game_primary_total';
+  Object.assign(rec.feed,{marketKey:'totals',side:'over',line:6,selectionKey:'game|totals|over||6'});
+  rec.coreAssessment.context.marketDetail=detail;
+  Object.assign(model,{side:'over',line:6,marketDetail:detail,sourceId:'dimers',publisher:'Dimers',probability:.49,probabilityBasis:'UNCONDITIONAL'});
+  model.comparison={priceDecimal:2,probabilityBasis:'UNCONDITIONAL',breakEvenProbability:.46,edgeProbabilityPoints:3,evPerUnit:.06};
+  const before=JSON.stringify({rec,run}),view=insights.describe(rec,run);
+  assert.equal(view.views.length,1);assert.equal(view.views[0].breakEven,.46);
+  assert.match(insights.render(document,rec,run).textContent,/46.0% to break even.*refunded pushes/);
+  assert.equal(JSON.stringify({rec,run}),before);
+  for(const change of [c=>c.edgeProbabilityPoints=4,c=>c.evPerUnit=.1,c=>c.breakEvenProbability=.8,c=>c.probabilityBasis='CONDITIONAL_ON_NO_PUSH']){
+    const altered=clone(rec);change(altered.forecastReview.records[0].comparison);assert.equal(insights.describe(altered,run).views.length,0);
+  }
+});
 test('expanded content shows useful facts and rechecks without raw schemas, duplicate checks or false missing-data claims',()=>{
   const {rec,run}=fixture(),before=JSON.stringify({rec,run});const node=insights.render(document,rec,run),text=node.textContent;
   assert.match(text,/GAME INSIGHTS/);assert.match(text,/8-4-1/);assert.match(text,/Named Forward — Out \(Ankle\)/);

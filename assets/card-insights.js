@@ -4,6 +4,7 @@
   // selection, infer a fair probability, or turn a reported starter into confirmed.
   const list=x=>Array.isArray(x)?x:[],clean=x=>String(x??'').replace(/\s+/g,' ').trim();
   const time=x=>Date.parse(x||''),same=(a,b)=>a===b||Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<1e-8;
+  const summary=typeof module==='object'&&module.exports?require('./card-summary.js'):root.BettingEdgeCardSummary;
   const names={espn:'ESPN',moneypuck:'MoneyPuck',dratings:'DRatings',nfelo:'nfelo',prediction_tracker:'The Prediction Tracker',bet_better:'Bet Better'};
   const technical=/\b(?:WRONG_[A-Z_]+|[A-Z]+_[A-Z_]{5,}|selectionKey|fairValueEvidence|schema|calibrated|calibration|calculation time|uncertainty interval|independent fair|market independence)\b/i;
   const clock=x=>{try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(x))+' PT';}catch{return '';}};
@@ -48,17 +49,15 @@
     }):[];
     const eligible=new Set(list(rec?.forecastReview?.eligibleExactRecordIds)),forecasts=new Map();
     for(const model of list(rec?.forecastReview?.records)){
-      const c=model.comparison,p=model.probability;
-      if(!exact||!Number.isFinite(asOf)||!eligible.has(model.recordId)||model.eligibility!=='ELIGIBLE_EXACT'||model.side!==f.side||model.period!=='FULL_GAME'||
-        model.marketDetail!==rec?.coreAssessment?.context?.marketDetail||!same(model.line,f.line??null)||!same(c?.priceDecimal,f.priceDecimal)||
-        !Number.isFinite(p)||p<=0||p>=1||!same(c.breakEvenProbability,1/f.priceDecimal)||!same(c.edgeProbabilityPoints,(p-1/f.priceDecimal)*100)||
+      if(!exact||!Number.isFinite(asOf)||!eligible.has(model?.recordId)||!summary?.exactForecastComparison(rec,model)||
         model.observedAt&&(!Number.isFinite(time(model.observedAt))||time(model.observedAt)>asOf)||
         model.eventId&&String(model.eventId)!==String(f.eventId)||model.startTime&&time(model.startTime)!==time(f.eventDate))continue;
       const key=model.modelFamily||model.sourceId,previous=forecasts.get(key);
       if(!previous||time(model.observedAt)>time(previous.observedAt))forecasts.set(key,model);
     }
     const views=[...forecasts.values()].map(m=>{cite(m);return {name:names[m.sourceId]||clean(m.publisher||m.sourceId),probability:m.probability,
-      breakEven:m.comparison.breakEvenProbability,gap:m.comparison.edgeProbabilityPoints};});
+      breakEven:m.comparison.breakEvenProbability,gap:m.comparison.edgeProbabilityPoints,
+      refundedPushes:m.comparison.breakEvenProbability<1/f.priceDecimal-1e-8};});
     const findingRows=list(rec?.cardEvidence?.findings).filter(x=>['CONTEXT','SUPPORT','CONTRARY'].includes(x.stance)&&readable(x.finding));
     const authoredNotes=findingRows.filter(x=>x.stance==='CONTEXT').map(x=>short(x.finding));
     const procedural=/\b(?:review clock|source clock|not backdated|captured dossier|NOT YET SUBMITTED|source identity|concrete recheck|no official|authoritatively confirmed)\b/i;
@@ -100,7 +99,7 @@
     const personnel=data.teams.flatMap(t=>[...(t.goalie?[`${t.team}: ${t.goalie.name} — ${t.goalie.status.toLowerCase()} starter`]:[]),
       ...(t.injuries.length?[`${t.team} reported availability: ${t.injuries.map(p=>`${p.name} — ${p.status}${p.detail?' ('+p.detail+')':''}`).join('; ')}`]:[])]);
     section('PERSONNEL & STARTERS',personnel);section('MATCHUP NOTES',data.notes);
-    section('PUBLISHED FORECASTS',data.views.map(v=>`${v.name}: ${(v.probability*100).toFixed(1)}% for this selection · the issued price needs ${(v.breakEven*100).toFixed(1)}% to break even.`));
+    section('PUBLISHED FORECASTS',data.views.map(v=>`${v.name}: ${(v.probability*100).toFixed(1)}% for this selection · the issued price needs ${(v.breakEven*100).toFixed(1)}% to break even${v.refundedPushes?' after allowing for refunded pushes':''}.`));
     if(data.reason&&!data.views.length)section('WHY THIS CALL',[data.reason]);
     section('WHAT TO WATCH',data.checks,'runnerInsightsWatch');
     if(data.benchmark!==null)section('MARKET CHECK',[`Pinnacle price comparison: ${data.benchmark>=0?'+':'−'}${Math.abs(data.benchmark).toFixed(2)} percentage points at the issued odds.`]);
