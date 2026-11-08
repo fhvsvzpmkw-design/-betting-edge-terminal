@@ -92,7 +92,8 @@ function compareQuote(report, selection, quote, observer, forecast, records, rec
       referenceGeneratedAt: reference.generatedAt, referenceMarketId: reference.bookmakerMarketId,
       referenceBreakEvenPriceDecimal: 1 / reference.selected.noVigProbability};
   } catch (error) { marketUnavailable = error.message; }
-  const forecasts = list(forecast?.records).filter(record => record.eligibility === 'ELIGIBLE_EXACT' && record.side === quote.side &&
+  const contractReview = list(forecast?.quoteReviews).find(row=>sameQuote(row.quote,quote));
+  const forecasts = list(contractReview?.records || forecast?.records).filter(record => record.eligibility === 'ELIGIBLE_EXACT' && record.side === quote.side &&
     (quote.marketKey === 'ml' || sameLine(record.line, quoteLineForSide(quote)))).map(record => {
     const raw = records.get(record.recordId);
     const comparison = raw ? forecastPriceComparison(raw, quote.priceDecimal) : close(record.comparison?.priceDecimal, quote.priceDecimal) ? record.comparison : null;

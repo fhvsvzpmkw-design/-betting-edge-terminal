@@ -30,6 +30,10 @@ The output records the timing basis and limitation. Earlier reports retain their
 
 ## Source routing and retrieval
 
+From `2026-11-08T00:55:00Z` (November 7, 17:55 Vancouver), draft routing retains an embedded capture already imported with identical records, revalidations and attempts. Retiming or removing its old event must not reimport those bytes as new evidence and fail unrelated draft intake. Retention grants no current eligibility: each reused point still needs actual current applicability; changed immutable identities and new invalid records still fail strict import. The advisory routing result distinguishes `reusedRecordIds` from new imports.
+
+For different primary spread/total lines offered by different books, import checks the actual offered contract matching the captured selected-side line. Coverage retains exact `quoteReviews` for other offered contracts, and candidate triage uses the corresponding quote's review. A probability for that contract never becomes eligible for another handicap/total. The producer must still author and bind the selected exact decision and all ordinary evidence. Current bound NBA/WNBA event facts outrank conflicting producer taxonomy; inventory-only replay retains its explicit existing fallback. Historical report-time behavior before the cutoff remains reproducible.
+
 | Sport | Moneyline lookup order | Primary line lookup | Total lookup |
 |---|---|---|---|
 | MLB | FanGraphs dated scores; DRatings; public Cipher pages | Stats Insider public articles; Dimers | Public Cipher; ATS.io/OddsTrader provisional |
