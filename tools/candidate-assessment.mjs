@@ -9,6 +9,7 @@ import {FORECAST_LEAN_FROM,validateForecastLean,validateForecastWait} from './fo
 import {inspectForecastLeadReview} from './forecast-lead-routing.mjs';
 import {inspectOpinionReview} from './opinion-review.mjs';
 import {aggregateForecastComparisons} from './forecast-aggregation.mjs';
+import {FINAL_DECISION_HANDOFF_FROM} from './research-completion.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -152,12 +153,14 @@ function displayCondition(value, quote) {
     text: value.state === 'PRICE_THRESHOLD' ? `Approximately ${OddsFormat.fromDecimal(value.priceDecimal)} comparison boundary. ${value.rationale}` : value.rationale};
 }
 
-function completion(report, selection, receipt, best, options, forecast, review) {
-  const missing = [], sources = sourceMap(receipt, report), personnel = personnelReview(receipt, review, report);
+function completion(report, selection, receipt, best, options, forecast, review, requireFinalHandoff=false) {
+  const proposed=receipt?.candidateDraft?.decision;
+  const unfinalized=requireFinalHandoff && receipt?.state==='BLOCKED' && ['BET','LEAN','WAIT','PASS'].includes(proposed?.status) && sameQuote(proposed.feed,receipt.quote);
+  const missing = unfinalized?['FINAL_DECISION_HANDOFF_REQUIRED']:[], sources = sourceMap(receipt, report), personnel = personnelReview(receipt, review, report);
   const selected = options.find(option => sameQuote(option.quote, receipt?.quote));
   const condition = conditionFor(review, selected || best, receipt);
   const technicalLeanEligible = Boolean(best.marketComparison?.direction === 'FAVORABLE' && personnel.resolved);
-  if (!best.promising) return {reviewState: 'NOT_REQUIRED', missingResearch: [], technicalLeanEligible,
+  if (!best.promising) return {reviewState: unfinalized?'UNFINISHED':'NOT_REQUIRED', missingResearch: missing, technicalLeanEligible,
     personnel, forecastDispositions: list(review?.forecastDispositions), priceCondition: condition.value};
   // The existing qualified market route is already a completed assessment.
   // New metadata must not erase valid LEAN/PASS work or require an independent
@@ -263,7 +266,8 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const review = receipt?.candidateAssessment;
     const researchReceipt = receipt?.state === 'BLOCKED' && receipt?.candidateDraft ? {...receipt,
       decision: receipt.candidateDraft.decision, evidence: receipt.candidateDraft.evidence} : receipt;
-    const reviewed = completion(report, selection, researchReceipt, best, options, forecast, review);
+    const requireFinalHandoff=developmentReplay || time(report.ts)>=time(FINAL_DECISION_HANDOFF_FROM);
+    const reviewed = completion(report, selection, researchReceipt, best, options, forecast, review,requireFinalHandoff);
     const assessed = options.find(option => sameQuote(option.quote, researchReceipt?.quote));
     const priorEntries = priorReceipts instanceof Map ? priorReceipts.get(selection.selectionId) : null;
     const prior = priorEntries && [...list(priorEntries.researchHistory),priorEntries].filter(entry => entry.row?.state === 'EVALUATED').at(-1);
@@ -288,7 +292,9 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const quarterbackFollowUp=inspectQuarterbackFollowUp({report,selection,receipt:researchReceipt});
     reviewed.quarterbackFollowUp=quarterbackFollowUp;
     if(!quarterbackFollowUp.complete){reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...quarterbackFollowUp.missing]);}
-    reviewed.reviewRequired=best.promising || forecastLeadReview.required || grahamReview.required || quarterbackFollowUp.required || opinionReview.required;
+    reviewed.reviewRequired=best.promising || forecastLeadReview.required || grahamReview.required || quarterbackFollowUp.required || opinionReview.required ||
+      requireFinalHandoff && receipt?.state==='BLOCKED' && ['BET','LEAN','WAIT','PASS'].includes(receipt.candidateDraft?.decision?.status) &&
+        sameQuote(receipt.candidateDraft.decision.feed,receipt.quote);
     reviewed.assessedPriceCondition = displayCondition(reviewed.priceCondition, receipt?.quote);
     for (const option of options) option.priceCondition = displayCondition(conditionFor(sameQuote(review?.quote, option.quote) ? review : null, option, researchReceipt).value, option.quote);
     reviewed.priceCondition = best.priceCondition || reviewed.assessedPriceCondition;
