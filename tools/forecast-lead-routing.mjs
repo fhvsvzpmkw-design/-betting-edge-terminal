@@ -2,10 +2,11 @@
 // producer's work queue. A prose lead is never eligible forecast evidence.
 import {createHash} from 'node:crypto';
 import {importForecastCapture} from './import-forecast-evidence.mjs';
-import {forecastCandidate, loadForecastSourceRegistry} from './forecast-evidence.mjs';
+import {forecastCandidate, forecastRoutes,loadForecastSourceRegistry} from './forecast-evidence.mjs';
 import {FORECAST_FOLLOW_UP_FROM} from './forecast-follow-ups.mjs';
 
 export const FORECAST_ROUTING_FROM = '2026-10-01T18:47:44-07:00';
+export const CAPTURED_POINT_REVIEW_FROM='2026-11-08T00:20:00Z';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
 const time = value => Date.parse(value || '');
@@ -23,7 +24,7 @@ function sourceIdFor(source, registry) {
   return null;
 }
 
-export function collectForecastLeads({report, sidecar, selection, receipt, feed, forecastFollowUps = [], registry = loadForecastSourceRegistry()}) {
+export function collectForecastLeads({report, sidecar, selection, receipt, feed, forecastFollowUps = [], registry = loadForecastSourceRegistry(),developmentReplay=false}) {
   const candidate = forecastCandidate(selection, {receipt, feed});
   const record = receipt?.decision || receipt?.candidateDraft?.decision;
   const event = list(feed?.events).find(row => String(row.eventId || row.id || row.identity?.eventId) === candidate.eventId);
@@ -61,6 +62,31 @@ export function collectForecastLeads({report, sidecar, selection, receipt, feed,
       supportsPrice:probability > 1 / candidate.priceDecimal,
       nextAction:'Preserve the original published field in forecastCapture, review event/personnel/settlement applicability, then assess BET and LEAN. Prose alone cannot issue a grade.'});
   }
+  // Original captured points remain research leads when a producer marks them
+  // context/inapplicable. That label is not a directional review or a loss of
+  // the published field. This does not change eligibility or issue a grade.
+  if(developmentReplay || time(report.ts)>=time(CAPTURED_POINT_REVIEW_FROM)) {
+    const route=forecastRoutes(candidate.sport,candidate.marketDetail,registry,report.ts);
+    for(const raw of list(sidecar.forecastEvidence?.records)) {
+      const source=registry.sources?.[raw.sourceId],observed=time(raw.observedAt),start=time(candidate.startTime);
+      if(!source || ![...list(route.exact),...list(route.provisional)].includes(raw.sourceId) || !text(raw.recordId) ||
+        raw.kind!=='OUTCOME_PROBABILITY' || raw.state!=='PRE_GAME' || raw.sport!==candidate.sport ||
+        String(raw.eventId)!==candidate.eventId || time(raw.startTime)!==start || raw.marketDetail!==candidate.marketDetail ||
+        raw.period!==candidate.period || raw.side!==candidate.side || (raw.line??null)!==candidate.line ||
+        !(typeof raw.probability==='number' && raw.probability>0 && raw.probability<1) || !Number.isFinite(observed) || observed>time(report.ts) ||
+        observed>=start || time(report.ts)>=start || !text(raw.excerpt) ||
+        raw.modelFamily && raw.modelFamily!==source.modelFamily || raw.marketDependence && raw.marketDependence!==source.marketDependence ||
+        raw.forecastAt!=null && (!Number.isFinite(time(raw.forecastAt)) || time(raw.forecastAt)>observed))continue;
+      try{const url=new URL(raw.url);if(!['https:','http:'].includes(url.protocol)||url.username||url.password)continue;}catch{continue;}
+      const signature=JSON.stringify([candidate.selectionId,raw.sourceId,raw.url,raw.observedAt,raw.probability]);
+      const leadId='forecast-lead-'+createHash('sha256').update(signature).digest('hex').slice(0,24),previous=leads.get(leadId);
+      leads.set(leadId,{...previous,leadId,selectionId:candidate.selectionId,selectionKey:candidate.selectionKey,
+        sourceId:raw.sourceId,sourceIds:previous?.sourceIds||[],url:raw.url,observedAt:raw.observedAt,
+        finding:raw.excerpt,probability:raw.probability,recordId:raw.recordId,fromCapturedRecord:true,
+        authority:'UNVERIFIED_SOURCE_FIELD_REQUIRES_CAPTURE_REVIEW',supportsPrice:raw.probability>1/candidate.priceDecimal,
+        nextAction:'Review this original exact published point and the actual personnel/settlement assumptions. Not adopting a calibrated fair does not establish a settlement mismatch or reject a zero-stake opinion. Record the actual source-linked directional judgment; no eligibility or grade is inferred.'});
+    }
+  }
   // Known event research is loaded independently of the receipt. Omitting the
   // second provider from the report must not make its outstanding lead vanish.
   if (time(report?.ts) >= time(FORECAST_FOLLOW_UP_FROM)) {
@@ -85,7 +111,7 @@ export function collectForecastLeads({report, sidecar, selection, receipt, feed,
 
 export function inspectForecastLeadReview({report, sidecar, selection, receipt, forecast, feed, registry, forecastFollowUps = [], developmentReplay = false}) {
   if (!active(report, developmentReplay)) return {required:false, complete:true, leads:[], missing:[]};
-  const leads = collectForecastLeads({report, sidecar, selection, receipt, feed, registry, forecastFollowUps});
+  const leads = collectForecastLeads({report, sidecar, selection, receipt, feed, registry, forecastFollowUps,developmentReplay});
   const candidate = forecastCandidate(selection, {receipt, feed}), missing = [];
   const dispositions = list(receipt?.candidateAssessment?.forecastLeadDispositions);
   const sources = new Map(sourcesOf(receipt).map(source => [source.id, source]));
@@ -114,10 +140,16 @@ export function inspectForecastLeadReview({report, sidecar, selection, receipt, 
       return ['MODEL','REPORTING'].includes(source?.kind) && sameProvider(source?.url) &&
         time(source.checkedAt || source.asOf) >= Math.max(time(report.feedGeneratedAt), time(lead.observedAt));
     }));
+    const objectionText=[review?.rationale,review?.directionalReview?.rationale].map(text).join(' ');
+    const adoptionOnlySettlement=lead.fromCapturedRecord && review?.objectionKind==='SETTLEMENT_UNRESOLVED' &&
+      /adopt|calibrat|independen|uncertainty|confidence interval/i.test(objectionText) &&
+      !/\b(?:regulation|overtime|shootout|penalties|extra time|draw|push|refund|three[- ]way|two[- ]way|first half|first period)\b/i.test(objectionText);
     const rejected = reviews.length === 1 && review.state === 'REJECTED' && text(review.rationale) &&
       time(review.checkedAt) >= time(report.feedGeneratedAt) && time(review.checkedAt) <= time(report.ts) &&
-      (lead.fromKnownFollowUp || list(review.sourceIds).some(id => lead.sourceIds.includes(id))) && linked && knownSourceCheck &&
+      (lead.fromKnownFollowUp || lead.fromCapturedRecord && records.some(raw=>raw.recordId===lead.recordId) ||
+        list(review.sourceIds).some(id => lead.sourceIds.includes(id))) && linked && knownSourceCheck &&
       ['EVENT_OR_MARKET_MISMATCH','STALE_ASSUMPTIONS','PERSONNEL_CONFLICT','SETTLEMENT_UNRESOLVED','SOURCE_UNVERIFIABLE','NO_DIRECTIONAL_PREFERENCE'].includes(review.objectionKind) &&
+      !adoptionOnlySettlement &&
       (!(lead.supportsPrice || lead.requiresReview) || (review.directionalReview?.state === 'REJECTED' && text(review.directionalReview.rationale)));
     if (!rejected && (lead.supportsPrice || lead.requiresReview)) missing.push('FORECAST_CAPTURE_OR_SOURCE_REJECTION_REQUIRED:' + lead.leadId);
     return {...lead, state:rejected ? 'REJECTED' : 'REVIEW_REQUIRED', recordIds:records.map(raw => raw.recordId)};
