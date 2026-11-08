@@ -22,9 +22,18 @@
       "boundary": "READ_ONLY_EXACT_BOUND_NO_DELEGATION",
       "launchedAt": "2026-11-08T13:14:00Z",
       "acknowledgedAt": "2026-11-08T13:14:43Z",
-      "state": "ACKNOWLEDGED_RUNNING",
-      "returnedAt": null,
-      "returnedWork": null,
+      "state": "RETURNED_COMPLETE",
+      "returnedAt": "2026-11-08T13:26:03.054Z",
+      "returnedWork": {
+        "eventsResearched": 1,
+        "eventIds": ["71474296"],
+        "marketsReviewed": ["MONEYLINE", "SPREAD", "TOTAL"],
+        "summary": "Verified expected starting QBs Joe Burrow and Michael Penix Jr.; documented official injury designations, stale/unreliable final-inactives access, captured forecast clocks and limitations, Graham partial-blocked status, exact-price mathematics and Pinnacle gaps. Proposed two zero-stake Cincinnati leans and four passes for coordinator review.",
+        "sourceAttempts": {
+          "successful": ["Bengals official", "Falcons official", "NFL.com", "nfelo", "Prediction Tracker", "Graham/Walters pinned ledger"],
+          "limited": ["ESPN current access blocked by JavaScript/bot verification", "Bet Better current HTML stale/cached", "No reliable official final game-day inactive list"]
+        }
+      },
       "error": null
     },
     {
@@ -35,9 +44,14 @@
       "boundary": "READ_ONLY_EXACT_BOUND_NO_DELEGATION",
       "launchedAt": "2026-11-08T13:14:00Z",
       "acknowledgedAt": "2026-11-08T13:14:43Z",
-      "state": "ACKNOWLEDGED_RUNNING",
-      "returnedAt": null,
-      "returnedWork": null,
+      "state": "RETURNED_COMPLETE",
+      "returnedAt": "2026-11-08T13:26:03.054Z",
+      "returnedWork": {
+        "reviewsReturned": 1,
+        "eventIds": ["71474296"],
+        "summary": "Corrected the signed Cincinnati spread to -3.5, identified approximately 706-minute forecast staleness and unresolved calculation clocks, no exact Pinnacle -3.5 comparison, open personnel/final-inactives and settlement questions, and the partial-blocked Graham input. Found no support for a BET or formal source-led LEAN.",
+        "decisionImpact": "Coordinator rejected the proposed Cincinnati ML and -3.5 leans. Four exact-market PASS cards survived validation; Cincinnati -3.5 and Atlanta +3 remain explicitly unfinished."
+      },
       "error": null
     }
   ],
@@ -49,18 +63,43 @@
       "releaseCondition": "Release after event-specific research and critical review return; no expansion unless a named consequential gap remains."
     }
   ],
-  "qualityFindings": [],
+  "qualityFindings": [
+    {
+      "finding": "SIGNED_SPREAD_IDENTITY_CORRECTED",
+      "detail": "The raw away hdp field of +3.5 normalizes to Cincinnati -3.5; Atlanta is +3. Final reasoning and unfinished-work labels preserve the betting contract signs.",
+      "impact": "Prevented a selection-identity error."
+    },
+    {
+      "finding": "STALE_FORECAST_AND_REFERENCE_LIMITS_RETAINED",
+      "detail": "Captured ESPN, nfelo and Bet Better observations were about 706 minutes older than the accepted price snapshot, had unknown calculation clocks, and Cincinnati -3.5 had no exact Pinnacle line.",
+      "impact": "Blocked formal Cincinnati leans and all BET promotion; retained two urgent spread reviews as unfinished."
+    },
+    {
+      "finding": "QB_STATUS_VERIFIED_WITH_INACTIVES_SHORTFALL",
+      "detail": "Joe Burrow and Michael Penix Jr. were the expected starters and absent from final injury designations, but no reliable official game-day inactive list was accessible.",
+      "impact": "Improved personnel context without falsely clearing the event."
+    }
+  ],
   "completedWork": {
-    "eventsResearched": 0,
-    "reviewsReturned": 0,
-    "findingsAdopted": 0,
-    "findingsRejected": 0
+    "eventsResearched": 1,
+    "reviewsReturned": 1,
+    "findingsAdopted": 3,
+    "findingsRejected": 2
   },
   "remainingWork": [
-    "Urgent NFL event 71474296 research and review returns",
-    "Coordinator review of the remaining 25 events and 150 selections",
-    "Guy shortlist source/price availability resolution",
-    "Event checkpoints, final preparation, publication and readback"
+    "Cincinnati -3.5 and Atlanta +3 remain unfinished before the 07:30 PT kickoff because exact current applicability, final inactives and/or qualified exact references are unresolved",
+    "The other 25 events and 150 selections remain evidence-blocked and not fully assessed",
+    "125 captured forecast applicability reviews remain pending",
+    "Guy shortlist is active but returned zero rows; no Guy pick was available"
   ],
-  "recordedAt": "2026-11-08T13:14:43.872Z"
+  "finalState": "AGENTS_READY_RETURNS_MERGED_PARTIAL_ANALYSIS",
+  "finalCandidateId": "2026-11-08T06:21:42-07:00|1",
+  "finalDecisions": {
+    "BET": 0,
+    "LEAN": 0,
+    "WAIT": 0,
+    "PASS": 4,
+    "risk": 0
+  },
+  "recordedAt": "2026-11-08T13:26:03.054Z"
 }
