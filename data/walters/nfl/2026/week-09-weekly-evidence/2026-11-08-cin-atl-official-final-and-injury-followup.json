@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "policyId": "graham-weekly-production-v2",
+  "season": 2026,
+  "sourceWeek": 9,
+  "recordedAt": "2026-11-08T18:56:54Z",
+  "scope": "Additive CIN-ATL correction after materially changed official sources. Cincinnati's official final page now binds the 34-17 final, line score, starting quarterbacks and offensive box-score participation. Atlanta's official recap binds an Olamide Zaccheaus possible-concussion evaluation and a return a few plays later. The prior complete candidate inactive/transaction sections remain bound by exact blob. The official PDF gamebook, full starter/substitute/DNP inventory, full specialist inventory, phase snaps and an exact printed Zaccheaus injury/return clock remain unavailable. No exposure fraction, replacement, injury loss, carried rating or issued Week 9 fair is changed.",
+  "inputCommit": "f581e57544c72897841fe4882e256edf81ac7a05",
+  "marketViewed": false,
+  "sources": [
+    {
+      "id": "cin-atl-official-bengals-final-boxscore",
+      "kind": "OFFICIAL",
+      "url": "https://www.bengals.com/game-day/2026/regular-season/week-9-falcons/box-score",
+      "capturedAt": "2026-11-08T18:56:54Z",
+      "finding": "The official Cincinnati page reports FINAL, a 34-17 Cincinnati win from quarter scores 7-17-7-3 and 10-0-7-0, Joe Burrow 24/29 for 271 yards with three passing touchdowns, and Michael Penix Jr. 20/31 for 162 yards with one touchdown and one interception. It supplies offensive box-score participation but not the complete official gamebook inventory."
+    },
+    {
+      "id": "cin-atl-official-falcons-recap-injury-update",
+      "kind": "OFFICIAL",
+      "url": "https://www.atlantafalcons.com/news/game-breakdown-what-happened-in-falcons-vs-bengals",
+      "capturedAt": "2026-11-08T18:56:54Z",
+      "finding": "The official Atlanta recap states that Olamide Zaccheaus was injured on his first punt return of the second half, underwent evaluation for a possible concussion, and returned to the field a few plays later. It does not print an exact play clock, diagnose a confirmed concussion, identify a distinct replacement, or provide phase snap exposure."
+    },
+    {
+      "id": "cin-atl-prior-candidate-inventory",
+      "kind": "REPOSITORY",
+      "path": "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-08-cin-atl-official-final-source-gate.json",
+      "blobSha": "d44c1b9ba7a12c6fb180a30ba0d4d5398389a540",
+      "finding": "Carries forward the source-bound Sunday inactive/transaction inventory and explicit unresolved participation, DNP, injury, quarterback, specialist, exposure, replacement and value fields without rewriting the original receipt."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W09-CIN-ATL",
+      "away": "CIN",
+      "home": "ATL",
+      "state": "BLOCKED",
+      "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+      "checklist": {
+        "exactFinal": "COMPLETE_OFFICIAL_FINAL_34_17",
+        "finalInactives": "COMPLETE_BOUND_FROM_SUNDAY_PREGAME_REVIEW",
+        "reserveElevationsAndTransactions": "PARTIAL_BOUND_FINAL_GAMEBOOK_PENDING",
+        "participationAndDnp": "PARTIAL_OFFENSIVE_BOX_SCORE_ONLY_FINAL_GAMEBOOK_PENDING",
+        "inGameInjuryAndReturnInventory": "PARTIAL_ZACCHEAUS_NOTICE_WITHOUT_EXACT_CLOCK_FULL_GAMEBOOK_PENDING",
+        "quarterbackInventory": "COMPLETE_STARTERS_VERIFIED_OFFICIAL_BOX_SCORE",
+        "specialistInventory": "UNRESOLVED_COMPLETE_FINAL_GAMEBOOK_REQUIRED",
+        "pairedGameDayInjuryLoss": "BLOCKED_MISSING_COMPLETE_FINAL_SOURCE_AND_EXPOSURE"
+      },
+      "final": {
+        "awayScore": 34,
+        "homeScore": 17,
+        "state": "OFFICIAL_FINAL_VERIFIED",
+        "sourceId": "cin-atl-official-bengals-final-boxscore"
+      },
+      "teams": [
+        {
+          "team": "CIN",
+          "finalInactives": [
+            "Kyle Dugger",
+            "Connor Lew",
+            "Myles Hinton",
+            "Landon Robinson"
+          ],
+          "reserveElevationsAndTransactions": [
+            "Cedric Johnson cleared the inactive gate in the bound Sunday review.",
+            "UNRESOLVED — the complete final active/substitute/DNP inventory still requires the official PDF gamebook."
+          ],
+          "participationAndDnp": [
+            "Joe Burrow and the recorded Cincinnati offensive skill players are verified in the official final box score.",
+            "UNRESOLVED — complete starters, substitutes, DNP rows, defense, special teams and phase exposure require the official PDF gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "UNRESOLVED — no complete official printed injury/return inventory is available; no missing event is treated as zero."
+          ],
+          "quarterback": {
+            "player": "Joe Burrow",
+            "actualParticipation": "VERIFIED_OFFICIAL_FINAL_BOX_SCORE"
+          },
+          "specialists": [
+            "UNRESOLVED — complete kicker, punter, long snapper and return participation requires the official PDF gamebook."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-CIN-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official final starter, substitute, DNP, defense, special-teams and printed injury/return inventory.",
+              "footballImpact": "Offensive box-score participation alone cannot establish phase exposure, non-participation, injury boundaries or replacement duties.",
+              "reopenWhen": "The official PDF gamebook and any official phase snap counts are published."
+            }
+          ]
+        },
+        {
+          "team": "ATL",
+          "finalInactives": [
+            "Zachariah Branch",
+            "Billy Bowman Jr.",
+            "Robert Longerbeam",
+            "Drake Jackson",
+            "Andy Dalton — emergency/backup quarterback inactive",
+            "Jack Strand — emergency/backup quarterback inactive"
+          ],
+          "reserveElevationsAndTransactions": [
+            "James Pearce Jr., Yasir Abdullah and Beaux Collins were activated in the bound Sunday review.",
+            "Brian Robinson Jr. moved to injured reserve and Khalil Herbert was signed; no one-for-one workload or locked replacement value was established.",
+            "Cameron Williams remained on reserve after a return designation.",
+            "UNRESOLVED — the complete final active/substitute/DNP inventory still requires the official PDF gamebook."
+          ],
+          "participationAndDnp": [
+            "Michael Penix Jr. and the recorded Atlanta offensive skill players are verified in the official final box score.",
+            "UNRESOLVED — complete starters, substitutes, DNP rows, defense, special teams and phase exposure require the official PDF gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "Olamide Zaccheaus — official recap reports injury on his first punt return of the second half, possible-concussion evaluation, and return a few plays later.",
+            "UNRESOLVED — exact printed play clock, confirmed diagnosis, distinct relief duty, replacement and exposure fraction are not available and are not inferred.",
+            "UNRESOLVED — complete official printed injury/return inventory requires the official PDF gamebook."
+          ],
+          "quarterback": {
+            "player": "Michael Penix Jr.",
+            "actualParticipation": "VERIFIED_OFFICIAL_FINAL_BOX_SCORE"
+          },
+          "specialists": [
+            "UNRESOLVED — complete kicker, punter, long snapper and return participation requires the official PDF gamebook."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-ATL-OLAMIDE-ZACCHEAUS-INGAME",
+              "exactMissingFact": "Exact official injury and return play clocks, phase exposure and distinct relief duty for Zaccheaus's second-half evaluation interval.",
+              "footballImpact": "A narrative 'few plays' interval cannot support a numerical unavailable fraction or replacement-aware injury loss.",
+              "reopenWhen": "The complete official PDF gamebook, printed status/return notices and eligible phase snap evidence are published."
+            },
+            {
+              "caseKey": "2026-W09-ATL-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official final starter, substitute, DNP, defense, special-teams and printed injury/return inventory plus source-supported replacement workload for the recorded absences.",
+              "footballImpact": "The absence cluster and post-transaction backfield cannot be assigned a one-for-one replacement or zero workload from offensive box-score production.",
+              "reopenWhen": "The official PDF gamebook and any official phase snap counts are published."
+            }
+          ]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The official final and starting quarterbacks are now verified, but the complete official PDF gamebook, starters/substitutes/DNP tables, full specialist inventory, printed injury/return sequence and phase snaps are not available.",
+          "footballImpact": "A paired numerical evaluation would otherwise invent missing participation, exposure, replacements or zero values.",
+          "nextAction": "Reopen once the official PDF gamebook is published; read it in full, bind both complete team inventories and all printed injury/return annotations, then validate only supported estimates.",
+          "sourceIds": [
+            "cin-atl-official-bengals-final-boxscore",
+            "cin-atl-prior-candidate-inventory"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+          "finding": "The official recap confirms a Zaccheaus possible-concussion evaluation and return a few plays later but does not supply exact printed injury/return clocks, phase exposure or distinct relief duties.",
+          "footballImpact": "The narrative interval cannot be converted into an unavailable fraction, replacement assignment or numerical injury loss.",
+          "nextAction": "Preserve the official sequence and wait for the complete official gamebook and eligible exposure evidence; do not invent an exit clock, diagnosis, replacement, workload or zero value.",
+          "sourceIds": [
+            "cin-atl-official-falcons-recap-injury-update"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
