@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_COORDINATOR",
+  "executionRunId": null,
+  "workBinding": {
+    "phase": "W09_FINAL_EVIDENCE_PREPARATION",
+    "mainCommit": "ea282008bcd6dea09adec6dbcf934ce1ccdfb973",
+    "activeManifestBlobSha": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "currentBoardBlobSha": "f47d4d582ff5f18bffa572e649757768da927d95",
+    "readinessBlobSha": "201a3622a2942e4a044c1502f8cb6737b5ed8286",
+    "season": 2026,
+    "week": 9,
+    "gameKeys": ["2026-W09-LAR-WAS","2026-W09-DEN-CAR","2026-W09-DAL-IND","2026-W09-CLE-NO","2026-W09-NYJ-KC","2026-W09-DET-MIA","2026-W09-NYG-PHI"]
+  },
+  "mode": "AGENTS_READY",
+  "reason": "Seven newly final games required source-bound paired inventories. Two normal researchers covered the initial five disjoint games; one bounded specialist was added when DAL-IND and CLE-NO became final after partition; one independent reviewer checked clocks, exposure boundaries, clusters and double counting.",
+  "workers": [
+    {"role":"SOURCE_RESEARCHER","workerId":"/root/w09_early_source_a","freshContext":true,"readOnly":true,"marketFree":true,"assignmentIds":["2026-W09-LAR-WAS","2026-W09-DEN-CAR"],"launchObservedAt":null,"acknowledgmentObservedAt":null,"returnedAt":"2026-11-08T22:03:00Z","state":"RETURNED","result":"Accepted official gamebooks, paired inventories, QB/specialist duties and literal injury/status/return sequences."},
+    {"role":"SOURCE_RESEARCHER","workerId":"/root/w09_early_source_b","freshContext":true,"readOnly":true,"marketFree":true,"assignmentIds":["2026-W09-NYJ-KC","2026-W09-DET-MIA","2026-W09-NYG-PHI"],"launchObservedAt":null,"acknowledgmentObservedAt":null,"returnedAt":"2026-11-08T22:05:07Z","state":"RETURNED","result":"Accepted official gamebooks, paired inventories, QB/specialist duties, transaction evidence and source conflicts."},
+    {"role":"SOURCE_SPECIALIST","workerId":"/root/w09_early_source_c","freshContext":true,"readOnly":true,"marketFree":true,"assignmentIds":["2026-W09-DAL-IND","2026-W09-CLE-NO"],"launchObservedAt":null,"acknowledgmentObservedAt":null,"returnedAt":"2026-11-08T22:03:51Z","state":"RETURNED","result":"Accepted official gamebooks with exact source metadata, overtime result, paired inventories and all printed injury annotations."},
+    {"role":"CRITICAL_REVIEWER","workerId":"/root/w09_early_reviewer","freshContext":true,"readOnly":true,"marketFree":true,"assignmentIds":["W09-SEVEN-GAME-EVIDENCE-REVIEW"],"launchObservedAt":null,"acknowledgmentObservedAt":null,"returnedAt":"2026-11-08T22:11:10Z","state":"RETURNED","result":"Verified all seven PDFs and scores; corrected clock attachment semantics; classified boundary completeness; identified cluster and double-count safeguards; rejected numerical staging from gamebooks alone."}
+  ],
+  "scalingDecisions": [
+    {"decision":"NORMAL_POOL","workers":3,"reason":"Two disjoint source researchers plus one reviewer for a substantive multi-game Graham phase."},
+    {"decision":"ADD_SOURCE_SPECIALIST","namedQuestion":"Complete paired official final inventories for DAL-IND and CLE-NO after their final states arrived after initial partition.","expectedQualityBenefit":"Avoid omitted late final inactives and injury annotations while preserving disjoint ownership.","readOnlyAssignment":true,"releaseCondition":"Return official source-bound inventory or exact unavailable-source gaps.","result":"RETURNED_ACCEPTED"}
+  ],
+  "qualityFindings": [
+    "Clockless questionable/out notices must remain status windows and cannot be rewritten as injury-play timestamps; 17 sequences are event-to-terminal complete, while the remaining cases preserve exact open boundaries.",
+    "NYG Harris/Thibodeaux and IND Carlies/Ward require cluster/double-count safeguards; lineup participation alone does not establish a replacement or snap share."
+  ],
+  "completedWork": {
+    "researchersLaunched": 3,
+    "researchersReturned": 3,
+    "reviewersLaunched": 1,
+    "reviewersReturned": 1,
+    "gamesResearched": 7,
+    "gamesReviewed": 7,
+    "officialGamebooksVerified": 7,
+    "pairedTeamSectionsPrepared": 14,
+    "numericalGamesCompleted": 0,
+    "evidencePath": "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-08-early-window-official-gamebooks.json"
+  },
+  "remainingWork": [
+    "Official snap/exposure evidence where required by existing methods.",
+    "Explicit replacement allocation and immutable value bindings for final inactives and open in-game cases.",
+    "Existing-method decisions for clockless status notices, special-teams injuries, overtime exposure, open terminal states and source precedence conflicts.",
+    "Paired evaluator validation and numerical publication only after both team sections satisfy existing gates."
+  ],
+  "recordedAt": "2026-11-08T22:11:10Z"
+}
