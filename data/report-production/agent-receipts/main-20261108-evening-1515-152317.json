@@ -8,10 +8,10 @@
     "candidateId": "2026-11-08T15:27:58-07:00|4",
     "feedBlobSha": "62ca68b7b4874fa31946da3c44843a9b02b60b20",
     "checkpoint": "data/report-production/checkpoints/20261108-evening-152317.json",
-    "checkpointRevision": 3,
+    "checkpointRevision": 13,
     "operatingRevision": "2026-11-07.ForecastContractContinuations"
   },
-  "mode": "AGENTS_IN_PROGRESS",
+  "mode": "AGENTS_COMPLETE",
   "reason": "The 15:15 broad profile launched one complete-event researcher and one independent reviewer after the exact 11-event inventory and remotely verified initial checkpoint. The queue was sized to the routine two-worker limit.",
   "workers": [
     {
@@ -31,22 +31,24 @@
       "assignmentIds": ["71516004", "GUY_EARLY_SHORTLIST"],
       "assignmentBinding": {"candidateIdAtLaunch":"2026-11-08T15:23:17-07:00|4","feedBlobSha":"62ca68b7b4874fa31946da3c44843a9b02b60b20","checkpointRevisionAtLaunch":1},
       "acknowledgment": "BOUND_WITHIN_60_SECONDS",
-      "state": "IN_PROGRESS",
-      "returnedWork": "Interim corrections identified snapshot-acceptance timing and a Tampa Bay away-spread sign inconsistency."
+      "state": "RETURNED",
+      "returnedWork": "Independent Tampa Bay–Chicago review across moneyline, spread and total; official-personnel/QB follow-up; source-clock and History Fit critique; and a Guy shortlist challenge. The reviewer recommended no NFL bet and identified Tampa Bay Lightning moneyline as the only marginally model-positive Guy candidate, with substantial Pinnacle, goalie and back-to-back opposition."
     }
   ],
   "scalingDecisions": [
-    {"decision":"ROUTINE_TWO_WORKER_POOL","workers":2,"reason":"Eleven events warranted one four-event NHL researcher and one independent NFL/Guy reviewer; the coordinator retained the six NBA events and final merge.","releaseCondition":"IN_PROGRESS"},
+    {"decision":"ROUTINE_TWO_WORKER_POOL","workers":2,"reason":"Eleven events warranted one four-event NHL researcher and one independent NFL/Guy reviewer; the coordinator retained the six NBA events and final merge.","releaseCondition":"COMPLETE"},
     {"decision":"NO_EXPANSION","workers":2,"reason":"No documented consequential gap yet requires launch beyond the routine cumulative limit.","releaseCondition":"CURRENT"}
   ],
   "qualityFindings": [
     "The reviewer found the initial report timestamp preceded snapshot acceptance by 41.845 seconds; the controller retimed the candidate before any decisions were saved.",
-    "The reviewer found a Tampa Bay–Chicago away-spread sign inconsistency; that exact contract remains unsaved pending identity reconciliation.",
-    "The NHL researcher found only a marginal Tampa Bay moneyline directional case and named current goalie/personnel limitations across all four games."
+    "The reviewer corrected its own interim spread warning after confirming that the controller stores both sides on the signed home-coordinate line: the executable contract is Tampa Bay +6, not Tampa Bay -6.",
+    "The NHL researcher found only a marginal Tampa Bay Lightning moneyline directional case. The coordinator retained PASS because the model-price advantage was only 0.651 percentage points and was opposed by Pinnacle, projected goalies and Tampa Bay's back-to-back.",
+    "The saved Guy board was stale at 16:45:05Z and produced no eligible shortlist. The reviewer independently screened current bound NHL prices against preserved original model clocks; no Guy call was authorized without a fresh eligible board."
   ],
   "decisionCorrections": [
     {"issue":"Snapshot acceptance ordering","resolution":"Retimed the unfrozen run to 15:27:58 PT and remotely verified the updated checkpoint before exact benchmark use."},
-    {"issue":"Tampa Bay–Chicago away-spread orientation","resolution":"Held the exact selection unresolved rather than saving the wrong-sign contract."}
+    {"issue":"Tampa Bay–Chicago away-spread orientation","resolution":"Confirmed the controller's signed home-coordinate convention and evaluated the executable Tampa Bay +6 contract. No wrong-sign contract was saved."},
+    {"issue":"Marginal Tampa Bay Lightning moneyline case","resolution":"Kept the selection at zero-stake PASS because the tiny model-price difference did not overcome market, goalie and scheduling opposition."}
   ],
-  "recordedAt": "2026-11-08T22:31:30Z"
+  "recordedAt": "2026-11-08T22:38:00Z"
 }
