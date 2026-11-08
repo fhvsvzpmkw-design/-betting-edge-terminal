@@ -4,6 +4,7 @@
   // selection, infer a fair probability, or turn a reported starter into confirmed.
   const list=x=>Array.isArray(x)?x:[],clean=x=>String(x??'').replace(/\s+/g,' ').trim();
   const time=x=>Date.parse(x||''),same=(a,b)=>a===b||Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<1e-8;
+  const summary=typeof module==='object'&&module.exports?require('./card-summary.js'):root.BettingEdgeCardSummary;
   const names={espn:'ESPN',moneypuck:'MoneyPuck',dratings:'DRatings',nfelo:'nfelo',prediction_tracker:'The Prediction Tracker',bet_better:'Bet Better'};
   const technical=/\b(?:WRONG_[A-Z_]+|[A-Z]+_[A-Z_]{5,}|selectionKey|fairValueEvidence|schema|calibrated|calibration|calculation time|uncertainty interval|independent fair|market independence)\b/i;
   const clock=x=>{try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(x))+' PT';}catch{return '';}};
@@ -47,17 +48,8 @@
         injuries:list(injury?.details?.players).filter(p=>clean(p.name)&&clean(p.status)).map(p=>({name:clean(p.name),status:clean(p.status),detail:clean(p.detail)==='Not Specified'?'':clean(p.detail)}))};
     }):[];
     const eligible=new Set(list(rec?.forecastReview?.eligibleExactRecordIds)),forecasts=new Map();
-    const selectedLine=f.marketKey==='spread'&&f.side==='away'?-f.line:f.line??null;
     for(const model of list(rec?.forecastReview?.records)){
-      const c=model.comparison,p=model.probability;
-      const regularBreakEven=same(c?.breakEvenProbability,1/f.priceDecimal);
-      const refundedPushes=model.probabilityBasis==='UNCONDITIONAL'&&c?.probabilityBasis==='UNCONDITIONAL'&&
-        Number.isFinite(c.breakEvenProbability)&&c.breakEvenProbability>0&&c.breakEvenProbability<1/f.priceDecimal&&
-        p+1-c.breakEvenProbability*f.priceDecimal<=1+1e-8&&Number.isFinite(c.evPerUnit)&&
-        same(c.evPerUnit,(p-c.breakEvenProbability)*f.priceDecimal);
-      if(!exact||!Number.isFinite(asOf)||!eligible.has(model.recordId)||model.eligibility!=='ELIGIBLE_EXACT'||model.side!==f.side||model.period!=='FULL_GAME'||
-        model.marketDetail!==rec?.coreAssessment?.context?.marketDetail||!same(model.line,selectedLine)||!same(c?.priceDecimal,f.priceDecimal)||
-        !Number.isFinite(p)||p<=0||p>=1||!(regularBreakEven||refundedPushes)||!same(c.edgeProbabilityPoints,(p-c.breakEvenProbability)*100)||
+      if(!exact||!Number.isFinite(asOf)||!eligible.has(model?.recordId)||!summary?.exactForecastComparison(rec,model)||
         model.observedAt&&(!Number.isFinite(time(model.observedAt))||time(model.observedAt)>asOf)||
         model.eventId&&String(model.eventId)!==String(f.eventId)||model.startTime&&time(model.startTime)!==time(f.eventDate))continue;
       const key=model.modelFamily||model.sourceId,previous=forecasts.get(key);

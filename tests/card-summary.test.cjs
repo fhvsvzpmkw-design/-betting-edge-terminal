@@ -12,6 +12,24 @@ const minnesota=report.recs.find(rec=>rec.title==='Minnesota Wild Moneyline');
 const exactForecast=rec=>rec.forecastReview.records.find(f=>f.eligibility==='ELIGIBLE_EXACT');
 const forecastGaps=rec=>summary.describe(rec).comparisons.filter(item=>item.label!=='Pinnacle gap');
 
+test('summary and details share exact away-handicap and refundable-push comparison rules',()=>{
+  for(const refundable of [false,true]){
+    const rec={status:'PASS',feed:{eventId:'synthetic',marketKey:refundable?'totals':'spread',side:refundable?'over':'away',line:refundable?6:1.5,
+      selectionKey:refundable?'synthetic|totals|over||6':'synthetic|spread|away||1.5',priceDecimal:2},
+      coreAssessment:{context:{marketDetail:refundable?'full_game_primary_total':'full_game_primary_puck_line'}},
+      forecastReview:{eligibleExactRecordIds:['synthetic-point'],records:[]}};
+    const forecast={recordId:'synthetic-point',sourceId:'dimers',publisher:'Dimers',eligibility:'ELIGIBLE_EXACT',side:rec.feed.side,
+      marketDetail:rec.coreAssessment.context.marketDetail,period:'FULL_GAME',line:refundable?6:-1.5,probability:refundable?.49:.58,
+      probabilityBasis:'UNCONDITIONAL',comparison:{priceDecimal:2,probabilityBasis:'UNCONDITIONAL',breakEvenProbability:refundable?.46:.5,
+        edgeProbabilityPoints:refundable?3:8,evPerUnit:refundable?.06:.16}};
+    rec.forecastReview.records=[forecast];const before=JSON.stringify(rec),rows=forecastGaps(rec);
+    assert.equal(rows.length,1);assert.equal(rows[0].value,refundable?'+3.00 pp':'+8.00 pp');
+    if(refundable)assert.match(rows[0].basis,/refunded pushes/);
+    assert.equal(JSON.stringify(rec),before);
+    forecast.line=999.5;assert.equal(forecastGaps(rec).length,0);
+  }
+});
+
 test('the issued 09:30 report retains every call, quote, condition and evidence byte',()=>{
   const before=JSON.stringify(report);
   freeze(report);
