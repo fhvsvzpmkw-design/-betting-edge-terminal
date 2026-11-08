@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "policyId": "graham-weekly-production-v2",
+  "season": 2026,
+  "sourceWeek": 9,
+  "recordedAt": "2026-11-08T16:59:44Z",
+  "scope": "Additive CIN-ATL final-source gate after the first focused official-source follow-up. Reuses the bound Sunday inactive and transaction inventory. The official team box-score route was present but had not populated a final box score, participation table or official gamebook at the observation cutoff. No exact final, departure boundary, exposure, replacement workload, player value, injury loss, carried rating or issued Week 9 fair is inferred.",
+  "inputCommit": "9d33b8d040019b1afdf9631e2861b96a27039550",
+  "marketViewed": false,
+  "sources": [
+    {
+      "id": "cin-atl-official-bengals-boxscore-check",
+      "kind": "OFFICIAL",
+      "url": "https://www.bengals.com/game-day/2026/regular-season/week-9-falcons/box-score",
+      "capturedAt": "2026-11-08T16:59:44Z",
+      "finding": "The official Bengals game route was available, but its returned box-score, team-stat and player-stat fields were unpopulated and it did not expose a final official gamebook. It did not support an exact final or complete paired final inventory at the observation cutoff."
+    },
+    {
+      "id": "cin-atl-official-nfl-game-center-check",
+      "kind": "OFFICIAL",
+      "url": "https://www.nfl.com/games/bengals-at-falcons-2026-reg-9",
+      "capturedAt": "2026-11-08T16:59:44Z",
+      "finding": "The official NFL game-center route did not return a stable final-state/gamebook payload suitable for the governed exact-final and participation inventory. No live or partial score is promoted to an official final."
+    },
+    {
+      "id": "cin-atl-bound-sunday-inventory",
+      "kind": "REPOSITORY",
+      "path": "data/walters/nfl/2026/week-09-research-ledger.json",
+      "blobSha": "f7516d542ac0f23af2d9a871c86a356a732692cc",
+      "finding": "The completed Sunday pregame review binds the final inactive lists and Atlanta transaction/reserve context. Those facts are reused without changing their original receipt or adding a numerical conclusion."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W09-CIN-ATL",
+      "away": "CIN",
+      "home": "ATL",
+      "state": "BLOCKED",
+      "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+      "checklist": {
+        "exactFinal": "UNRESOLVED_OFFICIAL_FINAL_NOT_BOUND",
+        "finalInactives": "COMPLETE_BOUND_FROM_SUNDAY_PREGAME_REVIEW",
+        "reserveElevationsAndTransactions": "PARTIAL_BOUND_PRE_GAME_FINAL_GAMEBOOK_PENDING",
+        "participationAndDnp": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "inGameInjuryAndReturnInventory": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "quarterbackInventory": "UNRESOLVED_ACTUAL_PARTICIPATION_FINAL_GAMEBOOK_REQUIRED",
+        "specialistInventory": "UNRESOLVED_ACTUAL_PARTICIPATION_FINAL_GAMEBOOK_REQUIRED",
+        "pairedGameDayInjuryLoss": "BLOCKED_MISSING_COMPLETE_FINAL_SOURCE_INVENTORY"
+      },
+      "teams": [
+        {
+          "team": "CIN",
+          "finalInactives": [
+            "Kyle Dugger",
+            "Connor Lew",
+            "Myles Hinton",
+            "Landon Robinson"
+          ],
+          "reserveElevationsAndTransactions": [
+            "Cedric Johnson cleared the inactive gate in the bound Sunday review.",
+            "UNRESOLVED — the final official gamebook is required to reconcile the complete active/substitute/DNP inventory."
+          ],
+          "participationAndDnp": [
+            "UNRESOLVED — actual starters, substitutes, DNP rows and phase exposure require the official final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "UNRESOLVED — no injury, return, exit or exposure boundary is inferred from an unavailable final gamebook."
+          ],
+          "quarterback": {
+            "pregameBinding": "Joe Burrow",
+            "actualParticipation": "UNRESOLVED — official final gamebook required"
+          },
+          "specialists": [
+            "UNRESOLVED — actual kicker, punter, long snapper and return participation require the official final gamebook."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-CIN-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official final participation, DNP, injury/return and specialist inventory.",
+              "footballImpact": "Missing phase exposure and injury boundaries cannot be treated as zero or converted into a replacement-aware injury loss.",
+              "reopenWhen": "The official final gamebook and any official phase snap counts are published."
+            }
+          ]
+        },
+        {
+          "team": "ATL",
+          "finalInactives": [
+            "Zachariah Branch",
+            "Billy Bowman Jr.",
+            "Robert Longerbeam",
+            "Drake Jackson",
+            "Andy Dalton — emergency/backup quarterback inactive",
+            "Jack Strand — emergency/backup quarterback inactive"
+          ],
+          "reserveElevationsAndTransactions": [
+            "James Pearce Jr., Yasir Abdullah and Beaux Collins were activated in the bound Sunday review.",
+            "Brian Robinson Jr. moved to injured reserve and Khalil Herbert was signed; no one-for-one workload or locked replacement value was established.",
+            "Cameron Williams remained on reserve after a return designation.",
+            "UNRESOLVED — the final official gamebook is required to reconcile the complete active/substitute/DNP inventory."
+          ],
+          "participationAndDnp": [
+            "UNRESOLVED — actual starters, substitutes, DNP rows and phase exposure require the official final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "UNRESOLVED — no injury, return, exit or exposure boundary is inferred from an unavailable final gamebook."
+          ],
+          "quarterback": {
+            "pregameBinding": "Michael Penix Jr.",
+            "actualParticipation": "UNRESOLVED — official final gamebook required"
+          },
+          "specialists": [
+            "UNRESOLVED — actual kicker, punter, long snapper and return participation require the official final gamebook."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-ATL-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official final participation, DNP, injury/return and specialist inventory plus source-supported replacement workload for the recorded absences.",
+              "footballImpact": "The absence cluster and post-transaction backfield cannot be assigned a one-for-one replacement or zero workload without final participation and eligible value bindings.",
+              "reopenWhen": "The official final gamebook and any official phase snap counts are published."
+            }
+          ]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The focused official-source follow-up did not return a stable exact final or complete official final gamebook. The pregame inactive/transaction inventory is bound, but participation, DNP, in-game injury/return, quarterback and specialist coverage remains explicitly unresolved.",
+          "footballImpact": "A paired numerical evaluation would otherwise invent missing exposure, replacements or zero values.",
+          "nextAction": "Reopen once the official final gamebook is published; read it in full, bind the exact final and both complete team inventories, then validate only supported estimates.",
+          "sourceIds": [
+            "cin-atl-official-bengals-boxscore-check",
+            "cin-atl-official-nfl-game-center-check",
+            "cin-atl-bound-sunday-inventory"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
