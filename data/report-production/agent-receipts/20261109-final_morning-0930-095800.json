@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-09:30",
+  "executionRunId": "20261109-final_morning-0930-095800",
+  "workBinding": {
+    "candidateIdAtLaunch": "2026-11-09T09:58:00-07:00|3",
+    "currentCandidateId": "2026-11-09T10:25:10-07:00|3",
+    "checkpointPath": "data/report-production/checkpoints/20261109-final_morning-0930-095800.json",
+    "checkpointRevisionAtLaunch": 1,
+    "currentCheckpointRevision": 15,
+    "feedBlobSha": "1612119a1130809395f2490096df77ccae8df764",
+    "operatingDate": "2026-11-09",
+    "canonicalSlot": 3,
+    "expectedReportTime": "09:30",
+    "operatingRevision": "2026-11-07.ForecastContractContinuations"
+  },
+  "mode": "TARGETED_UPDATE_REVIEW",
+  "reason": "The 09:30 update profile began with zero workers. The coordinator screened the full 12-event inventory and used one targeted researcher for the material Lakers-Hawks availability conflict; the coordinator completed and checkpointed all market-family reviews, then removed the two events that had started before actual issuance.",
+  "workers": [
+    {
+      "role": "targeted complete-event researcher",
+      "actualId": "/root/main_0930_lakers",
+      "boundary": "read-only; no subagents; no odds collection; no shared writes",
+      "assignmentIds": ["73719576", "moneyline", "spread", "total"],
+      "candidateBinding": "2026-11-09T09:58:00-07:00|3; checkpoint revision 1; feed 1612119a1130809395f2490096df77ccae8df764",
+      "bindingAcknowledgment": "ACK exact candidate, feed, revision and event boundary received within 60 seconds",
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "clockNote": "The coordinator observed launch, acknowledgment and return in this execution, but exact collaboration timestamps were not exposed; no timestamp is inferred.",
+      "state": "RETURNED",
+      "returnedWork": "Checked the official NBA 11:30 a.m. ET report and the bound Lakers-Hawks price context. The Lakers had not submitted; Atlanta listed Dennis, Landale and Wilson questionable and Gilbert, Gueye, Newell and Veesaar out. Secondary Doncic/Grimes reporting conflicted. No material line move or BET authority was found."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_ONE_TARGETED_RESEARCHER",
+      "workers": 1,
+      "namedQuestion": "Does the unresolved Lakers filing or conflicting Doncic/Grimes reporting change the exact Lakers-Hawks decisions?",
+      "expectedQualityBenefit": "Independent source-conflict check on the material update question without duplicating the coordinator's full inventory screen.",
+      "releaseCondition": "Return current official availability facts, conflicts and decision impact.",
+      "result": "SATISFIED"
+    },
+    {
+      "decision": "DO_NOT_EXPAND_POOL",
+      "workers": 0,
+      "namedQuestion": "Did the remaining queue contain another consequential gap or unusually large time-sensitive workload after the full screen?",
+      "expectedQualityBenefit": "Keep the update within the routine launch limit once all other events had source-bound coordinator reviews.",
+      "releaseCondition": "No second worker unless another decision-sensitive conflict survives the coordinator screen.",
+      "result": "NO_ADDITIONAL_GAP"
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "The official Lakers filing remained unavailable and secondary Doncic/Grimes status reporting conflicted.",
+      "impact": "No Lakers-Hawks price signal was promoted; the game was later excluded because it had started before actual issuance."
+    },
+    {
+      "finding": "Memphis-Toronto and Denver-Houston each lacked a qualified exact Pinnacle pair for both bound spread sides.",
+      "impact": "Four selection-specific evidence shortfalls remain blocked; no alternate line or invented fair replaced them."
+    }
+  ],
+  "decisionCorrections": [
+    {
+      "issue": "The initial 09:58 draft still included Lakers-Hawks and Cavaliers-Hornets.",
+      "resolution": "The controller was retimed to the truthful 10:25:10 issue clock and both 10:00 starts were removed from the issued inventory while their genuine event-review traces remained in the checkpoint."
+    }
+  ],
+  "completedWork": {
+    "acknowledgments": 1,
+    "researchersReturned": 1,
+    "reviewersReturned": 0,
+    "eventResearch": 12,
+    "retainedUnstartedEvents": 10,
+    "primarySelectionReviewsBeforeStartExclusion": 72,
+    "retainedPrimarySelections": 60,
+    "checkpointedEvents": 12,
+    "retainedForecastObservationsReplayedAtOriginalClocks": 44,
+    "currentReportForecastBindings": 44,
+    "decisions": {"BET": 0, "LEAN": 0, "WAIT": 0, "PASS": 56, "BLOCKED": 4}
+  },
+  "remainingWork": {
+    "events": 2,
+    "producerUnfinished": 0,
+    "documentedSourceShortfalls": 4,
+    "selectionIds": [
+      "NBA_WNBA|73719582|full_game_primary_spread|away",
+      "NBA_WNBA|73719582|full_game_primary_spread|home",
+      "NBA_WNBA|73719586|full_game_primary_spread|away",
+      "NBA_WNBA|73719586|full_game_primary_spread|home"
+    ],
+    "merge": "completed by coordinator only",
+    "forecastReviewHandoff": {"state": "BINDINGS_PRESENT", "records": 44, "bindingsPresent": 44, "pending": 0},
+    "prepareFreezeStageReadback": "PENDING"
+  },
+  "publication": {"state": "PENDING"},
+  "telemetry": {"model": "unknown", "tokenUsage": "unknown", "creditUsage": "unknown", "overlap": "unknown"},
+  "recordedAt": "2026-11-09T17:27:35.402Z"
+}
