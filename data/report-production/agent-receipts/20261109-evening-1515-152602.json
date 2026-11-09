@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "informational": true,
-  "candidateId": "2026-11-09T15:26:02-07:00|4",
+  "candidateId": "2026-11-09T15:37:02-07:00|4",
   "checkpointPath": "data/report-production/checkpoints/20261109-evening-1515-152602.json",
-  "checkpointRevision": 1,
+  "checkpointRevision": 15,
   "feedBlobSha": "7e75c4db8e622be0f0d4654824163c19a6e620a2",
   "slot": "evening",
   "scheduledReportTime": "15:15",
   "profile": "main-broad",
-  "phase": "STARTED",
-  "savedAt": "2026-11-09T15:28:23-07:00",
+  "phase": "RETURNED",
+  "savedAt": "2026-11-09T15:39:20-07:00",
   "scalingReason": "Twelve-event, 72-selection queue justified the current broad routine pool: one complete-event researcher plus one critical reviewer.",
   "workers": [
     {
@@ -21,7 +21,8 @@
         "72909412"
       ],
       "acknowledged": true,
-      "bounds": "read-only exact feed/checkpoint; no agents, writes, odds pulls or draft mutation"
+      "bounds": "read-only exact feed/checkpoint; no agents, writes, odds pulls or draft mutation",
+      "returned": true
     },
     {
       "id": "/root/evening_1515_review",
@@ -32,10 +33,26 @@
         "73719590"
       ],
       "acknowledged": true,
-      "bounds": "read-only exact feed/checkpoint; no agents, writes, odds pulls or draft mutation"
+      "bounds": "read-only exact feed/checkpoint; no agents, writes, odds pulls or draft mutation",
+      "returned": true
     }
   ],
-  "returnedWork": [],
-  "materialFindings": [],
-  "decisionCorrections": []
+  "returnedWork": [
+    {
+      "id": "/root/evening_1515_nhl",
+      "summary": "Reviewed Rangers-Oilers, Flyers-Canucks and Islanders-Sharks across moneyline, puck line and total families using exact current quotes, model continuations and lineup/goalie status."
+    },
+    {
+      "id": "/root/evening_1515_review",
+      "summary": "Independently challenged Lakers-Hawks, Bills-Vikings and Pelicans-Warriors, including current quote direction, model timing, official availability and publication readiness."
+    }
+  ],
+  "materialFindings": [
+    "Rangers and Islanders moneylines had model-supported zero-stake directional leads, but neither was promoted because current authoritative goalie/availability clearance was not established; Flyers-Canucks remained PASS throughout.",
+    "Lakers-Hawks Under and Pelicans-Warriors side/Under were conditional opinion leads, while Bills-Vikings stayed PASS; current official availability and Pinnacle disagreement prevented promotion."
+  ],
+  "decisionCorrections": [
+    "Reviewer identified that the original report timestamp preceded snapshot acceptance by four seconds; coordinator retimed issuance to 15:37:02-07:00 and rebound all forecast records.",
+    "Coordinator rejected LEAN promotion for the NHL leads and kept PASS because source-clock continuation did not clear late goalie/availability requirements."
+  ]
 }
