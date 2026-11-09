@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-08:00",
+  "executionRunId": "20261109-main-0800-084522",
+  "workBinding": {
+    "candidateIdAtLaunch": "2026-11-09T08:45:22-07:00|2",
+    "currentCandidateId": "2026-11-09T08:51:30-07:00|2",
+    "checkpointPath": "data/report-production/checkpoints/20261109-main-0800-084522.json",
+    "checkpointRevisionAtLaunch": 1,
+    "feedBlobSha": "e961d0c327a7452939604738ebe0ba3aab496fdb",
+    "operatingDate": "2026-11-09",
+    "canonicalSlot": 2,
+    "expectedReportTime": "08:00",
+    "operatingRevision": "2026-11-07.ForecastContractContinuations"
+  },
+  "mode": "TARGETED_UPDATE_REVIEW",
+  "reason": "The 08:00 update profile began with zero workers. The full 12-event inventory screen found one consequential Lakers-Hawks moneyline reversal and unresolved official Lakers availability, so one targeted complete-event researcher was useful; the remaining queue could be revalidated by the coordinator from bound evidence.",
+  "workers": [
+    {
+      "role": "targeted complete-event researcher",
+      "actualId": "/root/main_0800_lakers_hawks",
+      "boundary": "read-only; no subagents; no odds collection; no shared writes",
+      "assignmentIds": ["73719576", "moneyline", "spread", "total"],
+      "bindingAcknowledgment": "ACK exact candidate, feed, revision and event boundary received within 60 seconds",
+      "state": "RETURNED",
+      "returnedWork": "Reviewed all six Lakers-Hawks primary selections, current DraftKings/FanDuel and Pinnacle clocks, ESPN and Bet Better original points, the latest official NBA report, Support/Contrary and History Fit. Proposed two zero-stake LEAN opinions and four PASS assessments; named the missing official Lakers filing as the remaining personnel shortfall."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_ONE_TARGETED_RESEARCHER",
+      "workers": 1,
+      "namedQuestion": "Does the Lakers-Hawks price reversal plus current availability evidence support a defensible exact-contract opinion?",
+      "expectedQualityBenefit": "Independent challenge of the largest price move without duplicating the coordinator's full-inventory revalidation.",
+      "result": "SATISFIED"
+    },
+    {
+      "decision": "DO_NOT_EXPAND_POOL",
+      "workers": 0,
+      "namedQuestion": "Does the remaining queue contain another consequential gap or unusually large time-sensitive workload?",
+      "expectedQualityBenefit": "Keeps the 08:00 update within the routine launch profile after all other events were covered by bound current evidence and exact-price replay.",
+      "result": "NO_ADDITIONAL_GAP"
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "The official 10:30 a.m. ET NBA report still showed the Lakers as not submitted.",
+      "impact": "Doncic and Grimes Monday status was not asserted from news context; Lakers-Hawks remained zero stake."
+    },
+    {
+      "finding": "Atlanta +1.5 and Under 237.5 had directional source support but not an eligible exact published probability for those contracts.",
+      "impact": "The coordinator did not promote the worker's LEAN suggestions through a helper they did not satisfy; both remained PASS, with the supporting and contrary evidence retained."
+    },
+    {
+      "finding": "Four NBA spread sides lacked a qualified exact Pinnacle pair at the executable line.",
+      "impact": "Those four selections were preserved as documented source-specific shortfalls; no alternate line or invented fair was substituted."
+    }
+  ],
+  "decisionCorrections": [
+    {
+      "issue": "Worker-proposed Atlanta +1.5 and Under 237.5 LEANs",
+      "resolution": "Rejected after exact-contract eligibility review: ESPN was a moneyline probability and Bet Better supplied native score context without a cover/under probability or calibrated error. The source-led LEAN helper therefore did not apply."
+    }
+  ],
+  "completedWork": {
+    "acknowledgments": 1,
+    "researchersReturned": 1,
+    "reviewersReturned": 0,
+    "eventResearch": 12,
+    "primarySelectionReviews": 72,
+    "checkpointedEvents": 12,
+    "forecastRevalidations": 52,
+    "decisions": {"BET": 0, "LEAN": 0, "WAIT": 0, "PASS": 68, "BLOCKED": 4}
+  },
+  "remainingWork": {
+    "events": 0,
+    "producerUnfinished": 0,
+    "documentedSourceShortfalls": 4,
+    "selectionIds": [
+      "NBA_WNBA|73719582|full_game_primary_spread|away",
+      "NBA_WNBA|73719582|full_game_primary_spread|home",
+      "NBA_WNBA|73719586|full_game_primary_spread|away",
+      "NBA_WNBA|73719586|full_game_primary_spread|home"
+    ],
+    "merge": "completed by coordinator only",
+    "prepareFreezeStageReadback": "PENDING"
+  },
+  "publication": {"state": "PENDING"},
+  "telemetry": {"model": "unknown", "tokenUsage": "unknown", "creditUsage": "unknown", "overlap": "none"},
+  "recordedAt": "2026-11-09T15:55:00Z"
+}
