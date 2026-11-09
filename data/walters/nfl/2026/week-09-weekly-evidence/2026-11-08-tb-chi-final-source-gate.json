@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "policyId": "graham-weekly-production-v2",
+  "season": 2026,
+  "sourceWeek": 9,
+  "recordedAt": "2026-11-09T04:23:34Z",
+  "scope": "Additive TB-CHI final-source gate after the official scores surface reached Final. Reuses the bound Week 9 baseline and Sunday pregame evidence, binds the exact final, complete final inactive lists, Chicago elevation and the literal injury annotations exposed by the lagging official live feed. At the observation cutoff the official recap payload still said INGAME, exposed no gameBookUrl and the stable gamebook asset returned HTTP 404. Starters, complete substitutes/participants, DNP, late injury/return, full specialist and official snap coverage remain explicit UNRESOLVED fields. No started-game prediction, fair, carried rating or market field is changed.",
+  "inputCommit": "1cef6ec2d39d5e32e8c6f0c6d7c16648f751c62a",
+  "inputBlobs": {
+    "data/walters/nfl/active-week.json": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "data/walters/nfl/2026/week-09-current-numbers.json": "f47d4d582ff5f18bffa572e649757768da927d95",
+    "data/walters/nfl/2026/week-09-research-ledger.json": "f7516d542ac0f23af2d9a871c86a356a732692cc",
+    "data/walters/nfl-power-ratings-ledger.json": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "data/walters/nfl/home-field/h4-current.json": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+    "data/walters/nfl/weekly-readiness.json": "b942b2cd1c6ed842ae87c381f1e182b03e790d76"
+  },
+  "marketViewed": false,
+  "estimationPolicy": "Factual preparation only. Missing participation, exposure, replacements and values are not zero. A scores-page Final does not supply a complete final gamebook. No new numerical method is authorized.",
+  "sources": [
+    {
+      "id": "tb-chi-official-nfl-scores",
+      "kind": "OFFICIAL_FINAL",
+      "url": "https://www.nfl.com/scores/2026/week-9",
+      "capturedAt": "2026-11-09T04:14:00Z",
+      "finding": "Official NFL scores surface reached Final with Tampa Bay 16 and Chicago 24."
+    },
+    {
+      "id": "tb-chi-official-nfl-recap-lag",
+      "kind": "OFFICIAL_GAME_CENTER",
+      "url": "https://www.nfl.com/games/buccaneers-at-bears-2026-reg-9?tab=recap",
+      "gameId": "ab582247-4feb-11f1-abca-2c54536568a9",
+      "capturedAt": "2026-11-09T04:21:25Z",
+      "finding": "Fresh recap payload still identified gameState INGAME and exposed no gameBookUrl after the scores surface was Final. Earlier review preserved TB 16-CHI 24 at Q4 9:03; later source checks observed other lagging Q4 clocks. The conflict is retained rather than treated as a terminal participation source."
+    },
+    {
+      "id": "tb-chi-official-gamebook-404",
+      "kind": "OFFICIAL_GAMEBOOK_EXPECTED_ASSET",
+      "url": "https://static.www.nfl.com/image/upload/gamecenter/ab582247-4feb-11f1-abca-2c54536568a9.pdf",
+      "capturedAt": "2026-11-09T04:21:25Z",
+      "httpStatus": 404,
+      "finding": "Cloudinary returned Resource not found with a zero-length body. No final gamebook, participation pages or official snap table was available."
+    },
+    {
+      "id": "tb-chi-official-inactives",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.buccaneers.com/news/bucs-bears-inactives-emeka-egbuka-returns-action",
+      "capturedAt": "2026-11-09T04:21:39Z",
+      "finding": "Complete final inactive lists, Egbuka active, Stevenson active, no Tampa Bay elevations and the Chicago Ahmed elevation. Source position typo KB Keyshaun Elliott is corrected against the official Bears roster to LB."
+    },
+    {
+      "id": "tb-chi-official-bears-transactions",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.chicagobears.com/team/transactions/",
+      "capturedAt": "2026-11-09T04:21:39Z",
+      "finding": "Nov. 7 elevation of RB Salvon Ahmed; Nov. 5 Zavier Scott to Reserve/Injured; Nov. 4 Stephen Carlson signed and Kentavius Street placed on Reserve/Injured."
+    },
+    {
+      "id": "tb-chi-official-bucs-final-injury-report",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.buccaneers.com/news/buccaneers-bears-injury-report-nov-6-week-9-2026",
+      "capturedAt": "2026-11-09T04:22:10Z",
+      "finding": "Final bilateral practice/status table; identifies Diaby knee Out, Egbuka foot Questionable and Stevenson thumb Questionable."
+    },
+    {
+      "id": "tb-chi-official-bears-injury-report",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.chicagobears.com/team/injury-report/index-mobile",
+      "capturedAt": "2026-11-09T04:13:00Z",
+      "finding": "Final Chicago practice/status table. Its Stevenson injury cell was blank while the official bilateral table identified thumb; that conflict remains explicit."
+    },
+    {
+      "id": "tb-chi-bound-pregame-ledger",
+      "kind": "REPOSITORY",
+      "path": "data/walters/nfl/2026/week-09-research-ledger.json",
+      "blobSha": "f7516d542ac0f23af2d9a871c86a356a732692cc",
+      "finding": "Carries the verified Week 9 baseline and pregame availability chain without rewriting the completed sweep."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W09-TB-CHI",
+      "away": "TB",
+      "home": "CHI",
+      "state": "BLOCKED",
+      "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+      "checklist": {
+        "exactFinal": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE_REUSED_IMMUTABLE",
+        "finalInactives": "COMPLETE_OFFICIAL",
+        "reserveElevationsAndTransactions": "COMPLETE_SOURCE_BOUND_WITH_FINAL_GAMEBOOK_RECONCILIATION_PENDING",
+        "participationAndDnp": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "inGameInjuryAndReturnInventory": "PARTIAL_LITERAL_LIVE_FEED_FINAL_GAMEBOOK_REQUIRED",
+        "quarterbackInventory": "PARTIAL_ACTUAL_STARTERS_CONFIRMED_FULL_PARTICIPATION_UNRESOLVED",
+        "specialistInventory": "PARTIAL_ACTUAL_DUTIES_CONFIRMED_FULL_SPECIAL_TEAMS_PARTICIPATION_UNRESOLVED",
+        "officialSnapCounts": "UNRESOLVED_NOT_PUBLISHED",
+        "pairedGameDayInjuryLoss": "BLOCKED_MISSING_COMPLETE_FINAL_SOURCE_INVENTORY"
+      },
+      "final": {
+        "awayScore": 16,
+        "homeScore": 24,
+        "state": "OFFICIAL_FINAL_VERIFIED",
+        "sourceId": "tb-chi-official-nfl-scores"
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-11-08T17:20:00-08:00",
+        "awayRating": 24.7083807848,
+        "homeRating": 27.5479498274,
+        "neutralBaseHome": -2.8395690426,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "preservedPregameExactFairHome": -4.822,
+        "preservedPregameDisplayedFairHome": -5,
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "teams": [
+        {
+          "team": "TB",
+          "side": "AWAY",
+          "finalInactives": [
+            "DeMonte Capehart",
+            "Yaya Diaby",
+            "Ayden Garnes",
+            "Trevor Keegan",
+            "Billy Schrauth"
+          ],
+          "reserveElevationsAndTransactions": [
+            "No Tampa Bay practice-squad elevation for Week 9.",
+            "Official inactive notice states only Diaby was inactive due to injury and identifies the available edge rotation as Rueben Bain Jr., Al-Quadin Muhammad, David Walker and Anthony Nelson; exact game allocation remains unresolved.",
+            "Reserve/Injured roster section listed Josh Hayes, Mohamed Kamara, Jalen McMillan and Christian Rozeboom.",
+            "UNRESOLVED — final gamebook is required to reconcile complete active, starter, substitute and DNP inventory."
+          ],
+          "participationAndDnp": [
+            "Baker Mayfield actual quarterback duty is confirmed by official play-by-play.",
+            "Emeka Egbuka was cleared active after two missed games, but full participation and role cannot be inferred without the final gamebook.",
+            "UNRESOLVED — all offensive/defensive starters, substitutes, official DNP rows and phase exposure require the final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            {
+              "player": "Antoine Winfield Jr.",
+              "printedClock": "Q2 5:18",
+              "annotation": "Injured during the play.",
+              "terminal": "UNRESOLVED — no captured explicit return or out notice"
+            },
+            {
+              "player": "Sean Tucker",
+              "printedClock": "Kickoff",
+              "annotation": "Injured during the play; live feed printed no numeric clock.",
+              "terminal": "UNRESOLVED — no captured explicit return or out notice"
+            },
+            "UNRESOLVED — lagging live feed cannot certify late-Q4 or final-book injury and return coverage."
+          ],
+          "quarterback": {
+            "pregameBinding": "Baker Mayfield",
+            "actualParticipation": "PRIMARY DUTY CONFIRMED; complete snap coverage and Jalon Daniels participation/DNP unresolved"
+          },
+          "specialists": [
+            "Official live play confirms Chase McLaughlin kicking, Evan Deckers snapping/centering and Riley Dixon holding/punting.",
+            "UNRESOLVED — full kicker, punter, holder, long-snapper and returner participation requires the final gamebook/snap tables."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-TB-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official starters, substitutes, DNP, late injury/return, specialist and offense/defense/special-teams snap inventory.",
+              "footballImpact": "Diaby/edge, Winfield, Tucker and OL availability cannot receive exposure, replacement allocation or a value-based injury loss without complete final participation.",
+              "reopenWhen": "NFL recap reaches FINAL and exposes the official gamebook, or the exact stable PDF returns HTTP 200 with a nonzero application/pdf body, with official snap tables available."
+            }
+          ]
+        },
+        {
+          "team": "CHI",
+          "side": "HOME",
+          "finalInactives": [
+            "Keyshaun Elliott — source typo KB corrected to official roster position LB",
+            "Case Keenum — designated emergency third quarterback",
+            "Jayden Loving",
+            "Kyle Monangai",
+            "Malik Muhammad"
+          ],
+          "reserveElevationsAndTransactions": [
+            "RB Salvon Ahmed elevated Nov. 7 and appeared in the partial official live play feed.",
+            "RB Zavier Scott and DL Kentavius Street were placed on Reserve/Injured during game week; Stephen Carlson was signed to the active roster.",
+            "UNRESOLVED — final gamebook is required to reconcile complete active, starter, substitute and DNP inventory."
+          ],
+          "participationAndDnp": [
+            "Caleb Williams actual quarterback duty is confirmed by official play-by-play.",
+            "Tyrique Stevenson was cleared active; the official injury sources conflict on whether his thumb detail was displayed.",
+            "UNRESOLVED — all offensive/defensive starters, substitutes, official DNP rows and phase exposure require the final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            {
+              "player": "Kyler Gordon",
+              "printedClock": "Q3 12:41",
+              "annotation": "Injured during the play.",
+              "terminal": "RETURNED — explicit Injury Update at Q3 4:32"
+            },
+            "UNRESOLVED — lagging live feed cannot certify late-Q4 or final-book injury and return coverage."
+          ],
+          "quarterback": {
+            "pregameBinding": "Caleb Williams",
+            "actualParticipation": "PRIMARY DUTY CONFIRMED; complete snap coverage and Tyson Bagent participation/DNP unresolved",
+            "emergencyThirdQb": "Case Keenum inactive under designated emergency-third-QB mechanism; not treated as a primary-QB loss"
+          },
+          "specialists": [
+            "Official live play confirms Cairo Santos kicking and kickoffs.",
+            "Official roster identifies Tory Taylor as P and Scott Daly as LS, but actual complete duty/holding/snapping participation is not inferred from roster position.",
+            "UNRESOLVED — full kicker, punter, holder, long-snapper and returner participation requires the final gamebook/snap tables."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-CHI-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official starters, substitutes, DNP, late injury/return, specialist and offense/defense/special-teams snap inventory.",
+              "footballImpact": "Monangai/Ahmed/Scott backfield, Muhammad/Stevenson secondary and Gordon exposure cannot receive distinct replacement allocation or a value-based injury loss without complete final participation.",
+              "reopenWhen": "NFL recap reaches FINAL and exposes the official gamebook, or the exact stable PDF returns HTTP 200 with a nonzero application/pdf body, with official snap tables available."
+            }
+          ]
+        }
+      ],
+      "sourceConflicts": [
+        {
+          "finding": "Official NFL scores reached Final while the official recap payload continued to identify the game as INGAME and exposed no gameBookUrl.",
+          "sourceIds": [
+            "tb-chi-official-nfl-scores",
+            "tb-chi-official-nfl-recap-lag"
+          ]
+        },
+        {
+          "finding": "The official inactive article rendered Keyshaun Elliott as KB; the official Bears roster identifies LB.",
+          "sourceIds": [
+            "tb-chi-official-inactives"
+          ]
+        },
+        {
+          "finding": "The official Bears injury table left Tyrique Stevenson's injury cell blank while the official bilateral Buccaneers-hosted table identified thumb.",
+          "sourceIds": [
+            "tb-chi-official-bears-injury-report",
+            "tb-chi-official-bucs-final-injury-report"
+          ]
+        }
+      ],
+      "safeguards": [
+        "Diaby absence and the eventual edge allocation remain one exposure chain, not separate additive losses.",
+        "Monangai absence, Zavier Scott reserve status, Ahmed elevation and final backfield usage may not be stacked independently.",
+        "Muhammad absence may not be double-counted through both Stevenson availability and another defensive-back replacement.",
+        "Egbuka active return is not both a positive return and a separate starter/substitution adjustment.",
+        "Keegan and Schrauth are not an additive offensive-line cluster without starter/value provenance.",
+        "Keenum emergency-third-QB status is not evidence of degraded primary-QB availability.",
+        "Roster-listed specialist roles do not establish complete game duty or snap coverage."
+      ],
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The official final gamebook, participation pages and offense/defense/special-teams snap tables were not published at the stopping boundary.",
+          "footballImpact": "A paired numerical evaluation would otherwise invent missing starters, DNP, exposure, replacements or zero values.",
+          "nextAction": "Reopen only when the NFL recap reaches FINAL and exposes a gameBookUrl, or the stable game-ID PDF returns HTTP 200 with a nonzero application/pdf body, and official snap tables are available.",
+          "sourceIds": [
+            "tb-chi-official-nfl-recap-lag",
+            "tb-chi-official-gamebook-404"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Known inactives/elevations and partial live injury annotations do not establish distinct final replacement allocation, complete exposure or immutable values.",
+          "footballImpact": "Missing values are not zero and overlapping clusters cannot be summed without final participation and existing approved bindings.",
+          "nextAction": "After the official inventory posts, reconcile each named cluster once and use only approved existing exposure/replacement/value routes.",
+          "sourceIds": [
+            "tb-chi-official-inactives",
+            "tb-chi-official-bears-transactions",
+            "tb-chi-official-nfl-recap-lag"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ],
+  "reviewConclusion": {
+    "exactFinal": "CHI 24, TB 16 — OFFICIAL_FINAL_VERIFIED",
+    "completeFinalInactivesAndElevation": "SOURCE_BOUND",
+    "completeFinalParticipationAndSnapInventory": "UNAVAILABLE_AT_CAPTURE_CUTOFF",
+    "numericStagingState": "NO_INJURY_IMPACT_OR_REPLACEMENT_VALUE_SUPPORTED_FROM_PARTIAL_FINAL_SOURCES",
+    "nextAction": "Reopen once the exact official gamebook and both teams' offense/defense/special-teams snap tables are published. Preserve the earlier live-state timing correction and all explicit source conflicts."
+  }
+}
