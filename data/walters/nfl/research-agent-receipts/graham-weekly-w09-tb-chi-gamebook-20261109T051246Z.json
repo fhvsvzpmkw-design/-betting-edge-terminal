@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_COORDINATOR",
+  "executionRunId": null,
+  "workBinding": {
+    "phase": "W09_TB_CHI_OFFICIAL_GAMEBOOK_CORRECTION",
+    "mainCommit": "f365f17b53e12a6b3737aec1dab8a06853a512c8",
+    "activeManifestBlobSha": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "currentBoardBlobSha": "f47d4d582ff5f18bffa572e649757768da927d95",
+    "readinessBlobSha": "0530d24b1dc7bd44ff47484b57d7166e96fa962e",
+    "priorEvidenceBlobSha": "ada0344b2a1aca2cebb96741a21f755b9b4a3b36",
+    "officialGamebookSha256": "849bd3cb4c97f7e15df9bd69290b36912cc640895f57735407a8536a689f7b2d",
+    "season": 2026,
+    "week": 9,
+    "gameKeys": ["2026-W09-TB-CHI"]
+  },
+  "mode": "AGENTS_READY",
+  "reason": "The exact parked reopen trigger changed: the stable official gamebook transitioned from HTTP 404 to HTTP 200 application/pdf. Two fresh-context team researchers and one independent reviewer reconciled the complete gamebook inventory and the terminal score correction without importing prices or another group's transcript.",
+  "workers": [
+    {
+      "role": "SOURCE_RESEARCHER",
+      "workerId": "/root/w09_tb_chi_gamebook_tb",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": ["2026-W09-TB-CHI:TB:OFFICIAL_GAMEBOOK"],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": null,
+      "state": "RETURNED",
+      "result": "Corrected the terminal final to CHI 27-TB 24; completed Tampa Bay starters, substitutes, DNP, not-active, literal Winfield/Tucker injury updates, sole-QB duty and specialist/return duties with exact PDF pages and printed clocks; retained absent snap counts and replacement allocation."
+    },
+    {
+      "role": "SOURCE_RESEARCHER",
+      "workerId": "/root/w09_tb_chi_gamebook_chi",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": ["2026-W09-TB-CHI:CHI:OFFICIAL_GAMEBOOK"],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": null,
+      "state": "RETURNED",
+      "result": "Corrected the terminal final to CHI 27-TB 24; completed Chicago starters, substitutes, DNP, not-active, literal Gordon/Burden injury updates, sole-QB duty and specialist/return duties with exact PDF pages and printed clocks; retained Burden terminal status and absent snap counts."
+    },
+    {
+      "role": "CRITICAL_REVIEWER",
+      "workerId": "/root/w09_tb_chi_gamebook_review",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": ["2026-W09-TB-CHI:OFFICIAL_GAMEBOOK:REVIEW"],
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": null,
+      "state": "RETURNED_WITH_CORRECTIONS",
+      "result": "Accepted the terminal score and complete participation identities, corrected unclocked update boundaries, prevented initials expansion without identity evidence, separated observed specialist duty from snap exposure, and rejected numerical READY because phase exposure, distinct relief allocation, values and Burden terminal status remain unresolved."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "NORMAL_THREE_WORKER_POOL",
+      "workers": 3,
+      "namedQuestion": "Did the newly published official gamebook complete both paired inventories and support numerical readiness?",
+      "expectedQualityBenefit": "Disjoint team extraction plus independent page/clock, double-count and readiness review protects the additive correction from another false-final or inferred-exposure error.",
+      "releaseCondition": "Both team inventories and the independent readiness disposition returned.",
+      "reason": "One reopened game pair required two team/source owners and one critical reviewer. No additional worker was needed after the remaining exposure/value gap was precisely identified."
+    }
+  ],
+  "qualityFindings": [
+    "The official gamebook proves the prior TB 16-CHI 24 final was an interim-source error; the terminal final is TB 24-CHI 27 and must be corrected additively without rewriting the preserved predecessor blob.",
+    "Complete lineup/DNP and literal injury sequences do not supply phase snap exposure or distinct replacement allocation. The reviewer kept the pair BLOCKED and preserved Burden's missing terminal update and all missing values as unresolved."
+  ],
+  "completedWork": {
+    "researchersLaunched": 2,
+    "researchersReturned": 2,
+    "reviewersLaunched": 1,
+    "reviewersReturned": 1,
+    "gamesResearched": 1,
+    "gamesReviewed": 1,
+    "officialFinalsCorrected": 1,
+    "completeInactiveSectionsPrepared": 2,
+    "completeGamebookParticipationSectionsPrepared": 2,
+    "completeLiteralInjuryAnnotationSectionsPrepared": 2,
+    "quarterbackDutySectionsPrepared": 2,
+    "specialistDutySectionsPrepared": 2,
+    "numericalGamesCompleted": 0,
+    "evidencePath": "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-08-tb-chi-official-gamebook-correction.json"
+  },
+  "remainingWork": [
+    "Official offense, defense and special-teams snap totals or percentages, or another already-authorized exact participation source, for both teams.",
+    "Official Luther Burden terminal/postgame update or exact post-injury participation source.",
+    "Distinct replacement allocation and existing approved immutable player/replacement value bindings after exposure is available.",
+    "Paired evaluator validation and numerical publication only after both team sections satisfy the existing gates."
+  ],
+  "recordedAt": "2026-11-09T05:12:46Z"
+}
