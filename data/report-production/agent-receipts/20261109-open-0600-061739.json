@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-06:00",
+  "executionRunId": "2026-11-09T06:25:21-07:00|1",
+  "workBinding": {
+    "candidateId": "2026-11-09T06:25:21-07:00|1",
+    "feedBlobSha": "f06700c940d41d99cca35026b55daf65a47c2543",
+    "checkpoint": "data/report-production/checkpoints/20261109-open-0600-061739.json",
+    "checkpointRevision": 26,
+    "operatingRevision": "2026-11-07.ForecastContractContinuations"
+  },
+  "mode": "AGENTS_COMPLETE",
+  "reason": "The 06:00 broad profile used its routine one complete-event researcher and one independent critical reviewer after the remotely verified initial checkpoint. The 12-event, 72-selection queue and 36 captured forecasts justified the full routine pool; no expansion was required.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "actualId": "/root/open_0600_researcher_nov9",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": ["71516006", "72909408", "72909410", "72909412"],
+      "assignmentBinding": {
+        "candidateIdAtLaunch": "2026-11-09T06:17:39-07:00|1",
+        "feedBlobSha": "f06700c940d41d99cca35026b55daf65a47c2543",
+        "checkpointRevisionAtLaunch": 1
+      },
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "state": "RETURNED",
+      "returnedWork": "Four complete NFL/NHL event reviews across moneyline, spread/puck line and total; official personnel/QB/goalie checks; preserved forecast clocks; Support/Contrary, History Fit and exact line-orientation correction."
+    },
+    {
+      "role": "independent critical reviewer",
+      "actualId": "/root/open_0600_reviewer_nov9",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": ["ALL_72_SELECTIONS", "GUY_EARLY_SHORTLIST"],
+      "assignmentBinding": {
+        "candidateIdAtLaunch": "2026-11-09T06:25:21-07:00|1",
+        "feedBlobSha": "f06700c940d41d99cca35026b55daf65a47c2543",
+        "checkpointRevisionAtLaunch": 2
+      },
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "state": "RETURNED",
+      "returnedWork": "Independent full-candidate recheck approved all 64 public PASS records after corrections. It verified exact total lines, selection-facing spread/puck-line signs, quote identity, 24/12 settlement attestations, unresolved personnel treatment and source-clock language. It found no main-card publication blocker and confirmed that the sidecar candidateAssessment is the controller's explicit option-group diagnostic schema: quote is the ranked research option, assessedQuote is the exact producer decision contract."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "ROUTINE_TWO_WORKER_POOL",
+      "workers": 2,
+      "reason": "Twelve events, three sports and 36 captured forecasts warranted one four-event researcher and one independent full-candidate reviewer; the coordinator retained eight NBA events and final merge.",
+      "releaseCondition": "COMPLETE"
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "workers": 2,
+      "reason": "The researcher and coordinator resolved the named evidence gaps without a consequential new specialist need.",
+      "releaseCondition": "COMPLETE"
+    }
+  ],
+  "qualityFindings": [
+    "The researcher corrected the bettor-facing away-spread sign interpretation: the raw receipt line is stored in the home-coordinate convention.",
+    "Official team reporting confirmed Carson Wentz as Minnesota starter and retained Buffalo offensive-line/inactive uncertainty.",
+    "NHL reviews retained starting-goalie and late-lineup uncertainty instead of asserting confirmations.",
+    "The controller currently records 64 completed PASS assessments, 36 forecast applicability bindings, eight documented exact NBA spread reference gaps and zero unfinished producer selections; all 15 gates passed before reviewer return.",
+    "The independent corrected recheck found no main-card publication blocker. It verified that all published card titles and prices bind to the exact assessed selectionKey and that the controller's candidateAssessment quote/assessedQuote distinction is an explicit option-group research diagnostic rather than a second published decision.",
+    "The reviewer confirmed the contract-required freshnessStatus CURRENT field describes the current applicability review; each rationale explicitly preserves the immutable original source clock and disclaims any refreshed model calculation."
+  ],
+  "decisionCorrections": [
+    {
+      "issue": "Initial controller timestamp preceded the completed research window.",
+      "resolution": "Retimed the unfrozen candidate to 06:25:21 PT and remotely verified the complete compressed checkpoint before saving decisions."
+    },
+    {
+      "issue": "A first partial transfer of the expanded checkpoint did not match the local Git blob.",
+      "resolution": "Preserved and retransferred the complete 722044-byte checkpoint; local and remote blob SHA now both equal c8a8a68d61e4b65717df9e3f9c5cffb41b49c95e."
+    },
+    {
+      "issue": "The first reviewer pass found four line-mismatched total titles, unsupported best-price wording, generic revalidation language, twelve false settlement matches and overstated personnel suitability.",
+      "resolution": "Rebuilt every affected receipt and all event checkpoints. Published titles now use the exact receipt quote; price wording is receipt-bound; all 36 snapshot reviews retain original clocks; settlement matches are true only for explicit compatible settlement objects; and all current personnel applicability is UNRESOLVED."
+    },
+    {
+      "issue": "The corrected reviewer recheck noted that five derived candidateAssessment rows contain both a ranked research option and a different assessed exact contract.",
+      "resolution": "Confirmed against the authoritative candidate-assessment-v1 controller that these rows are explicit option groups: quote identifies the ranked research option, assessedQuote and recordedTitle identify the producer decision contract, and options preserves each exact selectionKey separately. No public card or receipt mixes those contracts."
+    }
+  ],
+  "recordedAt": "2026-11-09T13:34:00.000Z",
+  "finalOutcome": {
+    "state": "RESEARCH_AND_REVIEW_COMPLETE",
+    "workersLaunched": 2,
+    "workersReturned": 2,
+    "eventsScreened": 12,
+    "availableSelections": 72,
+    "completedAssessments": 64,
+    "documentedShortfalls": 8,
+    "producerUnfinished": 0,
+    "decisions": {"bet": 0, "lean": 0, "wait": 0, "pass": 64},
+    "validationGates": {"passed": 15, "failed": 0},
+    "publication": null
+  }
+}
+
