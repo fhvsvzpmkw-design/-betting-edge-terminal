@@ -3,12 +3,12 @@
   "policyId": "research-agent-groups-v2",
   "group": "main",
   "taskId": "main-06:00",
-  "executionRunId": "2026-11-09T06:25:21-07:00|1",
+  "executionRunId": "2026-11-09T06:50:00-07:00|1",
   "workBinding": {
-    "candidateId": "2026-11-09T06:25:21-07:00|1",
+    "candidateId": "2026-11-09T06:50:00-07:00|1",
     "feedBlobSha": "f06700c940d41d99cca35026b55daf65a47c2543",
     "checkpoint": "data/report-production/checkpoints/20261109-open-0600-061739.json",
-    "checkpointRevision": 26,
+    "checkpointRevision": 55,
     "operatingRevision": "2026-11-07.ForecastContractContinuations"
   },
   "mode": "AGENTS_COMPLETE",
@@ -81,9 +81,13 @@
     {
       "issue": "The corrected reviewer recheck noted that five derived candidateAssessment rows contain both a ranked research option and a different assessed exact contract.",
       "resolution": "Confirmed against the authoritative candidate-assessment-v1 controller that these rows are explicit option groups: quote identifies the ranked research option, assessedQuote and recordedTitle identify the producer decision contract, and options preserves each exact selectionKey separately. No public card or receipt mixes those contracts."
+    },
+    {
+      "issue": "The first freeze attempt correctly rejected event-review timestamps later than the 06:25:21 candidate clock.",
+      "resolution": "Advanced the unfrozen candidate to the honest 06:50:00 PT issuance clock, rebound all 36 original-snapshot applicability reviews with a 06:46:15 PT current check, restored the two temporarily deferred NFL spread assessments, and saved all 12 event checkpoints before the final report clock. The prepared revision 55 again has 64 completed assessments, eight documented shortfalls, zero producer-unfinished selections and 15 passing gates."
     }
   ],
-  "recordedAt": "2026-11-09T13:34:00.000Z",
+  "recordedAt": "2026-11-09T13:46:35.000Z",
   "finalOutcome": {
     "state": "RESEARCH_AND_REVIEW_COMPLETE",
     "workersLaunched": 2,
