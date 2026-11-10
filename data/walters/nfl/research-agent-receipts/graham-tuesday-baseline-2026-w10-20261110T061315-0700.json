@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "TUESDAY_BASELINE",
+  "executionRunId": "graham-tuesday-baseline-2026-w10-20261110T061315-0700",
+  "workBinding": {
+    "phase": "W10_FULL_32_TEAM_BASELINE_RECOVERY",
+    "mainCommit": "6cd8cafcb6de390463c9a532c585e8fb36e6410f",
+    "season": 2026,
+    "week": 10,
+    "runEventId": "graham-tuesday-baseline-2026-w10-20261110T061315-0700"
+  },
+  "mode": "AGENTS_RETURNED_REVIEW_BLOCKED",
+  "reason": "A pending active baseline required a fresh 32-team current-information review after the adapter rejected the absence of a verified research review.",
+  "workers": [
+    {
+      "role": "SOURCE_RESEARCHER",
+      "workerId": "/root/week10_afc_sources",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": [
+        "AFC_16_TEAM_CURRENT_INFORMATION"
+      ],
+      "state": "RETURNED",
+      "result": "Returned all 16 AFC team headings with dated official/NFL source links, material findings, schedule context and explicit unresolved cases."
+    },
+    {
+      "role": "SOURCE_RESEARCHER",
+      "workerId": "/root/week10_nfc_sources",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": [
+        "NFC_16_TEAM_CURRENT_INFORMATION"
+      ],
+      "state": "RETURNED",
+      "result": "Returned all 16 NFC team headings with dated official team source links, material findings, schedule context and explicit unresolved cases."
+    },
+    {
+      "role": "CRITICAL_REVIEWER",
+      "workerId": "/root/week10_baseline_reviewer",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": [
+        "FULL_32_TEAM_COVERAGE_REVIEW"
+      ],
+      "state": "RETURNED_WITH_CORRECTIONS",
+      "result": "Accepted 32/32 team-name coverage and trade-pair consistency but rejected full categorical completion; corrected PIT as coming off its Week 9 bye, preserved projected starters/statuses as unconfirmed, and required affirmative QB/injury/roster/OL/pass-rush/secondary/playmaker/coaching/schedule checks per team."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "NORMAL_THREE_WORKER_POOL",
+      "workers": 3,
+      "namedQuestion": "Does the Week 10 source return satisfy a complete 32-team current-information baseline?",
+      "expectedQualityBenefit": "Independent conference partitions plus critical review protect against false categorical completion.",
+      "releaseCondition": "Both source partitions and the critical review returned."
+    }
+  ],
+  "qualityFindings": [
+    "The source returns covered all 32 team names and contained no material trade-pair contradiction.",
+    "Most Tuesday practice reports were unavailable and return windows, expected starters and estimated reports were not treated as confirmed.",
+    "The reviewer found that category-by-category affirmative checks were missing for many teams, especially OL, coaching, pass rush, secondary and playmakers.",
+    "PIT was corrected from an erroneous Week 10 bye label to coming off its Week 9 bye; Week 10 byes remain CHI, DEN, PHI and TB."
+  ],
+  "completedWork": {
+    "researchersLaunched": 2,
+    "researchersReturned": 2,
+    "reviewersLaunched": 1,
+    "reviewersReturned": 1,
+    "teamHeadingsResearched": 32,
+    "teamHeadingsReviewed": 32,
+    "fullCategoricalTeamReviewsCompleted": 0,
+    "numericalChanges": 0
+  },
+  "remainingWork": [
+    "For every team, affirmatively source or explicitly source-block QB, general injuries, roster changes, OL, pass rush, secondary, playmakers, coaching and schedule/rest/travel.",
+    "Bind exact per-team URLs and as-of times for every mandatory category, including affirmative no-change checks.",
+    "Re-run critical review, then create the governed ledger sweep and research-completion receipt only if all categorical gaps close."
+  ],
+  "recordedAt": "2026-11-10T13:23:10.345Z"
+}
