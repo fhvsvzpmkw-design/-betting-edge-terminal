@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-2026-11-10-0800",
+  "executionRunId": null,
+  "workBinding": {
+    "candidateId": "2026-11-10T08:23:51-07:00|2",
+    "slot": "main",
+    "canonicalSlot": 2,
+    "feedBlobSha": "3788836db1980ba9cef40982ef4956f2e78bd0f8",
+    "feedGeneratedAt": "2026-11-10T15:14:14.107Z",
+    "pinnacleObserverBlobSha": "ac6b0213b810086c001fbb1fefda22061d96c105",
+    "pinnacleGeneratedAt": "2026-11-10T15:14:15.668Z",
+    "initialCheckpointBlobSha": "473b85d32949a201e43ee29daf427f6179850f8b",
+    "completedEventCheckpointBlobSha": "8a9cb5213631a149b4372fdacdf29eddc8e5f7fd"
+  },
+  "mode": "TARGETED_RESEARCH",
+  "reason": "The 08:00 update profile began coordinator-only. One targeted independent reviewer was used for material price reversals, lineup changes and a source-conflict check after the full 16-event inventory was screened.",
+  "workers": [
+    {
+      "role": "targeted_reviewer",
+      "actualId": "/root/main_0800_targeted_reviewer",
+      "readOnlyBoundary": true,
+      "freshContextBoundary": "Bound to candidate 2026-11-10T08:23:51-07:00|2, feed 3788836db1980ba9cef40982ef4956f2e78bd0f8, observer ac6b0213b810086c001fbb1fefda22061d96c105 and the named Miami-Utah, Oklahoma City-Portland and Detroit-St. Louis conflicts; no odds collection, writes, staging, merging or child agents.",
+      "assignmentId": "price-lineup-conflict-review",
+      "bindings": {
+        "feedBlobSha": "3788836db1980ba9cef40982ef4956f2e78bd0f8",
+        "events": ["73719600", "73719604", "72909422"]
+      },
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "clockLimitation": "The collaboration interface confirmed the exact-bound acknowledgment within 60 seconds and returned work, but did not expose reliable coordinator-observed timestamps; no timestamps were invented.",
+      "acknowledgmentState": "EXACT_BINDING_ACKNOWLEDGED_WITHIN_60_SECONDS",
+      "state": "RETURNED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "START_ZERO_WORKERS",
+      "reason": "08:00 update profile; the coordinator first screened all 16 events, the exact quotes, retained forecasts and Guy's early board."
+    },
+    {
+      "decision": "LAUNCH_ONE_TARGETED_REVIEWER",
+      "namedQuestion": "Do the material Miami-Utah, Oklahoma City-Portland and Detroit-St. Louis price/personnel changes support a different decision from the prior lane?",
+      "expectedQualityBenefit": "Independently challenge the largest current changes before completing exact-price decisions.",
+      "releaseCondition": "Return exact price direction, official availability facts and the strongest contrary case.",
+      "result": "RETURNED; all three cases retained as PASS with current, narrower reasons."
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "reason": "The reviewer resolved the consequential conflicts; the remaining 15 gaps were exact-reference shortfalls rather than additional research conflicts."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "Utah ML and Portland ML moved from favorable to unfavorable versus their exact paired benchmarks, while both games carried material official availability uncertainty.",
+      "decisionImpact": "Both directions remained zero-stake PASS; no prior-lane forecast point was treated as refreshed or adopted as a fair."
+    },
+    {
+      "finding": "Detroit -1.5's earlier tiny favorable difference reversed to a 0.021-point unfavorable comparison, with Detroit absences and the starting-goalie assignment unresolved.",
+      "decisionImpact": "The puck-line case remained PASS rather than being promoted from a de minimis historical comparison."
+    }
+  ],
+  "completedWork": {
+    "workersLaunched": 1,
+    "workersAcknowledged": 1,
+    "workersReturned": 1,
+    "eventsReviewedByCoordinator": 16,
+    "selectionsAssessed": 96,
+    "evaluatedSelections": 81,
+    "documentedSourceShortfalls": 15,
+    "forecastApplicabilityReviews": 54,
+    "guyCandidatesReviewed": 0,
+    "decisions": {"BET": 0, "LEAN": 0, "WAIT": 0, "PASS": 81}
+  },
+  "remainingWork": {
+    "producerUnfinishedSelections": 0,
+    "documentedSourceShortfalls": 15,
+    "sourceShortfallFamilies": ["12 NBA spread sides", "3 NCAAF spread sides"],
+    "publication": "PENDING",
+    "guy": "EARLY_BOARD_REVIEWED_NO_ISSUED_CALL"
+  },
+  "publication": null,
+  "recordedAt": "2026-11-10T15:36:00Z"
+}
