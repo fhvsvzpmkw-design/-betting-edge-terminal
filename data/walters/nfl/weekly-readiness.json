@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 10,
-  "generatedAt": "2026-11-10T14:12:57.034Z",
+  "generatedAt": "2026-11-10T14:45:26.097Z",
   "state": "CURRENT_WITH_LIMITATIONS",
   "counts": {
     "historicalApplied": 7,
     "historicalExpected": 14,
     "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 7,
+    "stalledHistoricalGames": 6,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 0,
     "ratingBasesBehind": 0,
@@ -88,123 +88,6 @@
     "instruction": "Check for a live competing baseline runtime, then execute the full current-information baseline under the existing partial-weekly-input policy. Do not wait for historical learning or next-week rollover; preserve unresolved weekly and numerical inputs."
   },
   "historicalGames": [
-    {
-      "gameKey": "2026-W07-NYG-HOU",
-      "away": "NYG",
-      "home": "HOU",
-      "state": "RECONCILE",
-      "workClass": "WAITING_SOURCE_OR_METHOD",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-early-window-targeted-reconciliation.json",
-        "blobSha": "2219be9b4edf5d6f16b64aff948bffbb82860ede",
-        "recordedAt": "2026-11-04T00:22:50Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        },
-        "finalInactiveReserveAndElevationInventories": {
-          "state": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS_WITH_ELEVATION_CATEGORY_LIMITATION_EXPLICIT",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        },
-        "pairedParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        },
-        "quarterbackParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        },
-        "specialistParticipation": {
-          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        },
-        "officialInGameInjuryReporting": {
-          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE; UNPRINTED INITIAL_BOUNDARIES_REMAIN_EXPLICIT",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-early-window-official-gamebooks.json"
-        }
-      },
-      "blockers": [
-        {
-          "team": "NYG",
-          "player": "Greg Newsome II / Jason Pinnock / Marcus Mbow",
-          "code": "DISTINCT_ROLES_AND_NEW_INACTIVE_REVIEW",
-          "finding": "Newsome out, but former relief Nic Jones has no defensive snaps; healthy active Adebo and Banks begin outside and other defensive corners actually rotate. Pinnock has 23s missed at safety and Nubin only one defensive snap. Mbow knee inactive is a new backup tackle case.",
-          "nextAction": "Verify Newsome’s ordinary and actual outside/slot roles with signed final lineup; bind eligible disjoint actual/role-depth relief. Verify Nubin’s one snap or another eligible safety, and classify Mbow/R. Reed/Sills.",
-          "sourceIds": [
-            "nyg-hou-book",
-            "nyg-hou-nyg-final",
-            "nyg-hou-nyg-friday"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "team": "NYG",
-          "player": "Tyrone Tracy Jr / Jaxson Dart",
-          "code": "OVERTIME_EXPOSURE_CONVENTION",
-          "finding": "Official final played overtime. Dart missed the whole game and two game-available QBs have the same frozen value. Tracy p13 play clock is 5:29 but official club describes 5:10; no exact treatment of clock crossing or duration was entered.",
-          "nextAction": "Use full-game historical QB exposure, and require the governing evaluator convention for the elapsed denominator and OT/Tracy clock bracket; keep Singletary documented distinct.",
-          "sourceIds": [
-            "nyg-hou-book",
-            "nyg-hou-nyg-qb",
-            "nyg-hou-nyg-tracy"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "team": "HOU",
-          "player": "David Montgomery / Woody Marks",
-          "code": "NESTED_RUNNING_BACK_RELIEF",
-          "finding": "Prior exact Montgomery relief Marks himself was out Q3 2:45 to Q4 8:47; Ogunbowale was the only other active RB and cannot be counted twice in nested cases.",
-          "nextAction": "Check documented passing/rushing duty during interval and get governed method review for one Montgomery whole-game vacancy plus incremental Marks interval without duplicate healthy duty or relief.",
-          "sourceIds": [
-            "nyg-hou-book",
-            "nyg-hou-hou-final",
-            "nyg-hou-hou-friday"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "team": "HOU",
-          "player": "Jaylin Noel / Noah Whittington / additional OL/TE inactives",
-          "code": "EXPOSURE_BASELINE_AND_IDENTITY",
-          "finding": "Noel had receiving and return roles and no printed initial injury play. Whittington is an archived practice-squad injured RB absent from the frozen registry. Fisher/Nwaiwu/Thomas/Klein require injury-versus-scratch classification.",
-          "nextAction": "Bind reported Noel no-return and narrow earliest/latest with official sequence and independent role evidence; recheck official/independent NFL27 identity for Whittington and use only an eligible historical position estimate. Reconcile final Friday injuries with final list.",
-          "sourceIds": [
-            "nyg-hou-book",
-            "nyg-hou-hou-final",
-            "nyg-hou-hou-friday",
-            "nyg-hou-hou-noel",
-            "nyg-hou-hou-noel-report",
-            "nyg-hou-whittington"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-21T22:04:30.000Z",
-      "lastEvidenceAt": "2026-11-04T00:22:50Z",
-      "unchangedSince": "2026-11-04T00:22:50Z",
-      "stalled": true,
-      "fingerprint": "db9cd7f00a69c96eace4d010c040377d8073b29f3c18ed91e1264da7665e70b5",
-      "followUp": {
-        "state": "WAITING_SOURCE_OR_METHOD",
-        "reason": "UNCHANGED_AFTER_RECONCILIATION",
-        "resumeWhen": "New source facts or an approved method changes the recorded blocker."
-      },
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
     {
       "gameKey": "2026-W07-PIT-NO",
       "away": "PIT",
@@ -736,6 +619,112 @@
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+    },
+    {
+      "gameKey": "2026-W07-NYG-HOU",
+      "away": "NYG",
+      "home": "HOU",
+      "state": "RECONCILE",
+      "workClass": "WAITING_SOURCE_OR_METHOD",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json",
+        "blobSha": "8973587abf8a62d97afcd2f195bb12005aa41012",
+        "recordedAt": "2026-11-10T14:38:25Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE_OFFICIAL",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED_REMAINING_EXPOSURE_ROLE_AND_IDENTITY_CASES",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        },
+        "finalInactiveReserveAndElevationInventories": {
+          "state": "COMPLETE_SOURCE_BOUND_PAIRED",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        },
+        "pairedParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        },
+        "quarterbackParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        },
+        "specialistParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        },
+        "officialInGameInjuryReporting": {
+          "state": "COMPLETE_PRINTED_GAMEBOOK_AND_ADDITIVE_BOUNDARY_RECONCILIATION",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json"
+        }
+      },
+      "blockers": [
+        {
+          "team": "NYG",
+          "player": "Jason Pinnock / Marcus Mbow",
+          "code": "DISTINCT_SAFETY_RELIEF_AND_BACKUP_TACKLE_REVIEW",
+          "finding": "Newsome's outside role and Adebo relief are now source-bound. Pinnock's 23-second safety interval still lacks a direct disjoint assignment, and Mbow's knee inactive backup-tackle case lacks an eligible role/value closure.",
+          "nextAction": "Wait for a source-supported safety assignment or approved bounded-capacity method and an eligible Mbow no-established-role/value decision.",
+          "sourceIds": [
+            "nyg-hou-prior-complete-inventory"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "team": "NYG",
+          "player": "Tyrone Tracy Jr / Jaxson Dart",
+          "code": "OVERTIME_EXPOSURE_CONVENTION",
+          "finding": "The official final played overtime; source-bound clocks and roles are retained, but the elapsed denominator and bounded Tracy interval remain unapproved.",
+          "nextAction": "Resume only when the existing evaluator accepts a source-bound overtime/bounded-exposure convention.",
+          "sourceIds": [
+            "nyg-hou-prior-complete-inventory"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "team": "HOU",
+          "player": "David Montgomery / Woody Marks",
+          "code": "NESTED_RUNNING_BACK_RELIEF",
+          "finding": "Marks was Montgomery's prior relief and himself missed Q3 2:45 to Q4 8:47; the only other active back cannot be credited twice.",
+          "nextAction": "Resume only with a source-supported disjoint allocation or approved nested-running-back method.",
+          "sourceIds": [
+            "nyg-hou-prior-complete-inventory"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "team": "HOU",
+          "player": "Jaylin Noel / Noah Whittington / additional OL/TE inactives",
+          "code": "EXPOSURE_BASELINE_AND_IDENTITY",
+          "finding": "Noel's complete receiving/return boundary and disjoint relief, Whittington's frozen identity/value route, and the injury-versus-scratch classification of Fisher/Nwaiwu/Thomas/Klein remain unresolved.",
+          "nextAction": "Resume only when a material source or approved existing adapter resolves one of the named boundary, identity, value or healthy-scratch questions.",
+          "sourceIds": [
+            "nyg-hou-prior-complete-inventory"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ],
+      "firstSeenAt": "2026-10-21T22:04:30.000Z",
+      "lastEvidenceAt": "2026-11-10T14:38:25Z",
+      "unchangedSince": "2026-11-10T14:38:25Z",
+      "stalled": false,
+      "fingerprint": "6a6a27268e58c247c5ab34aea465f0873940c2bd33bb8747f6e87c562602997a",
+      "followUp": {
+        "state": "WAITING_SOURCE_OR_METHOD",
+        "reason": "TARGETED_PASS_EXHAUSTED",
+        "resumeWhen": "New source facts or an approved method changes the recorded blocker."
+      },
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
+      "escalation": null
     },
     {
       "gameKey": "2026-W07-CIN-BAL",
@@ -3428,7 +3417,6 @@
     {
       "code": "STALLED_HISTORICAL_RECOVERY",
       "games": [
-        "2026-W07-NYG-HOU",
         "2026-W07-PIT-NO",
         "2026-W07-MIA-NYJ",
         "2026-W07-SF-ATL",
@@ -3534,6 +3522,7 @@
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json": "0dad30a474aec7dd2e7b56b8dc45d217710f993b",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-tb-car-targeted-reconciliation.json": "c49e33032044cd25b0c9b75d5620165de9da3078",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-pit-no-healthy-scratch-and-stopping-rule.json": "48778808b87010f7b8d53fa20ffad52f4abfe723",
-    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-tb-car-source-confirmed-scratches.json": "9e934d0cb97bb437fc3e05c6f7dd263a414f3147"
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-tb-car-source-confirmed-scratches.json": "9e934d0cb97bb437fc3e05c6f7dd263a414f3147",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json": "8973587abf8a62d97afcd2f195bb12005aa41012"
   }
 }
