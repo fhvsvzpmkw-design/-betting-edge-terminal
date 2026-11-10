@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "TUESDAY_BASELINE",
+  "executionRunId": "graham-tuesday-baseline-2026-w10-20261110T070700-0700",
+  "workBinding": {
+    "phase": "W10_32_TEAM_NINE_CATEGORY_BASELINE_RETRY",
+    "mainCommit": "5b9e7a51e5d140b890c5150ec0251fabb27e0478",
+    "season": 2026,
+    "week": 10,
+    "runEventId": "graham-tuesday-baseline-2026-w10-20261110T070700-0700"
+  },
+  "mode": "AGENTS_READY",
+  "reason": "The prior controlled failure identified missing affirmative category checks. This retry targeted exactly those gaps.",
+  "workers": [
+    {
+      "role": "SOURCE_RESEARCHER",
+      "workerId": "/root/w10_afc_category_matrix",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": [
+        "AFC_16_X_9_CATEGORY_MATRIX"
+      ],
+      "state": "RETURNED",
+      "result": "Returned 16 AFC teams across all nine categories with exact official URLs/dates or checked-source shortfalls."
+    },
+    {
+      "role": "SOURCE_RESEARCHER",
+      "workerId": "/root/w10_nfc_category_matrix",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": [
+        "NFC_16_X_9_CATEGORY_MATRIX"
+      ],
+      "state": "RETURNED",
+      "result": "Returned 16 NFC teams across all nine categories with exact official URLs/dates or checked-source shortfalls."
+    },
+    {
+      "role": "CRITICAL_REVIEWER",
+      "workerId": "/root/w10_category_reviewer",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": [
+        "FULL_32_TEAM_288_CELL_REVIEW"
+      ],
+      "state": "RETURNED_PASS_WITH_CONDITIONS",
+      "result": "Accepted 288/288 categorical coverage; corrected byes/PIT, preserved projections and source shortfalls, and approved zero hand-edited numeric actions."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "NORMAL_THREE_WORKER_POOL",
+      "workers": 3,
+      "namedQuestion": "Do the two matrices close every mandatory team/category coverage cell?",
+      "releaseCondition": "Both matrices and independent PASS returned."
+    }
+  ],
+  "qualityFindings": [
+    "Week 10 byes are CHI, DEN, PHI and TB; PIT comes off its Week 9 bye.",
+    "Bates, Davis and Godchaux acquisitions are reflected for JAX and Cisco for DET without inferred roles.",
+    "Expected starters and return windows remain unconfirmed; checked source shortfalls do not establish health.",
+    "Zero hand-edited numeric actions is appropriate; governed production owners retain numerical changes."
+  ],
+  "completedWork": {
+    "researchersLaunched": 2,
+    "researchersReturned": 2,
+    "reviewersLaunched": 1,
+    "reviewersReturned": 1,
+    "teamsResearched": 32,
+    "teamsReviewed": 32,
+    "categoryCellsReviewed": 288,
+    "gamesReviewed": 14,
+    "numericalChanges": 0
+  },
+  "remainingWork": [
+    "Governed QB/personnel production for confirmed changes.",
+    "Material practice, activation, role, replacement and value evidence as it publishes."
+  ],
+  "recordedAt": "2026-11-10T14:19:48.740Z"
+}
