@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "policyId": "graham-weekly-production-v2",
+  "season": 2026,
+  "sourceWeek": 9,
+  "recordedAt": "2026-11-10T05:07:36Z",
+  "scope": "Additive BUF-MIN final-source gate after official club surfaces reached Final. Reuses the immutable Week 9 baseline, the verified Monday kickoff closeout, both official final inactive lists and same-day roster/elevation facts. Binds Buffalo 23, Minnesota 6. At the observation cutoff the official NFL game center had reached Final but did not expose a downloadable final gamebook; complete starters, substitutes, participation/DNP, printed injury/return, specialist and official snap coverage remain explicit UNRESOLVED fields. No started-game prediction, fair, carried rating, historical receipt or market field is changed.",
+  "inputCommit": "b26d1baa84da67a8aa7769a8d64544102b36c74f",
+  "inputBlobs": {
+    "data/walters/nfl/active-week.json": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "data/walters/nfl/2026/week-09-current-numbers.json": "f47d4d582ff5f18bffa572e649757768da927d95",
+    "data/walters/nfl/2026/week-09-research-ledger.json": "6ec660d589caba3971100397eb38cd15d6e37c48",
+    "data/walters/nfl-power-ratings-ledger.json": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "data/walters/nfl/home-field/h4-current.json": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+    "data/walters/nfl/weekly-readiness.json": "6c88c86770bb46a9c9c8e6c53e7e18e6dfde8302"
+  },
+  "marketViewed": false,
+  "estimationPolicy": "Factual preparation only. Missing participation, exposure, replacements and values are not zero. An official final score without the complete final gamebook does not support a paired numerical evaluation. No new numerical method is authorized.",
+  "sources": [
+    {
+      "id": "buf-min-official-vikings-final",
+      "kind": "OFFICIAL_FINAL",
+      "url": "https://www.vikings.com/game-day/2026/bills-reg-week9/game-center",
+      "capturedAt": "2026-11-10T05:02:00Z",
+      "finding": "Official Minnesota game center reached FINAL with Buffalo 23 and Minnesota 6; Buffalo moved to 7-1 and Minnesota to 6-2."
+    },
+    {
+      "id": "buf-min-official-nfl-final-no-gamebook",
+      "kind": "OFFICIAL_GAME_CENTER",
+      "url": "https://www.nfl.com/games/bills-at-vikings-2026-reg-9",
+      "capturedAt": "2026-11-10T05:04:00Z",
+      "finding": "Fresh official NFL game center reached Final and exposed recap/stats navigation but no Download Game Book link or PDF URL. Complete official participation pages and snap tables were not available at the stopping boundary."
+    },
+    {
+      "id": "buf-min-official-bills-inactives",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.buffalobills.com/news/buffalo-bills-inactives-vs-vikings-week-9-mnf",
+      "capturedAt": "2026-11-10T05:05:00Z",
+      "finding": "Official Buffalo notice lists six final inactives: Skyler Bell, Jalon Kilgore, Mike Danna, Alec Anderson, Dion Dawkins and Greg Gaines; it also confirms Geno Stone and Trent Sherfield elevations."
+    },
+    {
+      "id": "buf-min-official-vikings-inactives",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.vikings.com/news/inactives-buffalo-bills-week-9-2026",
+      "capturedAt": "2026-11-10T05:05:00Z",
+      "finding": "Official Minnesota notice lists six final inactives: Kyler Murray, Jakobe Thomas, Jauan Jennings, Chuck Demmings, Theo Jackson and Caleb Banks; it confirms Carson Wentz started with Max Brosmer as backup."
+    },
+    {
+      "id": "buf-min-bound-kickoff-closeout",
+      "kind": "REPOSITORY",
+      "path": "data/walters/nfl/2026/week-09-research-ledger.json",
+      "blobSha": "6ec660d589caba3971100397eb38cd15d6e37c48",
+      "finding": "Verified Monday kickoff closeout binds both final inactive lists, game-day roster/elevation transactions, current QB publication and unresolved cluster/workload safeguards without rewriting the completed sweep."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W09-BUF-MIN",
+      "away": "BUF",
+      "home": "MIN",
+      "state": "BLOCKED",
+      "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+      "checklist": {
+        "exactFinal": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE_REUSED_IMMUTABLE",
+        "finalInactives": "COMPLETE_OFFICIAL",
+        "reserveElevationsAndTransactions": "COMPLETE_SOURCE_BOUND_WITH_FINAL_GAMEBOOK_RECONCILIATION_PENDING",
+        "participationAndDnp": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "inGameInjuryAndReturnInventory": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "quarterbackInventory": "PARTIAL_ACTUAL_STARTERS_CONFIRMED_FULL_PARTICIPATION_UNRESOLVED",
+        "specialistInventory": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "officialSnapCounts": "UNRESOLVED_NOT_PUBLISHED",
+        "pairedGameDayInjuryLoss": "BLOCKED_MISSING_COMPLETE_FINAL_SOURCE_INVENTORY"
+      },
+      "final": {
+        "awayScore": 23,
+        "homeScore": 6,
+        "state": "OFFICIAL_FINAL_VERIFIED",
+        "sourceId": "buf-min-official-vikings-final"
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-11-09T17:15:00-08:00",
+        "awayRating": 27.91586945,
+        "homeRating": 25.1652697866,
+        "neutralBaseHome": 2.7505996634,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "qbPerformancePointsToHomeSpread": 1.9,
+        "preservedPregameExactFairHome": 2.569,
+        "preservedPregameDisplayedFairHome": 2.5,
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "teams": [
+        {
+          "team": "BUF",
+          "side": "AWAY",
+          "finalInactives": [
+            "Skyler Bell",
+            "Jalon Kilgore",
+            "Mike Danna",
+            "Alec Anderson",
+            "Dion Dawkins",
+            "Greg Gaines"
+          ],
+          "reserveElevationsAndTransactions": [
+            "Geno Stone and Trent Sherfield were elevated for Week 9 in the official inactive notice.",
+            "Joshua Palmer moved to Reserve/Injured and Jordan Hancock/Tyrell Shavers were not activated in the bound kickoff closeout.",
+            "UNRESOLVED — the final gamebook is required to reconcile the complete active, starter, substitute and DNP inventory."
+          ],
+          "participationAndDnp": [
+            "Josh Allen actual primary quarterback duty is confirmed by the official final game context.",
+            "UNRESOLVED — all offensive/defensive starters, substitutes, official DNP rows and phase exposure require the final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "UNRESOLVED — no injury, return or exit boundary is inferred without the complete official final play-by-play and injury-update annotations."
+          ],
+          "quarterback": {
+            "pregameBinding": "Josh Allen",
+            "actualParticipation": "PRIMARY DUTY CONFIRMED; complete snap coverage and reserve-quarterback participation/DNP unresolved"
+          },
+          "specialists": [
+            "UNRESOLVED — actual kicker, punter, holder, long-snapper and returner participation require the final gamebook and official snap tables."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-BUF-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official starters, substitutes, DNP, printed injury/return, specialist and offense/defense/special-teams snap inventory.",
+              "footballImpact": "The Dawkins/Anderson offensive-line cluster, Gaines/Danna defensive-line duties and Palmer/Sherfield receiver allocation cannot receive exposure, distinct replacement allocation or value-based injury loss without complete final participation.",
+              "reopenWhen": "The official NFL game center exposes the final gamebook or another official complete final participation source and official snap tables are published."
+            }
+          ]
+        },
+        {
+          "team": "MIN",
+          "side": "HOME",
+          "finalInactives": [
+            "Kyler Murray",
+            "Jakobe Thomas",
+            "Jauan Jennings",
+            "Chuck Demmings",
+            "Theo Jackson",
+            "Caleb Banks"
+          ],
+          "reserveElevationsAndTransactions": [
+            "Odell Beckham Jr. joined the active roster, Demond Claiborne moved to Reserve/Injured and Tavierre Thomas was elevated in the bound kickoff closeout.",
+            "Jay Ward was active; Theo Jackson was inactive.",
+            "UNRESOLVED — the final gamebook is required to reconcile the complete active, starter, substitute and DNP inventory."
+          ],
+          "participationAndDnp": [
+            "Official Minnesota inactive notice confirms Carson Wentz as starter and Max Brosmer as backup.",
+            "UNRESOLVED — all offensive/defensive starters, substitutes, official DNP rows and phase exposure require the final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "UNRESOLVED — no injury, return or exit boundary is inferred without the complete official final play-by-play and injury-update annotations."
+          ],
+          "quarterback": {
+            "pregameBinding": "Carson Wentz",
+            "actualParticipation": "PRIMARY DUTY CONFIRMED; complete snap coverage and Max Brosmer participation/DNP unresolved"
+          },
+          "specialists": [
+            "UNRESOLVED — actual kicker, punter, holder, long-snapper and returner participation require the final gamebook and official snap tables."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W09-MIN-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official starters, substitutes, DNP, printed injury/return, specialist and offense/defense/special-teams snap inventory.",
+              "footballImpact": "The Jackson/Thomas/Ward safety allocation, Jennings/Beckham receiver duties and Claiborne backfield workload cannot receive distinct replacement allocation or value-based injury loss without complete final participation.",
+              "reopenWhen": "The official NFL game center exposes the final gamebook or another official complete final participation source and official snap tables are published."
+            }
+          ]
+        }
+      ],
+      "safeguards": [
+        "Dawkins and Anderson remain one combined offensive-line exposure chain; they are not separate additive starter losses without distinct final replacements and values.",
+        "Gaines and Danna may not be double-counted through overlapping defensive-line or edge replacement duties.",
+        "Palmer reserve status and Sherfield elevation do not establish a one-for-one receiver workload.",
+        "Jackson, Thomas and Ward remain one safety allocation question until final participation is bound.",
+        "Jennings absence and Beckham activation do not establish a one-for-one receiver workload.",
+        "Claiborne reserve status does not establish a value-invariant replacement committee or zero loss.",
+        "Missing participation, replacement values and exposure are never zero."
+      ],
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The official final gamebook, complete participation pages, printed play-by-play injury/return annotations and offense/defense/special-teams snap tables were not published at the stopping boundary.",
+          "footballImpact": "A paired numerical evaluation would otherwise invent missing starters, DNP, exposure, replacements or zero values.",
+          "nextAction": "Reopen only when the official NFL game center exposes the complete final gamebook or another official complete final participation source and official snap tables are available.",
+          "sourceIds": [
+            "buf-min-official-vikings-final",
+            "buf-min-official-nfl-final-no-gamebook",
+            "buf-min-bound-kickoff-closeout"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Known final inactives and same-day roster moves do not establish distinct final replacement allocation, complete exposure or immutable values for the recorded OL, DL, WR, safety and RB groups.",
+          "footballImpact": "Missing values are not zero and overlapping clusters cannot be summed without final participation and existing approved bindings.",
+          "nextAction": "After the official inventory posts, reconcile each named cluster once and use only approved existing exposure, replacement and value routes.",
+          "sourceIds": [
+            "buf-min-official-bills-inactives",
+            "buf-min-official-vikings-inactives",
+            "buf-min-bound-kickoff-closeout"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ],
+  "reviewConclusion": {
+    "exactFinal": "BUF 23, MIN 6 — OFFICIAL_FINAL_VERIFIED",
+    "completeFinalInactivesAndGameDayMoves": "SOURCE_BOUND",
+    "completeFinalParticipationAndSnapInventory": "UNAVAILABLE_AT_CAPTURE_CUTOFF",
+    "numericStagingState": "NO_INJURY_IMPACT_OR_REPLACEMENT_VALUE_SUPPORTED_FROM_PARTIAL_FINAL_SOURCES",
+    "nextAction": "Reopen once the official final gamebook and both teams' offense/defense/special-teams snap tables are published. Preserve the verified kickoff closeout and all cluster/double-count safeguards."
+  }
+}
