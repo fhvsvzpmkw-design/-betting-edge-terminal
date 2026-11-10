@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_COORDINATOR_ACTIVE_WEEK_PREPARATION",
+  "executionRunId": null,
+  "workBinding": {
+    "phase": "ACTIVE_WEEK_FINAL_PREPARATION",
+    "season": 2026,
+    "week": 9,
+    "gameKey": "2026-W09-BUF-MIN",
+    "activeManifestPath": "data/walters/nfl/active-week.json",
+    "activeManifestBlobSha": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "readinessGeneratedAt": "2026-11-10T01:58:01.070Z",
+    "priorCloseoutLedgerBlobSha": "6ec660d589caba3971100397eb38cd15d6e37c48",
+    "expectedFinalSource": "Official NFL/team final game center and downloadable gamebook"
+  },
+  "mode": "AGENTS_COMPLETE_GATED_NO_FINAL",
+  "reason": "The readiness queue exposed BUF-MIN as AVAILABLE_WORK after kickoff, but independent official checks established that the game was still live and no final gamebook existed. Workers stopped before provisional inventory construction.",
+  "workers": [
+    {
+      "role": "BUFFALO_SOURCE_RESEARCHER",
+      "id": "/root/buf_min_buf_sources",
+      "readOnly": true,
+      "freshMarketFreeContext": true,
+      "assignmentId": "2026-W09-BUF-MIN-BUF-OFFICIAL-INVENTORY",
+      "acknowledgment": "ACKNOWLEDGED_WITHIN_60_SECOND_BOUND",
+      "launchClock": null,
+      "acknowledgmentClock": null,
+      "returnClock": null,
+      "state": "RETURNED_GATED",
+      "result": "Official Bills/NFL game center live in Q1; no final result or gamebook. Buffalo evaluator section not built.",
+      "clockNote": "The collaboration API returned no per-message clock; coordinator observed launch, acknowledgment and return in this execution."
+    },
+    {
+      "role": "MINNESOTA_SOURCE_RESEARCHER",
+      "id": "/root/buf_min_min_sources",
+      "readOnly": true,
+      "freshMarketFreeContext": true,
+      "assignmentId": "2026-W09-BUF-MIN-MIN-OFFICIAL-INVENTORY",
+      "acknowledgment": "ACKNOWLEDGED_WITHIN_60_SECOND_BOUND",
+      "launchClock": null,
+      "acknowledgmentClock": null,
+      "returnClock": null,
+      "state": "RETURNED_GATED",
+      "result": "Official NFL and Vikings game centers still live in Q1; no final gamebook. Minnesota evaluator section not built.",
+      "clockNote": "The collaboration API returned no per-message clock; coordinator observed launch, acknowledgment and return in this execution."
+    },
+    {
+      "role": "INDEPENDENT_PAIRED_REVIEWER",
+      "id": "/root/buf_min_reviewer",
+      "readOnly": true,
+      "freshMarketFreeContext": true,
+      "assignmentId": "2026-W09-BUF-MIN-PAIRED-INVENTORY-REVIEW",
+      "acknowledgment": "ACKNOWLEDGED_WITHIN_60_SECOND_BOUND",
+      "launchClock": null,
+      "acknowledgmentClock": null,
+      "returnClock": null,
+      "state": "RETURNED_GATED",
+      "result": "NOT READY. Official game center live; prior-matchup FINAL text is not the current game; no Download Game Book link.",
+      "clockNote": "The collaboration API returned no per-message clock; coordinator observed launch, acknowledgment and return in this execution."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "NORMAL_THREE_WORKER_POOL",
+      "namedQuestion": "Whether BUF-MIN was truly final and had an official gamebook sufficient for complete paired inventory.",
+      "expectedQualityBenefit": "Independent team-source checks plus reviewer protection against premature use of a live-game page.",
+      "readOnlyAssignment": true,
+      "completionOrReleaseCondition": "Stop immediately if the official current game is not FINAL or the final gamebook is absent.",
+      "result": "All three stopped at the source gate; no expansion."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "The readiness AVAILABLE_WORK state reflected post-kickoff preparation, not an official final.",
+      "impact": "Prevented premature final-score or participation capture."
+    },
+    {
+      "finding": "The NFL page's visible FINAL label belonged to the previous-matchup section, not BUF-MIN.",
+      "impact": "Prevented misclassification of current game state."
+    }
+  ],
+  "completedWork": {
+    "sourceResearchersLaunched": 2,
+    "sourceResearchersReturned": 2,
+    "reviewersLaunched": 1,
+    "reviewersReturned": 1,
+    "officialGameStateChecks": 3,
+    "teamInventoriesCompleted": 0,
+    "pairedReviewsCompleted": 0,
+    "sharedStateWritesByWorkers": 0,
+    "numericalChanges": 0,
+    "marketViewed": false
+  },
+  "remainingWork": [
+    "Wait for the official current game to reach FINAL.",
+    "Retrieve the official downloadable final gamebook.",
+    "Build both complete evaluator-form team inventories: final inactive/reserve/elevation, starters/substitutes/DNP, phase participation, printed injury/return annotations, quarterbacks and specialists.",
+    "Bind distinct replacements, exposure and approved immutable values; retain UNRESOLVED cases and cluster/double-count safeguards.",
+    "Validate the paired inventory before any numerical writer or rollover action."
+  ],
+  "recordedAt": "2026-11-10T01:59:54.462Z"
+}
