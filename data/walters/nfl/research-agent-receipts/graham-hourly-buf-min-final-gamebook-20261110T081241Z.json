@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_COORDINATOR_ACTIVE_WEEK_FINAL_RECONCILIATION",
+  "executionRunId": null,
+  "workBinding": {
+    "phase": "ACTIVE_WEEK_FINAL_EVIDENCE_RECONCILIATION",
+    "season": 2026,
+    "week": 9,
+    "gameKey": "2026-W09-BUF-MIN",
+    "inputCommit": "db95b5d8c53610bc7c09016b3fa96e62d3e91b67",
+    "activeManifestBlobSha": "8a3847b04ca7479283ef0fca22fee7c80b0f4d8a",
+    "priorSourceGateBlobSha": "e53f8e030c4c7602a9ae07092ff5d40dd4313d17",
+    "officialGamebookUrl": "https://static.www.nfl.com/image/upload/v1794285215/gamecenter/ab5825a7-4feb-11f1-abca-2c54536568a9.pdf",
+    "officialGamebookSha256": "056ac51502fffbff963f8c7ab1b425a6965e3631cc77b9d84890c3beb502f7a2",
+    "marketViewed": false,
+    "scope": "Two fresh-context source-only team inventories and one independent paired reviewer. Workers did not delegate, write shared state, use market inputs, change methods or numbers, or publish."
+  },
+  "mode": "AGENTS_COMPLETE_FACTUAL_RECONCILIATION_NUMERICALLY_BLOCKED",
+  "reason": "The official final gamebook materially changed the prior source gate and required a complete paired factual reconciliation before any valuation or carried-rating writer.",
+  "workers": [
+    {
+      "workerId": "/root/buf_min_buf_final",
+      "role": "SOURCE_RESEARCHER_BUF",
+      "returnState": "COMPLETE_WITH_EXPLICIT_GAPS",
+      "acknowledgment": "ACKNOWLEDGED_WITHIN_60_SECOND_BOUND",
+      "quality": "Inspected all 16 official gamebook pages and official Buffalo sources; returned complete participation, injury/update, quarterback and specialist inventories with phase snaps and values explicit as unresolved."
+    },
+    {
+      "workerId": "/root/buf_min_min_final",
+      "role": "SOURCE_RESEARCHER_MIN",
+      "returnState": "COMPLETE_WITH_EXPLICIT_GAPS",
+      "acknowledgment": "ACKNOWLEDGED_WITHIN_60_SECOND_BOUND",
+      "quality": "Inspected all 16 official gamebook pages and official Minnesota sources; returned complete participation, transaction, injury/update, quarterback and specialist inventories with phase snaps, values and terminal gaps explicit."
+    },
+    {
+      "workerId": "/root/buf_min_final_reviewer",
+      "role": "INDEPENDENT_CRITICAL_PAIRED_REVIEWER",
+      "returnState": "COMPLETE_BLOCKED_NUMERICALLY",
+      "acknowledgment": "ACKNOWLEDGED_WITHIN_60_SECOND_BOUND",
+      "quality": "Independently verified the final, all gamebook categories and thirteen literal injury/status/return rows; identified identity, no-play, replay, duplicate-rendering and returned-then-questionable guards."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "NORMAL_THREE_WORKER_POOL",
+      "reason": "Two team-side source owners plus one fresh independent reviewer matched the governed default; no additional named method question was actionable before official phase snaps or an approved exposure method exists."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "The gamebook completes starters, substitutions, blank DNP rows, Not Active lists, actual QB/specialist duty and all printed injury/status/return annotations, but not individual phase snap counts.",
+      "impact": "The prior source-unavailable gate is corrected additively without claiming numerical readiness."
+    },
+    {
+      "finding": "Tyrion Ingram-Dawkins is printed returned at Q3 1:08 and Questionable again after Q4 14:49 without a second incident or terminal update.",
+      "impact": "The chronology remains unresolved and cannot be converted into an invented second interval or zero exposure."
+    },
+    {
+      "finding": "Jacob Thomas, Jakobe Thomas and Tavierre Thomas are distinct identities; Kyle Van Noy and Andrew Van Ginkel are distinct identities.",
+      "impact": "Prevents identity merging and duplicate/inferred losses."
+    },
+    {
+      "finding": "The final gamebook contains no official individual offense/defense/special-teams snap table, and no official club snap article was available at the capture cutoff.",
+      "impact": "Exact exposure, replacement allocation and paired numerical loss remain blocked."
+    }
+  ],
+  "completedWork": {
+    "sourceResearchersLaunched": 2,
+    "sourceResearchersReturned": 2,
+    "reviewersLaunched": 1,
+    "reviewersReturned": 1,
+    "teamInventoriesCompleted": 2,
+    "pairedReviewsCompleted": 1,
+    "officialGamebookPagesInspectedPerWorker": 16,
+    "sharedStateWritesByWorkers": 0,
+    "numericalChanges": 0,
+    "marketViewed": false,
+    "evidencePath": "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-10-buf-min-official-gamebook-correction.json",
+    "result": "COMPLETE_FACTUAL_INVENTORY_SAVED_WAITING_SOURCE_OR_METHOD"
+  },
+  "remainingWork": {
+    "gameKeys": ["2026-W09-BUF-MIN"],
+    "gaps": [
+      "Official individual offense, defense and special-teams snap counts or percentages",
+      "Distinct replacement allocation and immutable player/replacement value bindings for the named clusters",
+      "Tyrion Ingram-Dawkins second incident boundary and terminal status after the Q4 questionable notice"
+    ],
+    "next": "Reopen only on materially changed official snap/terminal evidence or an approved existing exposure/value method; do not repeat the same source search or rewrite completed evidence."
+  },
+  "recordedAt": "2026-11-10T08:12:41Z"
+}
