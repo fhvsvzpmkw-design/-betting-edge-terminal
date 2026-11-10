@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-06:00",
+  "executionRunId": "2026-11-10T06:21:27-07:00|1",
+  "workBinding": {
+    "candidateId": "2026-11-10T06:21:27-07:00|1",
+    "feedBlobSha": "05af30e5366f12cde6bc0e0aa3e174657962ff75",
+    "checkpoint": "data/report-production/checkpoints/20261110-open-0600-061322.json",
+    "checkpointRevision": 22,
+    "operatingRevision": "2026-11-07.ForecastContractContinuations"
+  },
+  "mode": "AGENTS_COMPLETE",
+  "reason": "The 06:00 broad profile used its routine one complete-event researcher and one independent critical reviewer after the remotely verified initial checkpoint. Sixteen events, 96 available primary selections and 54 preserved forecast points justified both routine roles; no expansion was required.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "actualId": "/root/morning_open_researcher",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": [
+        "70899052",
+        "70899054",
+        "70918996"
+      ],
+      "assignmentBinding": {
+        "candidateIdAtLaunch": "2026-11-10T06:13:21-07:00|1",
+        "finalCandidateIdAcknowledged": "2026-11-10T06:21:27-07:00|1",
+        "feedBlobSha": "05af30e5366f12cde6bc0e0aa3e174657962ff75",
+        "checkpointRevisionAtLaunch": 1
+      },
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "observedClocks": {
+        "launchAt": null,
+        "acknowledgedAt": null,
+        "returnedAt": null,
+        "limitation": "The collaboration runtime confirmed the bounded acknowledgment and return but did not expose durable wall-clock telemetry for these events."
+      },
+      "state": "RETURNED",
+      "returnedWork": "Three complete NCAAF event reviews across moneyline, spread and total; official role and personnel checks; preserved ESPN observation clocks; price mathematics, Support/Contrary and source-access limitations."
+    },
+    {
+      "role": "independent critical reviewer",
+      "actualId": "/root/morning_open_reviewer",
+      "boundary": "read-only; no subagents; no shared writes; no odds collection",
+      "assignmentIds": [
+        "ALL_96_SELECTIONS",
+        "TEN_POSITIVE_FORECAST_LEADS",
+        "EARLY_GUY_SHORTLIST"
+      ],
+      "assignmentBinding": {
+        "candidateIdAtLaunch": "2026-11-10T06:13:21-07:00|1",
+        "finalCandidateIdAcknowledged": "2026-11-10T06:21:27-07:00|1",
+        "feedBlobSha": "05af30e5366f12cde6bc0e0aa3e174657962ff75",
+        "checkpointRevisionAtLaunch": 1
+      },
+      "acknowledgment": "BOUND_WITHIN_60_SECONDS",
+      "observedClocks": {
+        "launchAt": null,
+        "acknowledgedAt": null,
+        "returnedAt": null,
+        "limitation": "The collaboration runtime confirmed the bounded acknowledgment and return but did not expose durable wall-clock telemetry for these events."
+      },
+      "state": "RETURNED",
+      "returnedWork": "Independent full-inventory challenge of the positive original-clock forecast leads, exact quote/reference mismatches, lineup conflicts and settlement assumptions; corrected the BetBetter handicap-sign interpretation."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "ROUTINE_TWO_WORKER_POOL",
+      "workers": 2,
+      "reason": "The broad 06:00 queue covered 16 events in three sports with 54 preserved forecast records, warranting one NCAAF complete-event researcher and one independent full-board reviewer while the coordinator owned the remaining events and merge.",
+      "releaseCondition": "COMPLETE"
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "workers": 2,
+      "reason": "The routine pool and coordinator resolved all positive-lead reviews; the 12 remaining exact-reference gaps were documented selection-level shortfalls rather than consequential unanswered delegated questions.",
+      "releaseCondition": "COMPLETE"
+    }
+  ],
+  "qualityFindings": [
+    "The reviewer corrected the BetBetter handicap sign: positive home handicap means the home team is behind, so those native point opinions supported the market favorite rather than the underdog.",
+    "Ten original-clock positive moneyline leads were explicitly reviewed; exact Pinnacle evidence was unfavorable or effectively neutral at the bound prices and current personnel sources retained material availability uncertainty, so none was adopted as a zero-stake directional LEAN.",
+    "The researcher preserved ESPN access and prediction-tracker limitations rather than claiming refreshed model points, and retained the original captured observation clocks."
+  ],
+  "completedWork": {
+    "eventsScreened": 16,
+    "availableSelections": 96,
+    "completedAssessments": 84,
+    "documentedShortfalls": 12,
+    "producerUnfinished": 0,
+    "preservedForecastRecordsReviewed": 54,
+    "positiveForecastLeadsDispositioned": 10,
+    "decisions": {
+      "bet": 0,
+      "lean": 0,
+      "wait": 0,
+      "pass": 84
+    },
+    "validationGates": {
+      "passed": 15,
+      "failed": 0
+    }
+  },
+  "remainingWork": {
+    "producerUnfinished": 0,
+    "documentedShortfalls": 12,
+    "description": "Ten NBA spread selections and both Ohio-Miami NCAAF spread selections lack a qualified exact Pinnacle pair and an independent calibrated fair interval."
+  },
+  "recordedAt": "2026-11-10T13:31:05Z"
+}
