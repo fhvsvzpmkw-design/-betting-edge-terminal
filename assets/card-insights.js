@@ -12,6 +12,7 @@
   const short=x=>{const value=clean(x);return value.length>300?value.slice(0,297).replace(/\s+\S*$/,'')+'…':value;};
   const first=x=>{const value=clean(x);for(const m of value.matchAll(/[.!?](?:\s|$)/g)){if(m[0][0]==='.'&&/\b(?:St|Dr|Mr|vs|No)$/i.test(value.slice(0,m.index)))continue;return value.slice(0,m.index+1);}return value;};
   const readable=x=>Boolean(clean(x))&&!technical.test(clean(x))&&!/^(?:NR\b|No additional supporting|Current event evidence and applicable strategy|The current source review addressed)/i.test(clean(x));
+  const repeatedPrice=x=>/exact executable-to-benchmark|exact paired Pinnacle benchmark|qualified paired Pinnacle reference|used only for a zero-stake exact-price/i.test(clean(x));
   function validSelection(rec){
     const f=rec?.feed||{},p=String(f.selectionKey||'').split('|');
     return Number.isFinite(time(f.eventDate))&&p.length===5&&p[0]===String(f.eventId)&&p[1]===f.marketKey&&p[2]===f.side&&p[3]===''&&
@@ -87,7 +88,9 @@
     const rationale=[bound?evidence.decisionExplanation:null,opinion?.rationale,
       exact&&rec?.marketAssessment&&rec.marketAssessment.selectionKey===rec.feed.selectionKey?rec.marketAssessment.decisionRationale:null,
       data.reason,rec?.analysis].find(readable);
-    const whyTonight=rationale?short(rationale):'A clear game-specific reason was not recorded in this report.';
+    const whyTonight=clean(rec?.status).toUpperCase()==='PASS'&&data.benchmark<0&&repeatedPrice(rationale)?
+      'Pass: the available odds fall short of the recorded Pinnacle reference.':
+      rationale?short(rationale):'A clear game-specific reason was not recorded in this report.';
     const f=rec?.feed || {},american=exact?(f.priceDecimal>=2?'+'+Math.round((f.priceDecimal-1)*100):String(-Math.round(100/(f.priceDecimal-1)))):null;
     const price=exact?[clean(rec.book),american].filter(Boolean).join(' '):null;
     const forecasts=data.views.slice(0,2).map(v=>v.name+': '+(v.probability*100).toFixed(1)+'% versus '+
@@ -95,10 +98,10 @@
     const target=readable(rec?.playTo || rec?.betAt)?clean(rec.playTo || rec.betAt):'';
     const whyPrice=exact?[price+'.',...forecasts,target&&target!=='NO BET'?'Price limit: '+target+'.':'',
       data.benchmark!==null?'Pinnacle comparison: '+(data.benchmark>=0?'+':'−')+Math.abs(data.benchmark).toFixed(2)+' percentage points.':''].filter(Boolean).join(' '):'An executable price was not verified.';
-    const opposing=findings.find(row=>row.stance==='CONTRARY'&&readable(row.finding));
+    const opposing=findings.find(row=>row.stance==='CONTRARY'&&readable(row.finding)&&!repeatedPrice(row.finding));
     const unresolved=findings.find(row=>row.stance==='UNRESOLVED'&&readable(row.finding));
     const risk=opposing?short([opposing.finding,opposing.application].filter(readable).join(' ')):
-      readable(rec?.contrary)&&!/^No additional opposing/i.test(clean(rec.contrary))?short(rec.contrary):
+      readable(rec?.contrary)&&!repeatedPrice(rec.contrary)&&!/^No additional opposing/i.test(clean(rec.contrary))?short(rec.contrary):
       unresolved?short(unresolved.finding):data.checks[0] || (data.benchmark<0?'Pinnacle prices this side below the offered break-even chance.':'A specific opposing case was not recorded in this report.');
     const status=clean(rec?.status).toUpperCase();
     const action={BET:'Use the recorded stake and price limit.',LEAN:'Lean only; no stake is recommended.',
@@ -130,7 +133,10 @@
     const sources=node(d,'details',undefined,'runnerEvidence');sources.append(node(d,'summary','SOURCES & SNAPSHOT'));
     sources.append(node(d,'div',[data.snapshotAt?'Report · '+clock(data.snapshotAt):'',data.oddsAt?'Odds · '+clock(data.oddsAt):''].filter(Boolean).join(' · '),'runnerInsightsMeta'));
     const links=node(d,'div',undefined,'runnerInsightsSources');
-    for(const source of data.sources){try{const u=new URL(source.url);if(u.protocol!=='https:'||u.username||u.password)continue;const a=node(d,'a',`${names[source.sourceId]||source.sourceId||u.hostname.replace(/^www\./,'')} · ${clock(source.observedAt)}`);a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';links.append(a);}catch{}}
+    for(const source of data.sources){try{const u=new URL(source.url);if(u.protocol!=='https:'||u.username||u.password)continue;
+      const raw=clean(source.sourceId),name=names[raw]||(/^Pinned exact Pinnacle/i.test(raw)?'Pinnacle':
+        /^\d{5,}|current-info|selectionKey|checkpoint|schema|\|/i.test(raw)?u.hostname.replace(/^www\./,''):raw||u.hostname.replace(/^www\./,''));
+      const a=node(d,'a',`${name} · ${clock(source.observedAt)}`);a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';links.append(a);}catch{}}
     if(links.children.length)sources.append(links);panel.append(sources);return panel;
   }
   const api={describe,brief,render};if(typeof module==='object'&&module.exports)module.exports=api;else root.BettingEdgeCardInsights=api;

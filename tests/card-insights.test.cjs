@@ -112,6 +112,15 @@ test('a source-bound contrary finding becomes the concern while a named recheck 
   assert.match(view.whyTonight,/high-danger/);assert.match(view.risk,/third game in four nights/);assert.match(view.timing,/Confirm Home starter/);
   rec.cardEvidence.selectionKey='other|ml|home||';assert.doesNotMatch(insights.brief(rec,run).risk,/third game in four nights/);
 });
+test('legacy price boilerplate is not repeated as the strongest game concern',()=>{
+  const {rec,run}=fixture();rec.status='PASS';delete rec.forecastLean;
+  rec.marketAssessment={basis:'QUALIFIED_PINNACLE',selectionKey:rec.feed.selectionKey,referenceProbability:.48,
+    decisionRationale:'Home at +100 is unfavorable to the exact paired Pinnacle benchmark.'};
+  rec.contrary='The exact executable-to-benchmark difference was unfavorable. Used only for a zero-stake exact-price assessment.';
+  const view=insights.brief(rec,run);assert.match(view.whyTonight,/Pass: the available odds/);
+  assert.match(view.risk,/Confirm Home starter/);assert.doesNotMatch(view.risk,/zero-stake|executable-to-benchmark/);
+  assert.equal(view.timing,'Pass at this price.');
+});
 test('both shared runner entry points load the insights before the common card renderer',()=>{
   for(const name of ['runner.html','runner-app.html']){const html=fs.readFileSync(name,'utf8');assert.ok(html.indexOf('assets/card-insights.js')<html.indexOf('assets/runner-core-runtime.js'));}
   const runtime=fs.readFileSync('assets/runner-core-runtime.js','utf8');assert.match(runtime,/CardInsights\.render\(d,r,activeRun\)/);
