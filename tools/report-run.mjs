@@ -18,6 +18,8 @@ import {serializeReportDocument,parseReportDocument} from './report-document-tra
 import {producerExecutionFor} from './report-producer-progress.mjs';
 import {bindReportSnapshot} from './report-snapshot.mjs';
 import {reportRunHealth,reportEventFeedback} from './report-run-health.mjs';
+import {rememberEventAssessment,SLATE_FOCUSED_FROM} from './report-workload.mjs';
+import {loadBoundMarketObserver} from './market-price-assessment.mjs';
 
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const read=file=>JSON.parse(fs.readFileSync(file));
@@ -227,6 +229,18 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
         readbackAt:new Date().toISOString()};state.phase='PUBLISHED';
     }
     state.revision++;
+    if(command==='checkpoint'&&eventId&&Date.parse(state.report.ts)>=Date.parse(SLATE_FOCUSED_FROM)){
+      try{
+        let bytes;
+        try{bytes=execFileSync('git',['cat-file','blob',state.identity.feedBlobSha],{cwd:root,maxBuffer:64*1024*1024,stdio:['ignore','pipe','pipe']});}
+        catch{bytes=fs.readFileSync(path.join(root,'data/live-odds.json'));}
+        if(blobSha(bytes)!==state.identity.feedBlobSha)throw Error('Saved assessment feed binding differs');
+        const inventory=derivePrimarySelectionInventory(state.report,JSON.parse(bytes),read(path.join(root,'data/major-sport-market-coverage-v1.json')));
+        let observer=null;try{observer=loadBoundMarketObserver(state.sidecar,root);}catch{}
+        rememberEventAssessment(state,eventId,inventory,{reviewedAt:new Date().toISOString(),observer});
+        delete state.workloadWarning;
+      }catch(error){state.workloadWarning=error.message;}
+    }
     state.events.push({command,at:new Date(command==='start'?commandStarted:Date.now()).toISOString(),revision:state.revision,phase:state.phase,durationMs:Date.now()-commandStarted,
       ...(command==='checkpoint'&&eventId?{eventId:String(eventId)}:{})});
     atomic(file,serializeReportDocument(state,'REPORT_CHECKPOINT'));

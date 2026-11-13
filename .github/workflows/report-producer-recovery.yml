@@ -1,10 +1,24 @@
 name: Report producer transfer and recovery
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - tools/report-*.mjs
+      - tools/event-research-plan.mjs
+      - tools/checkpoint-research-leads.mjs
+      - tests/slate-workload.test.mjs
+      - tests/report-*.mjs
+      - tests/event-research-plan.test.mjs
+      - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
+      - .github/workflows/report-producer-recovery.yml
   push:
     branches: [main]
     paths:
       - tools/report-run.mjs
+      - tools/report-workload.mjs
+      - tools/report-inputs.mjs
+      - tests/slate-workload.test.mjs
+      - tests/report-inputs.test.mjs
       - tools/report-document-transport.mjs
       - tools/report-producer-progress.mjs
       - tools/report-run-health.mjs
@@ -49,5 +63,6 @@ jobs:
           node tests/event-research-plan.test.mjs
           node tests/report-pipeline.test.mjs
           node tests/scheduled-report-authority.test.mjs
+          node --test tests/slate-workload.test.mjs tests/report-inputs.test.mjs
       - name: Replay through the real publisher gates and durable readback
         run: node tests/report-run-replay.test.mjs

@@ -1251,10 +1251,12 @@ function card(d,r){
     evidence.appendChild(el(d,'div','runnerDetail open',`GRAHAM ${r.grahamFairReview.disposition}: ${r.grahamFairReview.decisionImpact}`));
   }
   if(r.analysis)evidence.appendChild(el(d,'div','runnerDetail open',r.analysis));
-  expanded.appendChild(evidence);
+  // Compact analysis includes its own source drawer. Original issued research
+  // remains in the report bytes, rather than a second customer-facing dossier.
+  if(!CardInsights?.brief||identityProblem)expanded.appendChild(evidence);
   let insightsRendered=false;
-  const b=el(d,'button','runnerBtn','▶ VIEW DETAILS');b.type='button';b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls',expanded.id);
-  b.onclick=()=>{if(!insightsRendered&&!identityProblem&&CardInsights){expanded.prepend(CardInsights.render(d,r,activeRun));insightsRendered=true}expanded.hidden=!expanded.hidden;b.setAttribute('aria-expanded',String(!expanded.hidden));b.textContent=expanded.hidden?'▶ VIEW DETAILS':'▼ HIDE DETAILS'};
+  const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS');b.type='button';b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls',expanded.id);
+  b.onclick=()=>{if(!insightsRendered&&!identityProblem&&CardInsights){expanded.prepend(CardInsights.render(d,r,activeRun));insightsRendered=true}expanded.hidden=!expanded.hidden;b.setAttribute('aria-expanded',String(!expanded.hidden));b.textContent=expanded.hidden?'▶ VIEW ANALYSIS':'▼ HIDE ANALYSIS'};
   c.append(b,expanded);
   return c
 }

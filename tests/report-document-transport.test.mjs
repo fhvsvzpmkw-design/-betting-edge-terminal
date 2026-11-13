@@ -56,13 +56,14 @@ try{
   fs.mkdirSync(path.dirname(file),{recursive:true});
   // Existing uncompressed, already frozen checkpoints must remain resumable.
   fs.writeFileSync(file,JSON.stringify(original,null,2)+'\n');
-  assert.equal(runCommand({root,checkpoint,command:'status'}).phase,original.phase);
+  const plainStatus=runCommand({root,checkpoint,command:'status'});
+  assert.equal(plainStatus.phase,original.phase);
   fs.writeFileSync(file,packed);
   const resumed=runCommand({root,checkpoint,command:'status'});
   assert.deepEqual(resumed.counts,original.report.counts);
   assert.equal(resumed.research.available,132);
   assert.equal(resumed.research.evaluated,22);
-  assert.equal(resumed.research.unfinished,44);
+  assert.deepEqual(resumed.research,plainStatus.research,'compression preserves the current producer completion classification exactly');
 
   // Isolate transfer/retry behavior; this test grants no analytical clearance.
   const draft=structuredClone(original);
