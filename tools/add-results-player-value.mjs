@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { finiteValue, exactSettledUnits, opposingMarketCoverage } from './lib/results-populations.mjs';
+import { writeResultsIndex } from './lib/results-index-storage.mjs';
 
 const ROOT=process.cwd();
 const INDEX_PATH=path.join(ROOT,'data/history/results-index.json');
@@ -262,5 +263,5 @@ index.pizzaPlayAnalytics={
   note:'Pizza tracking is performance accounting only. The Pizza Plays card remains stake-neutral; the frozen 3% unit is used only for VigScope Value plus/minus calculations.'
 };
 
-fs.writeFileSync(INDEX_PATH,`${JSON.stringify(index,null,2)}\n`,'utf8');
+writeResultsIndex(INDEX_PATH,index);
 console.log(`${path.relative(ROOT,INDEX_PATH)}: $100 player (${pricedBets.length} priced settled BETs) + decision value (${pricedFinalDecisions.length} priced unique final non-BET decisions) + Pizza Plays (${pizzaPriced.length} priced settled / ${pizzaRows.length} tracked)`);

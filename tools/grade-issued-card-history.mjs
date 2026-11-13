@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { historicalIdentityCorrection } from './card-grading-identity-corrections.mjs';
 
 const read = p => JSON.parse(fs.readFileSync(p, 'utf8'));
 const write = (p, x) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(x, null, 2) + '\n'); };
@@ -131,6 +132,14 @@ async function fetchJson(url) {
 export async function verify(group, getJson = fetchJson, now = new Date()) {
   const unresolved = reason => ({ eventId: group.id, status: 'unresolved', unresolvedReason: reason });
   let info = eventInfo(group);
+  if (!info) {
+    try {
+      const correction = historicalIdentityCorrection(group);
+      if (correction) { info = correction.identity; group.identityCorrection = correction.audit; }
+    } catch (error) {
+      return {...unresolved('identity_conflict'), correctionError:String(error.message)};
+    }
+  }
   if (!info && !group.historicalIdentity) { group.historicalIdentity = historicalIdentity(group); info = eventInfo(group); }
   if (!info) return {...unresolved('identity_conflict'), identity: {titles:[...new Set(group.rows.map(x => x.rec.title))], firstDate:group.firstDate}};
   try {
@@ -182,6 +191,7 @@ export async function verify(group, getJson = fetchJson, now = new Date()) {
     } else return {...unresolved('result_provider_unsupported'), identity:info};
     const match = uniqueMatch(candidates, info.start);
     if (!match) return {...unresolved(candidates.length > 1 ? 'identity_conflict' : 'result_not_verified'), identity:info, sourceUrl:url};
+    if (group.identityCorrection && Date.parse(match.start || '') !== Date.parse(info.start)) return {...unresolved('identity_conflict'), identity:info, sourceUrl:url};
     const source = {name:`${info.sport === 'MLB' ? 'MLB official' : info.sport === 'CFL' ? 'CFL official' : 'ESPN ' + info.sport} historical ${match.cancelledUnplayed ? 'unplayed cancellation' : match.postponedUnplayed ? 'unplayed postponement' : 'final'} ${info.date}; event ${match.providerId}`, url:match.url || url};
     if (match.postponedUnplayed) {
       // Use the original dated schedule, never a mutable live-feed gamePk that
@@ -213,7 +223,8 @@ export async function verify(group, getJson = fetchJson, now = new Date()) {
         const rule = book === 'draftkings' ? {grade:'PUSH',url:'https://sportsbook.draftkings.com/help/general-betting-rules/general-rules'} : book === 'bet365' ? {grade:'VOID',url:'https://help.bet365.com/s/en-ca/terms-and-conditions'} : null;
         return rule ? {selectionKey:x.rec.feed.selectionKey,book,grade:rule.grade,basis:'Two-way full-game moneyline tied after overtime; stake returned.',ruleSource:rule.url} : null;
       }).filter(Boolean)} : {}),
-      ...(group.historicalIdentity ? {identitySnapshotBlobSha:group.historicalIdentity.snapshotBlobSha} : {}) };
+      ...(group.historicalIdentity ? {identitySnapshotBlobSha:group.historicalIdentity.snapshotBlobSha} : {}),
+      ...(group.identityCorrection ? {identityCorrection:group.identityCorrection} : {}) };
   } catch (error) { return { ...unresolved('result_not_verified'), identity:info, providerError:String(error.message) }; }
 }
 async function main(requestPath) {
@@ -238,7 +249,7 @@ async function main(requestPath) {
         const eventId = String(rec.feed?.eventId || '');
         if (eventId) {
           if (!identityRows.has(eventId)) identityRows.set(eventId, []);
-          identityRows.get(eventId).push({date, feedGeneratedAt:run.feedGeneratedAt, rec:{title:rec.title, meta:rec.meta, feed:rec.feed, coreAssessment:{context:{sport:rec.coreAssessment?.context?.sport}}}});
+          identityRows.get(eventId).push({date, sourceRun:p, index, feedGeneratedAt:run.feedGeneratedAt, rec:{title:rec.title, meta:rec.meta, feed:rec.feed, coreAssessment:{context:{sport:rec.coreAssessment?.context?.sport}}}});
         }
         if (String(old?.completion?.state || '').toLowerCase() === 'complete') {
           if ((old.selectionKey || null) !== (rec.feed?.selectionKey || null)) legacyIntegrityWarnings.push({ sourceRun: p, index, issuedSelectionKey: rec.feed?.selectionKey || null, observedSelectionKey: old.selectionKey || null, reason: 'previously_complete_identity_conflict_preserved_for_separate_review' });
@@ -246,7 +257,7 @@ async function main(requestPath) {
         }
         if (old) assert.equal(old.selectionKey || null, rec.feed?.selectionKey || null, `Observation identity mismatch: ${p}#${index}`);
         if (date < target) olderEnteringCards++;
-        const row = { rec, date, index }; pending.push(row);
+        const row = { rec, date, index, sourceRun:p }; pending.push(row);
         const id = String(rec.feed?.eventId || ''); if (!id) continue;
         if (!groups.has(id)) groups.set(id, { id, rows: [], current: false, firstDate: date, capDeferred: false });
         const g = groups.get(id); g.rows.push(row); g.current ||= date === target;

@@ -48,6 +48,14 @@ A receipt marked COMPLETE means the target date and older backlog are complete, 
 
 If source verification fails, retain unresolved cases. If writing, schema reconciliation, isolation, concurrency, or remote readback fails, report the exact failed stage and whether any outputs were actually persisted. Respect action safety denials; do not reroute around them. Keep the recurring task enabled after a successful run, empty day, partial result or individual failure. Only an explicit user request may pause, disable, delete or reschedule this recurring task.
 
+## Reviewed historical identity binding — November 13, 2026
+
+The user requested card grading fully updated, including the named historical backlog. `data/history/grading/corrections/event-70898886-20261027-v1.json` authorizes identity precedence for exactly 14 October 27 cards in three pinned issued-source blobs. Two evening spread display labels were contaminated with Brewers/Rays text; their immutable event ID, exact DraftKings selection, line, price, start and NCAAF context match Sam Houston/Missouri State in each corresponding pinned snapshot. This is an identity matching correction, not a replacement score or an issued-card edit.
+
+`tools/card-grading-identity-corrections.mjs` requires all pinned source hashes, ordinals, exact snapshot-index bindings and quoted selections to agree. Additional or modified rows, missing evidence or changed bindings remain unresolved. The ordinary historical provider must independently verify the football result at the exact scheduled start. Completion records and the receipt retain the correction identity and source hashes. Already-complete grades are preserved. This narrow binding is consumed by the existing grader without copying the unrelated September legacy-cleanup request flag.
+
+The derived results index keeps compact forecast identities, probabilities, eligibility and attribution. Long research explanations remain in the immutable source reports instead of being duplicated in every index row. All index writers enforce a 95 MiB publication budget; the publisher rejects an oversized file before committing and does not retry GitHub large-file rejection as a concurrency error. No historical results or issued source reports are removed.
+
 ## Explicit legacy identity correction — September 25, 2026
 
 The user separately authorized cleanup of the 35 integrity warnings recorded in recovery receipt `card-grading-recovery-20260925-sep24-v1`: one conflicting August 27 observation event ID and 34 missing September 19 observation selection keys. This is a metadata repair, not routine regrading or price backfilling.

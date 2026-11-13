@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import QuoteObservation from '../assets/quote-observation.js';
 import { finalSelectionCards, opposingMarketCoverage } from './lib/results-populations.mjs';
 import { rebuildMarketMethodShadowIndex } from './market-method-shadow.mjs';
+import { forecastReviewSummary, writeResultsIndex } from './lib/results-index-storage.mjs';
 
 const ROOT = process.cwd();
 const OBS_ROOT = path.join(ROOT, 'data/history/observations');
@@ -246,7 +247,7 @@ function addRunCards(sourceRun, run, obs = null, obsFile = null) {
       eventId: String(rec?.feed?.eventId || completion.eventId || '') || null,
       selectionKey: rec?.feed?.selectionKey || o.selectionKey || null,
       ...forecastAttribution(rec),
-      forecastReview: rec.forecastReview || null,
+      forecastReview: forecastReviewSummary(rec.forecastReview),
       sport: sportFamily(rec),
       market: marketFamily(rec),
       marketKey: rec?.feed?.marketKey || rec?.feed?.market || null,
@@ -461,5 +462,5 @@ const result = {
 };
 
 fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
-fs.writeFileSync(OUTPUT, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+writeResultsIndex(OUTPUT, result);
 console.log(`${repoPath(OUTPUT)}: ${result.coverage.cards} cards, ${result.coverage.selections} selections, ${result.coverage.events} events, ${result.coverage.unresolvedEvents} unresolved events`);

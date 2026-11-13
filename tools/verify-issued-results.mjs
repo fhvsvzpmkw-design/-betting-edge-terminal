@@ -407,6 +407,7 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
       settlementRuleSource: graded.ruleSource ?? null,
       observedValue: graded.observedValue ?? null,
       settlementComponents: graded.components ?? null,
+      ...(event.identityCorrection ? {identityCorrection:event.identityCorrection} : {}),
       source: source ? {
         name: source.name || null,
         url: source.url || null

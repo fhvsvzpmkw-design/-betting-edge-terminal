@@ -20,6 +20,8 @@ on:
       - "tools/add-results-player-value.mjs"
       - "tools/add-results-shadow-v2.mjs"
       - "tools/lib/results-populations.mjs"
+      - "tools/lib/results-index-storage.mjs"
+      - "tests/results-index-storage.test.mjs"
       - "tests/results-performance-populations.test.mjs"
       - "tests/results-index-quote-observation.test.mjs"
       - ".github/workflows/results-index.yml"
@@ -48,6 +50,7 @@ jobs:
       - name: Build results index
         run: |
           node tests/results-performance-populations.test.mjs
+          node tests/results-index-storage.test.mjs
           node tests/results-index-quote-observation.test.mjs
           node tests/market-method-shadow.test.mjs
           node tools/build-results-index.mjs

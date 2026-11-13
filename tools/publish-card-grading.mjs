@@ -4,11 +4,13 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {assertIndexSize} from './lib/results-index-storage.mjs';
 
 export function publishHistoricalOutputs({root=process.cwd(),paths,receiptPath,messagePath,buildCommands=[['node','tools/build-results-index.mjs'],['node','tools/add-results-player-value.mjs'],['node','tools/add-results-shadow-v2.mjs']]}={}) {
   const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8',maxBuffer:16*1024*1024,env:{...process.env,GIT_EDITOR:'true'}}).trim();
   const read=p=>JSON.parse(fs.readFileSync(path.join(root,p),'utf8'));
   const write=(p,data)=>fs.writeFileSync(path.join(root,p),JSON.stringify(data,null,2)+'\n');
+  assertIndexSize(path.join(root,'data/history/results-index.json'));
   git('add','--',...paths);git('commit','-F',messagePath);
   for(let attempt=1;attempt<=3;attempt++) {
     git('fetch','origin','main');
@@ -26,6 +28,7 @@ export function publishHistoricalOutputs({root=process.cwd(),paths,receiptPath,m
         git('checkout','--ours','data/history/results-index.json');git('add','data/history/results-index.json');git('rebase','--continue');
       }
       for(const command of buildCommands)execFileSync(command[0],command.slice(1),{cwd:root,stdio:'inherit'});
+      assertIndexSize(path.join(root,'data/history/results-index.json'));
       const receipt=read(receiptPath),idx=read('data/history/results-index.json');
       for(const [file,sha] of Object.entries(receipt.outputBlobs)) {
         if(file==='data/history/results-index.json')continue;
@@ -48,7 +51,7 @@ export function publishHistoricalOutputs({root=process.cwd(),paths,receiptPath,m
     try {git('push','origin','HEAD:main');return git('rev-parse','HEAD');}
     catch(error) {
       const message=String(error.stderr||error.message);
-      if(attempt===3 || !/non-fast-forward|fetch first|rejected/i.test(message))throw error;
+      if(attempt===3 || /GH001|large files detected|exceeds GitHub/i.test(message) || !/non-fast-forward|fetch first|rejected/i.test(message))throw error;
     }
   }
 }
