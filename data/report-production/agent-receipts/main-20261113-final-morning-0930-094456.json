@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v3-slate-focused",
+  "group": "main",
+  "taskId": "main-2026-11-13-0930",
+  "executionRunId": "20261113-final_morning-0930-094456",
+  "workBinding": {
+    "candidateId": "2026-11-13T10:09:20-07:00|3",
+    "authorityBlobSha": "261c2deed9ca10279ce3e060e5a1c6b40778a272",
+    "coreFrameworkBlobSha": "a898067ae6777e276ab7f45284d4c5f472c9f895",
+    "feedBlobSha": "7e833bfda26e1b8037375270974dfe1e0e090af4",
+    "observerBlobSha": "fe5a24c1c9aae4cf6feb907f5743bdc6b9c100d3",
+    "initialCheckpointCommit": "293b172f86888ea768406386a195f5d0a7847414",
+    "retimedCheckpointBlobSha": "8f8614bc88ba6568ace65d4bff97124d0bb3f98c",
+    "completedEventCheckpointBlobSha": "d0e504f494677587eef3d2eb13296372f3ee96d9",
+    "frozenStagingBlobSha": "cf7548e2c01867ced9f235f767642486a8128fca",
+    "stagingCommit": "cb7ebf90d284af5e490d23f596bfbfd98089ac29",
+    "finalControllerCheckpointBlobSha": "439f3abd5409dce510a332f19fe1064be24c2427",
+    "issuedReportBlobSha": "b85616676e5a3e8955bc5278ff7f168cd0b949d2",
+    "issuedResearchFitBlobSha": "05164ccd5750234b1a8c4b80807ad9f0bdd6c8b0"
+  },
+  "mode": "TARGETED_RESEARCH",
+  "reason": "The deterministic intake contained 15 priced games, above the six-game coordinator-only threshold. After coordinator screening, one targeted read-only worker checked the consequential official NBA status question affecting current moneyline opinions and the nearby Hawks decision.",
+  "workers": [
+    {
+      "role": "targeted_researcher",
+      "actualId": "/root/nba_official_recheck_0930",
+      "readOnlyBoundary": true,
+      "freshContextBoundary": "Bound to feed 7e833bfda26e1b8037375270974dfe1e0e090af4, observer fe5a24c1c9aae4cf6feb907f5743bdc6b9c100d3 and events 73696984, 73696988, 73696990 and 73697000. No odds collection, shared-state writes, grading, staging, publication or child agents.",
+      "assignmentId": "nba-official-status-recheck-0930",
+      "bindings": {
+        "feedBlobSha": "7e833bfda26e1b8037375270974dfe1e0e090af4",
+        "events": [
+          "73696984",
+          "73696988",
+          "73696990",
+          "73697000"
+        ]
+      },
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "clockLimitation": "The collaboration interface confirmed the exact-bound acknowledgment within 60 seconds and returned the work, but did not expose reliable coordinator-observed timestamps; no timestamps were invented.",
+      "acknowledgmentState": "EXACT_BINDING_ACKNOWLEDGED_WITHIN_60_SECONDS",
+      "state": "RETURNED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "START_ZERO_WORKERS",
+      "reason": "The coordinator first resolved the lane, completed the odds intake and screened all 18 discovered events and 15 priced games."
+    },
+    {
+      "decision": "LAUNCH_ONE_TARGETED_RESEARCHER",
+      "namedQuestion": "Did the latest linked official NBA report materially change the named statuses affecting Knicks-Pacers, Cavaliers-Heat, Hawks-Bulls or Thunder-Clippers decisions?",
+      "expectedQualityBenefit": "Independently distinguish unchanged named questionables from a material status change before retaining or rejecting the four forecast-led moneyline opinions and the Hawks alternative.",
+      "releaseCondition": "Return exact official report clocks, changed and unchanged named statuses, access limitations and decision-relevant conflicts for the four bound events.",
+      "result": "RETURNED; the official status comparison was merged, with all later availability beyond the linked 11:15 ET report left unverified."
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "reason": "The coordinator completed the remaining exact-contract queue with saved game intelligence; no second consequential question justified another worker."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "For Knicks-Pacers, T.J. McConnell remained probable and Aaron Nesmith remained questionable between the linked 07:45 ET and 11:15 ET official reports.",
+      "decisionImpact": "The Knicks moneyline remained a provisional zero-stake LEAN, with active-lineup confirmation still required."
+    },
+    {
+      "finding": "For Cavaliers-Heat, Pelle Larsson and Klay Thompson remained questionable on the latest linked official report.",
+      "decisionImpact": "The Cavaliers moneyline remained a provisional zero-stake LEAN; the unresolved availability range was not numerically cleared."
+    },
+    {
+      "finding": "The named Hawks-Bulls questionables were unchanged on the latest linked official report.",
+      "decisionImpact": "Together with the worsened executable price, small forecast gap and contrary Pinnacle comparison, the Hawks moneyline stayed PASS."
+    },
+    {
+      "finding": "For Thunder-Clippers, Ajay Mitchell remained questionable while Nikola Topic changed from Out due to G League assignment to Available.",
+      "decisionImpact": "The Thunder moneyline remained a provisional zero-stake LEAN because Mitchell and final active lineups were still unresolved; Topic's availability was recorded without inventing a numerical adjustment."
+    }
+  ],
+  "completedWork": {
+    "workersLaunched": 1,
+    "workersReturned": 1,
+    "inventoryEventsScreened": 18,
+    "pricedEventsReviewedByCoordinator": 15,
+    "unpricedEventsRecorded": 3,
+    "availableSelections": 90,
+    "evaluatedSelections": 76,
+    "documentedSourceShortfalls": 14,
+    "forecastRecordsBound": 96,
+    "decisions": {
+      "BET": 0,
+      "LEAN": 4,
+      "WAIT": 0,
+      "PASS": 72
+    }
+  },
+  "remainingWork": {
+    "producerUnfinishedSelections": 0,
+    "documentedSourceShortfalls": 14,
+    "sourceShortfallFamilies": [
+      "Ten NBA spread selections lacked a qualified exact Pinnacle pair in the pinned observer.",
+      "Four Southern Utah-Portland State moneyline/spread selections lacked a qualified exact Pinnacle pair in the pinned observer."
+    ],
+    "namedRechecks": [
+      "Final NBA active lineups and named questionable players.",
+      "Final quarterbacks for Pittsburgh, UCLA, Portland State and Colorado.",
+      "Both starting goaltenders and final scratches for the two NHL games."
+    ],
+    "publication": "DURABLY_VERIFIED"
+  },
+  "publication": {
+    "workflowRunId": 43472016862,
+    "workflowState": "SUCCESS_NON_SKIPPED",
+    "publisherCommit": "9377ca8fe9fe5e04466a111d01834656ce3b4baa",
+    "reportPath": "data/history/runs/2026-11-13/final_morning-100920.json",
+    "researchFitPath": "data/history/research-fit/2026-11-13/final_morning-100920.json",
+    "controllerReadback": "PASS"
+  },
+  "recordedAt": "2026-11-13T17:34:53.589Z"
+}
