@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-11-13T18:46:40.000Z",
+  "lastAppliedAt": "2026-11-13T16:47:59-07:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -826,13 +826,13 @@
       "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
       "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
       "currentStarterPlayer": {
-        "playerId": "11215",
-        "gsisId": "00-0029604",
-        "playerName": "Kirk Cousins",
-        "candidateValue": 7.45,
-        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-        "confidence": "MEDIUM",
-        "evidenceDropbacks": 742
+        "playerId": "16261",
+        "gsisId": "00-0041562",
+        "playerName": "Fernando Mendoza",
+        "candidateValue": 7.5,
+        "candidateStatus": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "confidence": "LOW",
+        "evidenceDropbacks": 0
       },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
@@ -842,24 +842,41 @@
         "priorValue": 7.5,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": 7.45,
+      "approvedProductionStarterValue": 7.5,
       "embeddedBaselineQbValue": 7.5,
-      "teamQbDelta": -0.05,
+      "teamQbDelta": 0,
       "gameContributionEligible": true,
-      "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
+      "sampleTreatment": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
       "evidence": {
-        "researchSweepSequence": 7,
-        "researchFinding": "Kirk Cousins was formally named the Week 1 starting quarterback after the prior board carried a +0.5 QB_UNCERTAINTY game factor. This is a material information resolution, but removing or recalibrating a quarterback numeric term requires GOVERNED_QB_PERFORMANCE_AUTHORITY authority, which was not located in the current governed repository package. The existing fair is preserved rather than manually changed.",
+        "researchFinding": "Las Vegas officially named Fernando Mendoza its Week 10 starter against Seattle after trading Kirk Cousins to Minnesota. Mendoza has no qualifying frozen performance sample, so apply only the contract's labelled LOW-confidence frozen prior through the governed QB calculator; preserve Las Vegas' embedded Cousins baseline, the -2.082 H4 term, personnel layers, carried ratings and betting gates.",
         "sourceRefs": [
-          "data/walters/nfl/2026/week-01-research-ledger.json",
-          "core/staging/walters-nfl-seed-dataset-2026.json",
-          "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-          "data/walters/nfl/2026/week-01-research-ledger.json"
+          "https://www.raiders.com/news/fernando-mendoza-named-raiders-starting-quarterback",
+          "https://www.raiders.com/news/raiders-acquire-2027-third-round-pick-nfl-2026",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+          "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-02T19:16:51-07:00",
-      "marketViewed": false
+      "lastUpdatedAt": "2026-11-13T16:47:59-07:00",
+      "marketViewed": false,
+      "failClosedCode": null,
+      "priorEstimate": {
+        "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "value": 7.5,
+        "confidence": "LOW",
+        "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+        "evidenceDropbacks": 0,
+        "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+        "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+        "starterEvidence": {
+          "kind": "OFFICIAL",
+          "team": "LV",
+          "playerId": "16261",
+          "url": "https://www.raiders.com/news/fernando-mendoza-named-raiders-starting-quarterback",
+          "observedAt": "2026-11-13T16:47:59-07:00",
+          "finding": "Las Vegas General Manager John Spytek officially named Fernando Mendoza the Week 10 starting quarterback against Seattle."
+        }
+      }
     },
     {
       "team": "MIA",
@@ -922,9 +939,17 @@
     {
       "team": "MIN",
       "teamName": "Minnesota",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "UNRESOLVED",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "11215",
+        "gsisId": "00-0029604",
+        "playerName": "Kirk Cousins",
+        "candidateValue": 7.45,
+        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+        "confidence": "MEDIUM",
+        "evidenceDropbacks": 742
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "20430",
@@ -933,24 +958,23 @@
         "priorValue": 8.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 7.45,
       "embeddedBaselineQbValue": 8.25,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
+      "teamQbDelta": -0.8,
+      "gameContributionEligible": true,
       "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Minnesota's official November 12 update states the club has not announced its Week 10 starter. Kevin O'Connell said it was too early to commit while the team worked toward newly acquired Kirk Cousins playing; Kyler Murray remained a nonparticipant and Carson Wentz limited on the current official report. Fail closed without selecting Cousins, Murray, or Wentz and preserve the prior fair until an official named starter resolves the case.",
+        "researchFinding": "Minnesota head coach Kevin O'Connell officially announced Kirk Cousins will start Week 10 at Green Bay five days after the Raiders trade. Apply Cousins' frozen approved candidate through the governed QB calculator, preserving Minnesota's embedded Kyler Murray baseline, the -2.082 H4 term, personnel layers, carried ratings and betting gates.",
         "sourceRefs": [
-          "https://www.vikings.com/news/nfl-expert-picks-packers-rivalry-renews-week-10",
-          "https://www.vikings.com/news/kevin-oconnell-nolan-teasley-kirk-cousins-return",
+          "https://www.nfl.com/news/kirk-cousins-to-start-for-vikings-vs-packers-week-10",
           "https://www.vikings.com/news/packers-injury-report-week-10-2026-nfl-season",
-          "https://www.nfl.com/injuries/league/2026/reg10"
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-11-13T18:46:40.000Z",
+      "lastUpdatedAt": "2026-11-13T16:47:59-07:00",
       "marketViewed": false,
-      "failClosedCode": "CURRENT_STARTER_UNRESOLVED_AFTER_TRADE_AND_INJURIES",
+      "failClosedCode": null,
       "priorEstimate": null
     },
     {
@@ -1495,7 +1519,8 @@
     "graham-delta-1645-2026-w09-20261105T164124-0700-qb-01",
     "graham-delta-1645-2026-w09-20261106T154333-0800-qb-01",
     "graham-daily-review-2026-w10-20261113T113534-0700-qb-01",
-    "graham-daily-review-2026-w10-20261113T113534-0700-qb-02"
+    "graham-daily-review-2026-w10-20261113T113534-0700-qb-02",
+    "graham-delta-1645-2026-w10-20261113T164206-0700-qb-01"
   ],
   "bindingUpdates": [
     {
@@ -1930,6 +1955,16 @@
         "MIN"
       ],
       "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-delta-1645-2026-w10-20261113T164206-0700-qb-01",
+      "effectiveAt": "2026-11-13T16:47:59-07:00",
+      "teams": [
+        "MIN",
+        "LV"
+      ],
+      "sourceTask": "DELTA_1645",
       "marketViewed": false
     }
   ],
