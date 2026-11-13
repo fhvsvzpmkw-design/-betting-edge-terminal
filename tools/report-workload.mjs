@@ -13,7 +13,7 @@ const iso = value => Number.isFinite(stamp(value)) ? new Date(value).toISOString
 const keyOf = event => JSON.stringify([event.sport, String(event.eventId), iso(event.eventDate || event.startTime)]);
 const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 function stable(value) {
-  if (Array.isArray(value)) return value.map(stable).sort((a,b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])]));
   return value;
 }
@@ -28,8 +28,10 @@ function content(value) {
   return value;
 }
 function uniqueContent(rows) {
-  return [...new Map(rows.map(row => {const value=stable(content(row));return [JSON.stringify(value),value];})).values()];
+  return [...new Map(rows.map(row => {const value=stable(content(row));return [JSON.stringify(value),value];})).values()]
+    .sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)));
 }
+const setDigest=rows=>digest(rows.map(stable).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))));
 function matching(rows,event) {
   return list(rows).filter(row => eventOf(row) === String(event.eventId) &&
     (!row.sport || row.sport === event.sport || event.sport === 'NBA_WNBA' && ['NBA','WNBA'].includes(row.sport)) &&
@@ -38,17 +40,19 @@ function matching(rows,event) {
 export function eventSnapshot({event, selections = [], inputs = {}, observer = null}) {
   const rows=matching(selections,event);
   const quotes=rows.flatMap(row => list(row.quotes).length ? row.quotes : row.quote ? [row.quote] : row.decision?.feed ? [row.decision.feed] : []);
-  const contracts=rows.map(row => ({selectionId:row.selectionId,marketDetail:row.marketDetail,
+  const contracts=rows.map(row => ({selectionId:row.selectionId,marketDetail:row.marketDetail,period:row.period,settlement:row.settlement,
     quotes:quotes.filter(quote=>eventOf(quote)===String(event.eventId)&&(!row.selectionId ||
       list(row.quotes).includes(quote)||row.quote===quote||row.decision?.feed===quote))
-      .map(quote=>({selectionKey:quote.selectionKey,marketKey:quote.marketKey,side:quote.side,line:quote.line ?? null,book:quote.book || quote.bookmaker}))}));
+      .map(quote=>({selectionKey:quote.selectionKey,marketKey:quote.marketKey,side:quote.side,line:quote.line ?? null,
+        book:quote.book || quote.bookmaker,period:quote.period,settlement:quote.settlement}))
+      .map(stable).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))}));
   const facts=matching(inputs.facts,event);
   const models=[...matching(inputs.records,event),...matching(inputs.curatedPicks,event),...matching(inputs.internalModels,event)];
   // Include sharp prices as a research change; they never create a decision.
   const sharp=observer ? matching(observer.fixtures || observer.events,event) : [];
   return {eventKey:keyOf(event),eventId:String(event.eventId),sport:event.sport,eventDate:iso(event.eventDate || event.startTime),
-    signatures:{contracts:digest(stable(contracts)),prices:digest(stable(quotes.map(quote=>({selectionKey:quote.selectionKey,
-      book:quote.book || quote.bookmaker,priceDecimal:quote.priceDecimal,line:quote.line ?? null})))),
+    signatures:{contracts:setDigest(contracts),prices:setDigest(quotes.map(quote=>({selectionKey:quote.selectionKey,
+      book:quote.book || quote.bookmaker,priceDecimal:quote.priceDecimal,line:quote.line ?? null}))),
       facts:digest(stable(uniqueContent(facts))),forecasts:digest(stable(uniqueContent(models))),
       benchmark:digest(stable(uniqueContent(sharp)))}};
 }
@@ -64,7 +68,8 @@ export function rememberEventAssessment(state,eventId,inventory,{reviewedAt,obse
   const incomplete=receipts.length!==rows.length||health.continuationRequired||health.forecastReviewHandoff.pending>0;
   state.gameAssessments ||= {};
   state.gameAssessments[key]={...eventSnapshot({event,selections:rows,inputs:state.sidecar?.gameIntelligenceInputs,observer}),
-    candidateId:state.identity.candidateId,reviewedAt:reviewedAt || state.report.ts,reportTs:state.report.ts,
+    candidateId:state.identity.candidateId,feedBlobSha:state.identity.feedBlobSha,
+    reviewedAt:reviewedAt || state.report.ts,reportTs:state.report.ts,
     state:incomplete?'UNFINISHED':'REVIEWED',available:rows.length,evaluated:receipts.filter(row=>row.state==='EVALUATED').length,
     documentedShortfalls:health.remainingWork.documentedShortfalls,
     rechecks:[...new Set(receipts.flatMap(row=>{
@@ -88,7 +93,9 @@ export function loadGameAssessments(root,report,{excludeCheckpoint}={}) {
       for(const row of Object.values(state.gameAssessments || {})){
         if(!row.eventKey||!row.signatures||!['REVIEWED','UNFINISHED'].includes(row.state)||
           !Number.isFinite(stamp(row.reviewedAt))||stamp(row.reviewedAt)>stamp(report.ts)||
-          row.candidateId!==state.identity.candidateId||!list(state.events).some(trace=>trace.command==='checkpoint'&&String(trace.eventId)===row.eventId))continue;
+          row.feedBlobSha!==state.identity.feedBlobSha||row.eventKey!==keyOf(row)||
+          !Number.isFinite(stamp(row.reportTs))||stamp(row.reportTs)>stamp(state.report.ts)||
+          !list(state.events).some(trace=>trace.command==='checkpoint'&&String(trace.eventId)===row.eventId))continue;
         const prior=assessments.get(row.eventKey);
         if(!prior||stamp(row.reviewedAt)>stamp(prior.reviewedAt))assessments.set(row.eventKey,{...row,checkpointPath:path.relative(root,file).split(path.sep).join('/')});
       }
@@ -116,7 +123,8 @@ export function buildSlateWorkload({report,events=[],inventory={},inputs={},obse
   const priced=games.filter(game=>list(inventory.selections).some(row=>String(row.eventId)===game.eventId));
   const feedAge=stamp(report.ts)-stamp(report.feedGeneratedAt);
   const slateUnverified=!Number.isFinite(feedAge)||feedAge<0||feedAge>75*60000||
-    acquisition?.discoveryFailures>0||acquisition?.pendingPrimaryEvents>games.length;
+    acquisition?.discoveryFailures>0||acquisition?.pendingPrimaryEvents>games.length||
+    list(acquisition?.errors).some(error=>error.stage==='events');
   return {schema:1,mode:'SLATE_FOCUSED_WORKLOAD',decisionAuthority:false,
     state:games.length===0?(slateUnverified?'SLATE_UNVERIFIED':'NO_UPCOMING_GAMES'):priced.length===0?'PRICES_UNAVAILABLE':'WORK_AVAILABLE',
     games:games.length,pricedGames:priced.length,counts:games.reduce((counts,game)=>({...counts,[game.mode]:(counts[game.mode] || 0)+1}),{}),

@@ -55,9 +55,18 @@ test('price-only change reprices; changed lineup, contract or forecast opens onl
   const goalie=fixture();goalie.inputs.facts[0].details.status='CONFIRMED';assert.equal(plan(goalie).assessments[0].mode,'TARGETED_RESEARCH');
   const model=fixture();model.inputs.records[0].probability=.48;assert.equal(plan(model).assessments[0].mode,'TARGETED_RESEARCH');
   const line=fixture();line.quote.marketKey='spread';line.quote.line=1.5;assert.equal(plan(line).assessments[0].mode,'TARGETED_RESEARCH');
+  const settlement=fixture();settlement.quote.settlement={overtimeIncluded:false};assert.equal(plan(settlement).assessments[0].mode,'TARGETED_RESEARCH');
   const other=fixture();other.inputs.facts.push({...other.inputs.facts[0],eventId:'different',details:{status:'OUT'}});
   assert.equal(plan(other).assessments[0].mode,'REVALIDATE');
   const rescheduled=fixture();rescheduled.event.eventDate='2026-11-13T06:00:00Z';assert.equal(plan(rescheduled).assessments[0].mode,'INITIAL_REVIEW');
+});
+test('source order is immaterial but a changed batting order remains a changed game fact',()=>{
+  const f=fixture();f.inputs.facts[0].details.battingOrder=['First Batter','Second Batter'];
+  f.prior={...f.prior,...eventSnapshot({event:f.event,selections:f.inventory.selections,inputs:f.inputs})};
+  f.inputs.facts[0].details.battingOrder.reverse();assert.equal(plan(f).assessments[0].mode,'TARGETED_RESEARCH');
+  const other={...f.inputs.facts[0],kind:'VENUE',details:{name:'Arena'}};f.inputs.facts.push(other);
+  f.prior={...f.prior,...eventSnapshot({event:f.event,selections:f.inventory.selections,inputs:f.inputs})};
+  f.inputs.facts.reverse();assert.equal(plan(f).assessments[0].mode,'REVALIDATE');
 });
 test('unfinished reviews resume even without changed inputs; started games leave the workload',()=>{
   const f=fixture();f.prior.state='UNFINISHED';assert.equal(plan(f).assessments[0].mode,'RESUME_REVIEW');
@@ -90,12 +99,16 @@ test('loading skips corrupt, future and wrong-binding checkpoints and uses the l
   try{
     const dir=path.join(root,'data/report-production/checkpoints');fs.mkdirSync(dir,{recursive:true});
     const f=fixture(),ts='2026-11-13T02:30:00-00:00',sha='a'.repeat(40),candidateId=ts+'|5';
-    const row={...f.prior,candidateId,reviewedAt:'2026-11-13T02:40:00Z'};
+    const row={...f.prior,candidateId,feedBlobSha:sha,reportTs:ts,reviewedAt:'2026-11-13T02:40:00Z'};
     const state={identity:{ts,feedBlobSha:sha,candidateId},report:{ts},sidecar:{provenance:{feedBlobSha:sha}},
       gameAssessments:{[row.eventKey]:row},events:[{command:'checkpoint',eventId:f.event.eventId}]};
     fs.writeFileSync(path.join(dir,'2026-11-13-late.json'),JSON.stringify(state));
     fs.writeFileSync(path.join(dir,'2026-11-13-broken.json'),'{');
     let loaded=loadGameAssessments(root,report);assert.equal(loaded.assessments.size,1);assert.equal(loaded.warnings.length,1);
+    state.report.ts='2026-11-13T02:45:00Z';state.identity.ts=state.report.ts;state.identity.candidateId=state.report.ts+'|5';
+    fs.writeFileSync(path.join(dir,'2026-11-13-late.json'),JSON.stringify(state));
+    loaded=loadGameAssessments(root,report);assert.equal(loaded.assessments.size,1,'advancing issue time preserves the original reviewed game and its original clock');
+    assert.equal(loaded.assessments.get(row.eventKey).reviewedAt,row.reviewedAt);
     delete state.events[0].eventId;fs.writeFileSync(path.join(dir,'2026-11-13-late.json'),JSON.stringify(state));
     assert.equal(loadGameAssessments(root,report).assessments.size,0);
     state.events[0].eventId=f.event.eventId;state.sidecar.provenance.feedBlobSha='b'.repeat(40);

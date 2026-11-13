@@ -17,7 +17,7 @@ Use authoritative main and data/main-schedule.json. EXPECTED_REPORT_TIME resolve
 
 Routine connected GitHub reads, governed checkpoint/request/staging/receipt writes, publication and readback are already authorized. Do not ask again to resume or publish. Respect actual tool-enforced denials and preserve saved work.
 
-Run tools/report-inputs.mjs --at <actual-ISO-timestamp> --report-time <HH:MM>. Inspect workload before source research. NO_UPCOMING_GAMES means no betting research or workers: leave the latest report intact and report the empty current slate honestly. PRICES_UNAVAILABLE means an acquisition limitation, never no value found. Keep grading independent.
+Run tools/report-inputs.mjs --at <actual-ISO-timestamp> --report-time <HH:MM>. Inspect workload before source research. NO_UPCOMING_GAMES means no betting research or workers: leave the latest report intact and report the empty current slate honestly. PRICES_UNAVAILABLE means an acquisition limitation, never no value found. SLATE_UNVERIFIED means stale inputs or failed discovery; it cannot establish an empty slate. Keep grading independent.
 
 Resolve Core with tools/core-release.mjs and pin its returned production path/SHA; current production is Core 1.5. The 1.4-named components remain intentional dependencies. Preserve Contract v1.0, Research v1.8, exact source/provenance bindings, current enums, bankroll and risk controls. Read the Core operating contract and relevant evidence schemas when needed; the existing pipeline executes validation. Never invent a release, enum, source clearance, fair, clock or stake.
 
