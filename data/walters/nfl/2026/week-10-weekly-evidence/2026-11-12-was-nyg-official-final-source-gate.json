@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "policyId": "graham-weekly-production-v2",
+  "season": 2026,
+  "sourceWeek": 10,
+  "recordedAt": "2026-11-13T05:07:04Z",
+  "scope": "Additive WAS-NYG final-source gate after official NFL and New York Giants surfaces reached Final. Reuses the immutable Week 10 carried board, verified full current-information review, official final inactive list, final injury designations and same-day roster/elevation facts. Binds Washington 24, New York Giants 21. At the observation cutoff the official NFL game center had reached Final but did not expose a downloadable final gamebook; complete starters, substitutes, participation/DNP, printed injury/return, specialist and official snap coverage remain explicit UNRESOLVED fields. No started-game prediction, fair, carried rating, historical receipt, completed baseline receipt or market field is changed.",
+  "inputCommit": "63ccf1890992bcd93ba8b43eb72821753ba721a2",
+  "inputBlobs": {
+    "data/walters/nfl/active-week.json": "f449f03bdfbe68147e1efee6c786fa7294e751e5",
+    "data/walters/nfl/2026/week-10-current-numbers.json": "6aca324bbaf233bb3bcf9950069fe10c14814863",
+    "data/walters/nfl/2026/week-10-research-ledger.json": "9f3a8e193c5a4a9b9572dab6e7870781916bbe83",
+    "data/walters/nfl-power-ratings-ledger.json": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "data/walters/nfl/home-field/h4-current.json": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+    "data/walters/nfl/weekly-readiness.json": "b6bfc22ba12a2e9f4c052af911310e19d5147d03"
+  },
+  "marketViewed": false,
+  "estimationPolicy": "Factual preparation only. Missing participation, exposure, replacements and values are not zero. An official final score and final inactive list without the complete final gamebook do not support a paired numerical evaluation. No new numerical method is authorized.",
+  "sources": [
+    {
+      "id": "was-nyg-official-giants-final",
+      "kind": "OFFICIAL_FINAL",
+      "url": "https://www.giants.com/news/instant-analysis-giants-fall-to-commanders-24-21",
+      "capturedAt": "2026-11-13T05:02:00Z",
+      "finding": "Official New York Giants recap records Washington defeating New York 24-21. It identifies Jayden Daniels and J.J. McCarthy as the primary quarterbacks, the Giants' 66-yard fourth-quarter go-ahead touchdown and Washington's 32-yard go-ahead touchdown to Stefon Diggs with 57 seconds remaining."
+    },
+    {
+      "id": "was-nyg-official-nfl-final-no-gamebook",
+      "kind": "OFFICIAL_GAME_CENTER",
+      "url": "https://www.nfl.com/games/commanders-at-giants-2026-reg-10",
+      "capturedAt": "2026-11-13T05:04:00Z",
+      "finding": "Fresh official NFL game center reached Final and exposed recap, stats and highlights navigation but no Download Game Book link or PDF URL. Complete official participation pages, printed injury/return annotations and snap tables were not available at the stopping boundary."
+    },
+    {
+      "id": "was-nyg-official-final-inactives",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.giants.com/news/inactives-who-s-in-who-s-out-for-giants-vs-commanders",
+      "capturedAt": "2026-11-13T05:02:00Z",
+      "finding": "Official Giants notice lists New York inactives Paulson Adebo, J.C. Davis, Thomas Fidone II, Malik Harrison, C.J. Okoye, Nikko Reed and Josh Sills; Washington inactives Ricky Barber, Athan Kaliakmanis (third quarterback), Lucas Patrick, Tanoa Togiai, Colson Yankoff and Isaac Yiadom. It also records New York elevations Dawuane Smoot and Chandler Martin, and Washington's Ale Kaho signing and Julian Good-Jones elevation."
+    },
+    {
+      "id": "was-nyg-official-final-injury-report",
+      "kind": "OFFICIAL_CLUB",
+      "url": "https://www.giants.com/news/giants-vs-commanders-week-10-injury-report-qb-j-j-mccarthy-rb-cam-skattebo-limited",
+      "capturedAt": "2026-11-13T05:02:00Z",
+      "finding": "Official final injury report lists Washington center Lucas Patrick (concussion) and tight end Colson Yankoff (knee) Out, and New York linebacker Malik Harrison (groin) Questionable. It records J.J. McCarthy, Cam Skattebo and the other listed Giants without final game designations, while preserving Washington's listed participation statuses. The report does not classify every other final inactive as injury-driven or healthy."
+    },
+    {
+      "id": "was-nyg-bound-week10-kickoff",
+      "kind": "REPOSITORY",
+      "path": "data/walters/nfl/2026/week-10-current-numbers.json",
+      "blobSha": "6aca324bbaf233bb3bcf9950069fe10c14814863",
+      "finding": "Immutable issued board binds the Week 10 kickoff time, carried ratings, H4, governed QB differential and exact/displayed pregame fair. The issued NYG -0.5 prediction remains frozen after kickoff."
+    },
+    {
+      "id": "was-nyg-bound-completed-baseline",
+      "kind": "REPOSITORY",
+      "path": "data/walters/nfl/2026/week-10-research-ledger.json",
+      "blobSha": "9f3a8e193c5a4a9b9572dab6e7870781916bbe83",
+      "finding": "Verified full Week 10 current-information review preserves the source-bound Washington and New York categorical findings, original receipt/runtime limitations and zero unsupported numerical moves."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W10-WAS-NYG",
+      "away": "WAS",
+      "home": "NYG",
+      "state": "BLOCKED",
+      "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+      "checklist": {
+        "exactFinal": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE_REUSED_IMMUTABLE",
+        "finalInactives": "COMPLETE_OFFICIAL",
+        "reserveElevationsAndTransactions": "COMPLETE_SOURCE_BOUND_WITH_FINAL_GAMEBOOK_RECONCILIATION_PENDING",
+        "participationAndDnp": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "inGameInjuryAndReturnInventory": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "quarterbackInventory": "PARTIAL_ACTUAL_STARTERS_CONFIRMED_FULL_PARTICIPATION_UNRESOLVED",
+        "specialistInventory": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+        "officialSnapCounts": "UNRESOLVED_NOT_PUBLISHED",
+        "pairedGameDayInjuryLoss": "BLOCKED_MISSING_COMPLETE_FINAL_SOURCE_INVENTORY"
+      },
+      "final": {
+        "awayScore": 24,
+        "homeScore": 21,
+        "state": "OFFICIAL_FINAL_VERIFIED",
+        "sourceId": "was-nyg-official-giants-final"
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-11-12T17:15:00-08:00",
+        "awayRating": 21.42399585,
+        "homeRating": 20.698687348,
+        "neutralBaseHome": 0.725308502,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "qbPerformancePointsToHomeSpread": 0.92,
+        "preservedPregameExactFairHome": -0.437,
+        "preservedPregameDisplayedFairHome": -0.5,
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "teams": [
+        {
+          "team": "WAS",
+          "side": "AWAY",
+          "finalInactives": [
+            "Ricky Barber",
+            "Athan Kaliakmanis (third quarterback)",
+            "Lucas Patrick",
+            "Tanoa Togiai",
+            "Colson Yankoff",
+            "Isaac Yiadom"
+          ],
+          "reserveElevationsAndTransactions": [
+            "Official final inactive notice records Ale Kaho signed from the practice squad and Julian Good-Jones elevated for the game.",
+            "Lucas Patrick (concussion) and Colson Yankoff (knee) were ruled Out on the final injury report.",
+            "UNRESOLVED — the final gamebook is required to reconcile the complete active roster, starters, substitutes, DNP rows and phase participation; no injury classification is inferred for other inactives absent an official designation."
+          ],
+          "participationAndDnp": [
+            "Jayden Daniels actual primary quarterback duty is confirmed by the official final recap.",
+            "Stefon Diggs participated and caught the official-recap go-ahead touchdown with 57 seconds remaining.",
+            "UNRESOLVED — all other offensive/defensive starters, substitutes, official DNP rows and phase exposure require the final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "UNRESOLVED — no injury, return or exit boundary is inferred without the complete official final play-by-play and separate injury-update annotations."
+          ],
+          "quarterback": {
+            "pregameBinding": "Jayden Daniels",
+            "actualParticipation": "PRIMARY DUTY CONFIRMED; complete snap coverage and reserve-quarterback participation/DNP unresolved; Athan Kaliakmanis was inactive as third quarterback"
+          },
+          "specialists": [
+            "UNRESOLVED — actual kicker, punter, holder, long-snapper and returner participation require the final gamebook and official phase snap evidence."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W10-WAS-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official starters, substitutes, DNP, printed injury/return, specialist and offense/defense/special-teams snap inventory.",
+              "footballImpact": "Patrick/Good-Jones/Togiai offensive-line duties, Yankoff tight-end coverage, Barber front participation and Yiadom defensive-back allocation cannot receive exposure, distinct replacement allocation or value-based injury loss without complete final participation.",
+              "reopenWhen": "The official NFL game center exposes the final gamebook or another official complete final participation source and official phase snap evidence is published."
+            },
+            {
+              "caseKey": "2026-W10-WAS-INACTIVE-CLASSIFICATION-AND-ROLE",
+              "exactMissingFact": "Official injury-versus-non-injury classification, established role and distinct replacement allocation for Ricky Barber, Tanoa Togiai and Isaac Yiadom, plus actual additional duty supplied by Kaho and Good-Jones.",
+              "footballImpact": "A final inactive identity or game-day elevation alone does not establish unavailable strength, a one-for-one replacement or zero loss.",
+              "reopenWhen": "A material official participation/transaction source or an already approved existing role/value adapter supplies the named classification and distinct duty."
+            }
+          ]
+        },
+        {
+          "team": "NYG",
+          "side": "HOME",
+          "finalInactives": [
+            "Paulson Adebo",
+            "J.C. Davis",
+            "Thomas Fidone II",
+            "Malik Harrison",
+            "C.J. Okoye",
+            "Nikko Reed",
+            "Josh Sills"
+          ],
+          "reserveElevationsAndTransactions": [
+            "Official final inactive notice records outside linebacker Dawuane Smoot and inside linebacker Chandler Martin elevated for the game.",
+            "Malik Harrison carried the only Giants final game designation, Questionable with a groin injury.",
+            "UNRESOLVED — the final gamebook is required to reconcile the complete active roster, starters, substitutes, DNP rows and phase participation; the absence of a final injury designation is not by itself a healthy-scratch finding for every other inactive."
+          ],
+          "participationAndDnp": [
+            "J.J. McCarthy actual primary quarterback duty is confirmed by the official final recap.",
+            "Isaiah Likely participated and caught the official-recap 66-yard fourth-quarter go-ahead touchdown.",
+            "UNRESOLVED — all other offensive/defensive starters, substitutes, official DNP rows and phase exposure require the final gamebook."
+          ],
+          "inGameInjuriesAndReturns": [
+            "UNRESOLVED — no injury, return or exit boundary is inferred without the complete official final play-by-play and separate injury-update annotations."
+          ],
+          "quarterback": {
+            "pregameBinding": "J.J. McCarthy",
+            "actualParticipation": "PRIMARY DUTY CONFIRMED; complete snap coverage and reserve-quarterback participation/DNP unresolved"
+          },
+          "specialists": [
+            "UNRESOLVED — actual kicker, punter, holder, long-snapper and returner participation require the final gamebook and official phase snap evidence."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W10-NYG-FINAL-INVENTORY",
+              "exactMissingFact": "Complete official starters, substitutes, DNP, printed injury/return, specialist and offense/defense/special-teams snap inventory.",
+              "footballImpact": "Adebo/Reed defensive-back availability, Harrison/Martin linebacker duty, the reserve offensive-line and tight-end groups, and Smoot's actual role cannot receive exposure, distinct replacement allocation or value-based injury loss without complete final participation.",
+              "reopenWhen": "The official NFL game center exposes the final gamebook or another official complete final participation source and official phase snap evidence is published."
+            },
+            {
+              "caseKey": "2026-W10-NYG-INACTIVE-CLASSIFICATION-AND-ROLE",
+              "exactMissingFact": "Official injury-versus-non-injury classification, established role and distinct replacement allocation for the non-designated final inactives, plus actual additional duty supplied by Smoot and Martin.",
+              "footballImpact": "A final inactive identity or game-day elevation alone does not establish unavailable strength, a one-for-one replacement or zero loss.",
+              "reopenWhen": "A material official participation/transaction source or an already approved existing role/value adapter supplies the named classification and distinct duty."
+            }
+          ]
+        }
+      ],
+      "safeguards": [
+        "Patrick, Good-Jones and Togiai remain one offensive-line capacity/role-chain question until final participation and distinct duties are bound.",
+        "Yankoff's absence does not establish a one-for-one tight-end workload or zero loss.",
+        "Yiadom and Barber may not receive unsupported replacement credit from an elevation or active roster identity.",
+        "Adebo and Reed remain one defensive-back allocation question until final participation and common baseline duties are bound.",
+        "Harrison and Martin remain one linebacker allocation question; Martin's elevation alone does not prove Harrison relief.",
+        "Smoot's elevation does not establish an additional edge duty or immutable replacement value.",
+        "The official recap confirms selected participants, not the complete game-day inventory or phase exposure.",
+        "Missing participation, replacement values and exposure are never zero."
+      ],
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The official final gamebook, complete participation pages, printed play-by-play injury/return annotations and offense/defense/special-teams snap tables were not published at the stopping boundary.",
+          "footballImpact": "A paired numerical evaluation would otherwise invent missing starters, DNP, exposure, replacements or zero values.",
+          "nextAction": "Reopen only when the official NFL game center exposes the complete final gamebook or another official complete final participation source and official phase snap evidence is available.",
+          "sourceIds": [
+            "was-nyg-official-giants-final",
+            "was-nyg-official-nfl-final-no-gamebook",
+            "was-nyg-official-final-inactives",
+            "was-nyg-bound-completed-baseline"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Known final inactives and same-day roster moves do not establish distinct final replacement allocation, complete exposure or immutable values for the recorded offensive-line, tight-end, front, linebacker and defensive-back groups.",
+          "footballImpact": "Missing values are not zero and overlapping clusters cannot be summed without final participation and existing approved bindings.",
+          "nextAction": "After the official inventory posts, reconcile each named cluster once and use only approved existing exposure, replacement and value routes.",
+          "sourceIds": [
+            "was-nyg-official-final-inactives",
+            "was-nyg-official-final-injury-report",
+            "was-nyg-bound-completed-baseline"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ],
+  "reviewConclusion": {
+    "exactFinal": "WAS 24, NYG 21 — OFFICIAL_FINAL_VERIFIED",
+    "completeFinalInactivesAndGameDayMoves": "SOURCE_BOUND",
+    "completeFinalParticipationAndSnapInventory": "UNAVAILABLE_AT_CAPTURE_CUTOFF",
+    "numericStagingState": "NO_INJURY_IMPACT_OR_REPLACEMENT_VALUE_SUPPORTED_FROM_PARTIAL_FINAL_SOURCES",
+    "nextAction": "Reopen once the official final gamebook and both teams' offense/defense/special-teams snap evidence are published. Preserve the verified kickoff board, completed baseline receipt/runtime and all cluster/double-count safeguards."
+  }
+}
