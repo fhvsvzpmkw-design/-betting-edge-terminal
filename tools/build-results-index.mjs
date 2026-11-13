@@ -216,6 +216,20 @@ function loadRun(sourceRun) {
 const cards = [];
 const observedRuns = new Set();
 const recordIds = (...groups) => [...new Set(groups.flatMap(group => Array.isArray(group) ? group : []).filter(id => typeof id === 'string' && id.trim()))];
+const correctionCache = new Map();
+function reviewedPresentation(rec, completion, sourceRun, index) {
+  const audit = completion.state === 'complete' && completion.identityCorrection;
+  if (!audit || !/^data\/history\/grading\/corrections\/[a-zA-Z0-9_-]+\.json$/.test(audit.path || '')) return null;
+  if (!correctionCache.has(audit.path)) correctionCache.set(audit.path, readJson(path.join(ROOT, audit.path)));
+  const correction = correctionCache.get(audit.path);
+  if (!correction || correction.correctionId !== audit.correctionId || correction.eventId !== String(rec.feed?.eventId)) return null;
+  if (!correction.issuedRuns?.some(run => run.path === sourceRun && run.blobSha === audit.sourceBlobs?.[sourceRun] && run.indices.includes(index))) return null;
+  if (!correction.displayConflicts?.some(row => row.sourceRun === sourceRun && row.indices.includes(index))) return null;
+  const line = selectedLine(rec), identity = correction.identity;
+  if (rec.feed?.marketKey !== 'spread' || line === null || !['home','away'].includes(rec.feed?.side)) return null;
+  return {title:`${identity[rec.feed.side]} ${line > 0 ? '+' : ''}${line} — Spread`, sport:identity.sport,
+    issuedTitle:rec.title, identityCorrectionId:audit.correctionId};
+}
 function forecastAttribution(rec) {
   // Reviewed/context evidence is not proof of adoption. Preserve the historical
   // top-level alias, but expose the actual fair-input IDs separately.
@@ -233,6 +247,7 @@ function addRunCards(sourceRun, run, obs = null, obsFile = null) {
     const price = exactAnalysisPrice(run, rec, o);
     const grade = cleanText(completion.grade).toUpperCase() || null;
     const units = completion.state === 'complete' ? settledUnits(grade, price.decimal) : null;
+    const presentation = reviewedPresentation(rec, completion, sourceRun, index);
 
     cards.push({
       cardId: `${sourceRun}#${index}`,
@@ -242,13 +257,14 @@ function addRunCards(sourceRun, run, obs = null, obsFile = null) {
       runId: obs?.runId || run.ts || null,
       date: cleanText(obs?.runId || run.ts).slice(0, 10) || null,
       slot: obs?.slot || run.slot || null,
-      title: rec.title || o.title || null,
+      title: presentation?.title || rec.title || o.title || null,
+      ...(presentation ? {issuedTitle:presentation.issuedTitle, identityCorrectionId:presentation.identityCorrectionId} : {}),
       status: cleanText(rec.status || o.status).toUpperCase() || null,
       eventId: String(rec?.feed?.eventId || completion.eventId || '') || null,
       selectionKey: rec?.feed?.selectionKey || o.selectionKey || null,
       ...forecastAttribution(rec),
       forecastReview: forecastReviewSummary(rec.forecastReview),
-      sport: sportFamily(rec),
+      sport: presentation?.sport || sportFamily(rec),
       market: marketFamily(rec),
       marketKey: rec?.feed?.marketKey || rec?.feed?.market || null,
       side: rec?.feed?.side || null,

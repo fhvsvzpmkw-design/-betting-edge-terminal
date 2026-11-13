@@ -26,7 +26,8 @@ try {
   const audit='data/history/grading/corrections/event-70898886-20261027-v1.json';
   const correction={schema:1,kind:'reviewed-historical-event-identity',correctionId:'test-pinned-identity',eventId:id,
     expectedCards:2,identity:{away:'Sam Houston State Bearkats',home:'Missouri State Bears',start,sport:'NCAAF',date:'2026-10-27'},
-    issuedRuns:[{path:source,blobSha,feedGeneratedAt:generatedAt,snapshotBlobSha,indices:[0,1]}]};
+    issuedRuns:[{path:source,blobSha,feedGeneratedAt:generatedAt,snapshotBlobSha,indices:[0,1]}],
+    displayConflicts:[{sourceRun:source,indices:[1]}]};
   write(audit,correction);write('data/history/odds-index.json',{entries:[{generatedAt,snapshotBlobSha}]});
   const rows=recs.map((rec,index)=>({rec,index,sourceRun:source,date:'2026-10-27',feedGeneratedAt:generatedAt}));
   const group=()=>({id,rows:structuredClone(rows),identityRows:structuredClone(rows),firstDate:'2026-10-27'});
@@ -41,6 +42,13 @@ try {
   const grades=JSON.parse(fs.readFileSync('observations.json')).recommendations.map(row=>row.completion);
   assert.deepEqual(grades.map(row=>row.grade),['LOSS','WIN']);
   assert.ok(grades.every(row=>row.hypothetical&&!row.official&&row.identityCorrection.blobSha));
+  write('data/history/observations/2026-10-27/evening.json',JSON.parse(fs.readFileSync('observations.json')));
+  write('run-history.json',{runs:[{path:source}]});
+  execFileSync(process.execPath,[path.join(repo,'tools/build-results-index.mjs')]);
+  const cards=JSON.parse(fs.readFileSync('data/history/results-index.json')).cards;
+  assert.equal(cards[1].title,'Missouri State Bears -6 — Spread');
+  assert.equal(cards[1].issuedTitle,recs[1].title);assert.equal(cards[1].sport,'NCAAF');
+  assert.equal(cards[1].identityCorrectionId,correction.correctionId);
   assert.equal(fs.readFileSync(source,'utf8'),original,'Repair must never rewrite issued labels or selections');
   assert.equal((await verify(group(),async()=>({events:[]}))).unresolvedReason,'result_not_verified');
   assert.equal((await verify(group(),async()=>resultJson('2026-10-28T01:00:00Z'))).unresolvedReason,'identity_conflict');
