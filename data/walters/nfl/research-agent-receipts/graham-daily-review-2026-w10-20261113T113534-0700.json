@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v3-slate-focused",
+  "group": "graham",
+  "taskId": "DAILY_REVIEW",
+  "executionRunId": "graham-daily-review-2026-w10-20261113T113534-0700",
+  "workBinding": {
+    "phase": "W10_FRIDAY_DAILY_REVIEW_TARGETED_MIN_QB_GAP",
+    "mainCommit": "3874bcd7b882f68e41058806f8ed410a3debef7d",
+    "season": 2026,
+    "week": 10,
+    "runEventId": "graham-daily-review-2026-w10-20261113T113534-0700"
+  },
+  "mode": "COORDINATOR_FIRST_TARGETED_ONE_WORKER",
+  "reason": "Coordinator reused the verified Tuesday baseline and current official league sources. One fresh source-only worker was opened only for the consequential unresolved Minnesota starting-quarterback question created by a trade plus two practice-limited/injured incumbents.",
+  "workers": [
+    {
+      "role": "TARGETED_SOURCE_RESEARCHER",
+      "workerId": "/root/week10_min_qb_gap",
+      "freshContext": true,
+      "readOnly": true,
+      "marketFree": true,
+      "assignmentIds": [
+        "MIN_WEEK10_OFFICIAL_STARTER_CONFIRMATION"
+      ],
+      "state": "RETURNED",
+      "result": "Official Minnesota and NFL sources did not confirm a Week 10 starter at the observation cutoff. Kirk Cousins was the clear expectation, but Minnesota explicitly said it had not announced a starter; Kyler Murray was DNP and Carson Wentz limited. Practice participation was not treated as a starter announcement."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "OPEN_ONE_TARGETED_WORKER",
+      "workers": 1,
+      "namedQuestion": "Has Minnesota officially confirmed its Week 10 starter, or must the QB case fail closed?",
+      "releaseCondition": "Exact current official team/league URLs and a confirmed-versus-unresolved conclusion returned."
+    }
+  ],
+  "qualityFindings": [
+    "Minnesota's November 12 official article explicitly states it had not announced who would start Sunday.",
+    "Kevin O'Connell said the club was working toward Kirk Cousins playing but did not commit; opponent expectation is not Minnesota confirmation.",
+    "Kyler Murray DNP and Carson Wentz limited are practice classifications, not named-starter authority.",
+    "The current QB case therefore required a governed fail-closed staging update rather than a guessed Cousins binding."
+  ],
+  "completedWork": {
+    "researchersLaunched": 1,
+    "researchersReturned": 1,
+    "reviewersLaunched": 0,
+    "reviewersReturned": 0,
+    "teamsResearched": 1,
+    "teamsReviewed": 1,
+    "gamesReviewed": 1,
+    "numericalChanges": 0
+  },
+  "remainingWork": [
+    "Recheck Minnesota's Friday final designation or later official named-starter announcement in the subsequent Delta or pregame owner.",
+    "If a starter is officially named and exists in the frozen registry, use only the existing governed QB writer."
+  ],
+  "recordedAt": "2026-11-13T18:47:08Z"
+}
