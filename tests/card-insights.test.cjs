@@ -93,14 +93,33 @@ test('integer-contract insights preserve the issued push-adjusted break-even com
     const altered=clone(rec);change(altered.forecastReview.records[0].comparison);assert.equal(insights.describe(altered,run).views.length,0);
   }
 });
-test('expanded content shows useful facts and rechecks without raw schemas, duplicate checks or false missing-data claims',()=>{
+test('expanded analysis leads with four betting questions and keeps generic team statistics out of the brief',()=>{
   const {rec,run}=fixture(),before=JSON.stringify({rec,run});const node=insights.render(document,rec,run),text=node.textContent;
-  assert.match(text,/GAME INSIGHTS/);assert.match(text,/8-4-1/);assert.match(text,/Named Forward — Out \(Ankle\)/);
-  assert.match(text,/Named Goalie — projected starter/);assert.match(text,/MoneyPuck: 58.0%/);assert.match(text,/WHAT TO WATCH/);
+  for(const question of ['WHY THIS PLAY TONIGHT?','WHY THIS PRICE?','STRONGEST CONCERN','ACT NOW OR WAIT?'])assert.ok(text.includes(question));
+  assert.doesNotMatch(text,/8-4-1|Named Forward|Named Goalie/);
+  assert.match(text,/MoneyPuck: 58.0%/);assert.match(text,/Lean only; no stake is recommended/);assert.match(text,/SOURCES & SNAPSHOT/);
   assert.equal(text.match(/Confirm Home starter before reassessing at \+100\./g).length,1);
   assert.doesNotMatch(text,/WRONG_MARKET_OR_SIDE|No injuries|No entries supplied|RECORDED DECISION|JSON/);
   assert.equal(JSON.stringify({rec,run}),before);assert.equal(rec.status,'LEAN');assert.equal(rec.stake,'$0');
-  assert.match(insights.render(document,{status:'PASS',analysis:'A specific earlier decision.'},{ts:run.ts}).textContent,/not captured in this report/);
+  assert.match(insights.render(document,{status:'PASS',analysis:'A specific earlier decision.'},{ts:run.ts}).textContent,/A specific earlier decision/);
+});
+test('a source-bound contrary finding becomes the concern while a named recheck remains the action',()=>{
+  const {rec,run}=fixture();rec.cardEvidence.selectionKey=rec.feed.selectionKey;
+  rec.sourceEvidence=[{id:'lineup',title:'Team update',url:'https://www.nhl.com/news',checkedAt:'2026-11-07T16:00:00Z'}];
+  rec.cardEvidence.decisionExplanation='Home creates more high-danger chances against this depleted defence.';
+  rec.cardEvidence.findings.push({stance:'CONTRARY',sourceIds:['lineup'],finding:'Home is playing its third game in four nights.',application:'Fatigue could weaken the late-game advantage.'});
+  const view=insights.brief(rec,run);
+  assert.match(view.whyTonight,/high-danger/);assert.match(view.risk,/third game in four nights/);assert.match(view.timing,/Confirm Home starter/);
+  rec.cardEvidence.selectionKey='other|ml|home||';assert.doesNotMatch(insights.brief(rec,run).risk,/third game in four nights/);
+});
+test('legacy price boilerplate is not repeated as the strongest game concern',()=>{
+  const {rec,run}=fixture();rec.status='PASS';delete rec.forecastLean;
+  rec.marketAssessment={basis:'QUALIFIED_PINNACLE',selectionKey:rec.feed.selectionKey,referenceProbability:.48,
+    decisionRationale:'Home at +100 is unfavorable to the exact paired Pinnacle benchmark.'};
+  rec.contrary='The exact executable-to-benchmark difference was unfavorable. Used only for a zero-stake exact-price assessment.';
+  const view=insights.brief(rec,run);assert.match(view.whyTonight,/Pass: the available odds/);
+  assert.match(view.risk,/Confirm Home starter/);assert.doesNotMatch(view.risk,/zero-stake|executable-to-benchmark/);
+  assert.equal(view.timing,'Pass at this price.');
 });
 test('both shared runner entry points load the insights before the common card renderer',()=>{
   for(const name of ['runner.html','runner-app.html']){const html=fs.readFileSync(name,'utf8');assert.ok(html.indexOf('assets/card-insights.js')<html.indexOf('assets/runner-core-runtime.js'));}

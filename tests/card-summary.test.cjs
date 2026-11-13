@@ -127,7 +127,7 @@ test('a contrary market reference cannot replace the actual LEAN, WAIT or BET ex
   }
 });
 
-test('rendered cards keep checks visible and the full research behind accessible expansion',()=>{
+test('rendered cards preserve calls and checks while expanding to concise analysis and source links',()=>{
   class Element{
     constructor(tag){this.tagName=tag;this.children=[];this.style={};this.dataset={};this.attributes={};this._text='';}
     set textContent(value){this._text=String(value);this.children=[];}
@@ -150,16 +150,16 @@ test('rendered cards keep checks visible and the full research behind accessible
     const card=context.renderCard(d,rec),nodes=all(card),text=visible(card);
     assert.doesNotMatch(text,/WRONG_MARKET_OR_SIDE|WRONG_LINE|SOURCE_EXACT_CAPABILITY_UNVERIFIED/);
     assert.match(text,/UNRESOLVED:/);
-    const evidence=nodes.find(node=>node.className==='runnerEvidence');
-    assert.ok(evidence.textContent.includes('ORIGINAL REPORT & SOURCES'));
-    assert.ok(evidence.textContent.includes('SUPPORT'),'the research is retained, not deleted');
     const button=nodes.find(node=>node.className==='runnerBtn'),expanded=nodes.find(node=>node.className==='runnerExpanded');
     assert.equal(button.attributes['aria-controls'],expanded.id);
     assert.ok(!ids.has(expanded.id));ids.add(expanded.id);
     assert.ok(!all(expanded).some(node=>node.className==='runnerInsights'),'game details render on demand');
     button.onclick();assert.equal(expanded.hidden,false);assert.equal(button.attributes['aria-expanded'],'true');
-    assert.match(visible(card),/GAME INSIGHTS/);
-    assert.match(visible(card),/ORIGINAL REPORT & SOURCES/);
+    assert.match(visible(card),/WHY THIS PLAY TONIGHT\?/);
+    assert.match(visible(card),/WHY THIS PRICE\?/);
+    assert.match(visible(card),/STRONGEST CONCERN/);
+    assert.match(visible(card),/ACT NOW OR WAIT\?/);
+    assert.match(visible(card),/SOURCES & SNAPSHOT/);
     assert.doesNotMatch(visible(card),/RECORDED DECISION:|MOVEMENT:/,'details do not repeat the headline decision and movement');
     assert.doesNotMatch(visible(card),/WRONG_MARKET_OR_SIDE/,'audit prose still requires the research drawer');
     button.onclick();button.onclick();assert.equal(all(expanded).filter(node=>node.className==='runnerInsights').length,1,'reopening details keeps one game snapshot');

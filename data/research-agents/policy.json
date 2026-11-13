@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "policyId": "research-agent-groups-v2",
+  "policyId": "research-agent-groups-v3-slate-focused",
   "status": "OPERATIONAL_CONFIGURATION",
-  "effectiveDate": "2026-11-01",
+  "effectiveDate": "2026-11-12",
   "timezone": "America/Vancouver",
-  "objective": "Improve source-backed research depth, opposing-case review and decision quality.",
+  "objective": "Use one saved assessment per game and investigate consequential changes with minimal model work.",
   "coordinatorOnlySpawning": true,
   "recursiveDelegation": false,
   "maxOpenWorkersPerCoordinator": 6,
@@ -19,9 +19,9 @@
   "inheritTaskModelAndEffort": true,
   "groups": {
     "main": {
-      "normalResearchers": 1,
-      "normalReviewers": 1,
-      "maxOpenWorkers": 6,
+      "normalResearchers": 0,
+      "normalReviewers": 0,
+      "maxOpenWorkers": 1,
       "adaptive": true,
       "receiptDirectory": "data/report-production/agent-receipts",
       "scope": "Existing five Main report tasks and Guy handoff",
@@ -31,7 +31,8 @@
             "06:00",
             "15:15"
           ],
-          "routineMaxNewWorkers": 2
+          "routineMaxNewWorkers": 0,
+          "initialWorkers": 0
         },
         "update": {
           "slots": [
@@ -40,20 +41,27 @@
             "18:15"
           ],
           "initialWorkers": 0,
-          "routineMaxNewWorkers": 1
+          "routineMaxNewWorkers": 0
         }
       },
-      "maxNewWorkersPerRun": 6
+      "maxNewWorkersPerRun": 1,
+      "slateStaffing": {
+        "smallSlateMaxPricedGames": 6,
+        "smallSlateWorkers": 0,
+        "largeSlateMaxTargetedWorkers": 1,
+        "defaultWorkers": 0
+      }
     },
     "graham": {
-      "normalResearchers": 2,
-      "normalReviewers": 1,
-      "maxOpenWorkers": 6,
+      "normalResearchers": 0,
+      "normalReviewers": 0,
+      "maxOpenWorkers": 1,
       "adaptive": true,
       "requireFreshMarketFreeContext": true,
       "receiptDirectory": "data/walters/nfl/research-agent-receipts",
       "scope": "Existing four research tasks and substantive hourly learning/baseline phases; no mechanical rollover or ATS closeout delegation",
-      "baselineOwnerClaim": "Existing RUN_STARTED event committed with expected main head; losing entrant observes owner"
+      "baselineOwnerClaim": "Existing RUN_STARTED event committed with expected main head; losing entrant observes owner",
+      "maxNewWorkersPerRun": 1
     },
     "meat-desk": {
       "normalResearchers": 1,
@@ -102,7 +110,7 @@
       "remainingWork",
       "recordedAt"
     ],
-    "saveAttemptRequiredFor": "Substantive delegated phases, actual startup failures, and final Main delivery when the coordinator works alone",
+    "saveAttemptRequiredFor": "Actual delegated work and actual startup failures only; no routine zero-worker receipt",
     "skipVerifiedUnchangedChecksWithoutDelegation": true
   },
   "unchanged": [

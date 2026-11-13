@@ -12,6 +12,7 @@
   const short=x=>{const value=clean(x);return value.length>300?value.slice(0,297).replace(/\s+\S*$/,'')+'…':value;};
   const first=x=>{const value=clean(x);for(const m of value.matchAll(/[.!?](?:\s|$)/g)){if(m[0][0]==='.'&&/\b(?:St|Dr|Mr|vs|No)$/i.test(value.slice(0,m.index)))continue;return value.slice(0,m.index+1);}return value;};
   const readable=x=>Boolean(clean(x))&&!technical.test(clean(x))&&!/^(?:NR\b|No additional supporting|Current event evidence and applicable strategy|The current source review addressed)/i.test(clean(x));
+  const repeatedPrice=x=>/exact executable-to-benchmark|exact paired Pinnacle benchmark|qualified paired Pinnacle reference|used only for a zero-stake exact-price/i.test(clean(x));
   function validSelection(rec){
     const f=rec?.feed||{},p=String(f.selectionKey||'').split('|');
     return Number.isFinite(time(f.eventDate))&&p.length===5&&p[0]===String(f.eventId)&&p[1]===f.marketKey&&p[2]===f.side&&p[3]===''&&
@@ -78,6 +79,41 @@
       teams,views,notes,reason:readable(reason)?short(reason):null,checks:uniqueChecks,benchmark,
       sources:[...new Map(sources.map(s=>[s.url+'|'+s.observedAt,s])).values()]};
   }
+  function brief(rec,run){
+    const data=describe(rec,run),exact=validSelection(rec),evidence=rec?.cardEvidence,
+      bound=exact&&evidence?.selectionKey===rec.feed.selectionKey;
+    const sourceIds=new Set(list(rec?.sourceEvidence).map(source=>source.id));
+    const findings=bound?list(evidence.findings).filter(row=>list(row.sourceIds).length&&row.sourceIds.every(id=>sourceIds.has(id))):[];
+    const opinion=rec?.forecastLean || rec?.forecastWait;
+    const rationale=[bound?evidence.decisionExplanation:null,opinion?.rationale,
+      exact&&rec?.marketAssessment&&rec.marketAssessment.selectionKey===rec.feed.selectionKey?rec.marketAssessment.decisionRationale:null,
+      data.reason,rec?.analysis].find(readable);
+    const whyTonight=clean(rec?.status).toUpperCase()==='PASS'&&data.benchmark<0&&repeatedPrice(rationale)?
+      'Pass: the available odds fall short of the recorded Pinnacle reference.':
+      rationale?short(rationale):'A clear game-specific reason was not recorded in this report.';
+    const f=rec?.feed || {},american=exact?(f.priceDecimal>=2?'+'+Math.round((f.priceDecimal-1)*100):String(-Math.round(100/(f.priceDecimal-1)))):null;
+    const price=exact?[clean(rec.book),american].filter(Boolean).join(' '):null;
+    const forecasts=data.views.slice(0,2).map(v=>v.name+': '+(v.probability*100).toFixed(1)+'% versus '+
+      (v.breakEven*100).toFixed(1)+'% to break even'+(v.refundedPushes?' after allowing for refunded pushes':'')+'.');
+    const target=readable(rec?.playTo || rec?.betAt)?clean(rec.playTo || rec.betAt):'';
+    const whyPrice=exact?[price+'.',...forecasts,target&&target!=='NO BET'?'Price limit: '+target+'.':'',
+      data.benchmark!==null?'Pinnacle comparison: '+(data.benchmark>=0?'+':'−')+Math.abs(data.benchmark).toFixed(2)+' percentage points.':''].filter(Boolean).join(' '):'An executable price was not verified.';
+    const opposing=findings.find(row=>row.stance==='CONTRARY'&&readable(row.finding)&&!repeatedPrice(row.finding));
+    const unresolved=findings.find(row=>row.stance==='UNRESOLVED'&&readable(row.finding));
+    const risk=opposing?short([opposing.finding,opposing.application].filter(readable).join(' ')):
+      readable(rec?.contrary)&&!repeatedPrice(rec.contrary)&&!/^No additional opposing/i.test(clean(rec.contrary))?short(rec.contrary):
+      unresolved?short(unresolved.finding):data.checks[0] || (data.benchmark<0?'Pinnacle prices this side below the offered break-even chance.':'A specific opposing case was not recorded in this report.');
+    const status=clean(rec?.status).toUpperCase();
+    const action={BET:'Use the recorded stake and price limit.',LEAN:'Lean only; no stake is recommended.',
+      WAIT:'Wait for the stated condition before reconsidering.',PASS:'Pass at this price.'}[status] || 'The decision needs review.';
+    const checks=[...new Set(data.checks)].filter(check=>clean(check)!==clean(risk)).slice(0,2);
+    const timing=[action,...checks].join(' ');
+    const sources=[...data.sources,...list(rec?.sourceEvidence).filter(source=>Number.isFinite(time(source.checkedAt || source.asOf))&&
+      time(source.checkedAt || source.asOf)<=time(run?.ts)&&time(source.checkedAt || source.asOf)<time(f.eventDate))
+      .map(source=>({url:source.url,sourceId:source.title || source.id,observedAt:source.checkedAt || source.asOf}))];
+    return {whyTonight,whyPrice,risk,timing,snapshotAt:data.snapshotAt,oddsAt:run?.feedGeneratedAt || null,
+      sources:[...new Map(sources.map(source=>[source.url+'|'+source.observedAt,source])).values()]};
+  }
   function node(d,tag,text,cls){const e=d.createElement(tag);if(text!==undefined)e.textContent=root.VigScopeOddsFormat?root.VigScopeOddsFormat.text(text):text;if(cls)e.className=cls;return e;}
   function style(d){if(!d.head||d.getElementById?.('cardInsightsStyle'))return;const s=node(d,'style');s.id='cardInsightsStyle';s.textContent=`
     .runnerInsights{border-top:1px solid var(--line,#16445a);margin-top:10px;padding-top:12px;font-size:13px;line-height:1.55;overflow-wrap:anywhere}
@@ -89,24 +125,19 @@
     @media(max-width:600px){.runnerInsightsTeams{grid-template-columns:1fr}.runnerInsights{font-size:13px}.runnerInsightsTeam,.runnerInsightsSection{padding:10px}}
   `;d.head.appendChild(s);}
   function render(d,rec,run){
-    const data=describe(rec,run);style(d);const panel=node(d,'section',undefined,'runnerInsights');panel.setAttribute('aria-label','Game insights for this selection');
-    panel.append(node(d,'h4','GAME INSIGHTS'),node(d,'div',[data.snapshotAt?'Report snapshot · '+clock(data.snapshotAt):'',data.venue].filter(Boolean).join(' · '),'runnerInsightsMeta'));
-    const group=node(d,'div',undefined,'runnerInsightsTeams');
-    for(const team of data.teams){const box=node(d,'div',undefined,'runnerInsightsTeam');box.append(node(d,'strong',team.team),node(d,'div',[team.location,team.record,team.split].filter(Boolean).join(' · '),'runnerInsightsRecord'));
-      if(team.form)box.append(node(d,'p',team.form));if(team.lastGame)box.append(node(d,'p','Last game: '+team.lastGame));if(team.rest)box.append(node(d,'p',team.rest));group.append(box);}
-    if(data.teams.length)panel.append(group);
-    function section(title,items,cls){if(!items.length)return;const box=node(d,'section',undefined,'runnerInsightsSection'+(cls?' '+cls:''));box.append(node(d,'h4',title));const ul=node(d,'ul');for(const item of items)ul.append(node(d,'li',item));box.append(ul);panel.append(box);}
-    const personnel=data.teams.flatMap(t=>[...(t.goalie?[`${t.team}: ${t.goalie.name} — ${t.goalie.status.toLowerCase()} starter`]:[]),
-      ...(t.injuries.length?[`${t.team} reported availability: ${t.injuries.map(p=>`${p.name} — ${p.status}${p.detail?' ('+p.detail+')':''}`).join('; ')}`]:[])]);
-    section('PERSONNEL & STARTERS',personnel);section('MATCHUP NOTES',data.notes);
-    section('PUBLISHED FORECASTS',data.views.map(v=>`${v.name}: ${(v.probability*100).toFixed(1)}% for this selection · the issued price needs ${(v.breakEven*100).toFixed(1)}% to break even${v.refundedPushes?' after allowing for refunded pushes':''}.`));
-    if(data.reason&&!data.views.length)section('WHY THIS CALL',[data.reason]);
-    section('WHAT TO WATCH',data.checks,'runnerInsightsWatch');
-    if(data.benchmark!==null)section('MARKET CHECK',[`Pinnacle price comparison: ${data.benchmark>=0?'+':'−'}${Math.abs(data.benchmark).toFixed(2)} percentage points at the issued odds.`]);
-    if(!data.teams.length&&!data.notes.length)panel.append(node(d,'p','Detailed game context was not captured in this report. The original reasoning and sources are available below.','runnerInsightsEmpty'));
+    const data=brief(rec,run);style(d);const panel=node(d,'section',undefined,'runnerInsights');panel.setAttribute('aria-label','Tonight betting analysis for this selection');
+    for(const [title,text] of [['WHY THIS PLAY TONIGHT?',data.whyTonight],['WHY THIS PRICE?',data.whyPrice],
+      ['STRONGEST CONCERN',data.risk],['ACT NOW OR WAIT?',data.timing]]){
+      const box=node(d,'section',undefined,'runnerInsightsSection');box.append(node(d,'h4',title),node(d,'p',text));panel.append(box);
+    }
+    const sources=node(d,'details',undefined,'runnerEvidence');sources.append(node(d,'summary','SOURCES & SNAPSHOT'));
+    sources.append(node(d,'div',[data.snapshotAt?'Report · '+clock(data.snapshotAt):'',data.oddsAt?'Odds · '+clock(data.oddsAt):''].filter(Boolean).join(' · '),'runnerInsightsMeta'));
     const links=node(d,'div',undefined,'runnerInsightsSources');
-    for(const source of data.sources.slice(0,4)){try{const u=new URL(source.url);if(u.protocol!=='https:'||u.username||u.password)continue;const a=node(d,'a',`${names[source.sourceId]||u.hostname.replace(/^www\./,'')} · ${clock(source.observedAt)}`);a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';links.append(a);}catch{}}
-    if(links.children.length)panel.append(links);return panel;
+    for(const source of data.sources){try{const u=new URL(source.url);if(u.protocol!=='https:'||u.username||u.password)continue;
+      const raw=clean(source.sourceId),name=names[raw]||(/^Pinned exact Pinnacle/i.test(raw)?'Pinnacle':
+        /^\d{5,}|current-info|selectionKey|checkpoint|schema|\|/i.test(raw)?u.hostname.replace(/^www\./,''):raw||u.hostname.replace(/^www\./,''));
+      const a=node(d,'a',`${name} · ${clock(source.observedAt)}`);a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';links.append(a);}catch{}}
+    if(links.children.length)sources.append(links);panel.append(sources);return panel;
   }
-  const api={describe,render};if(typeof module==='object'&&module.exports)module.exports=api;else root.BettingEdgeCardInsights=api;
+  const api={describe,brief,render};if(typeof module==='object'&&module.exports)module.exports=api;else root.BettingEdgeCardInsights=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

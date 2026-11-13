@@ -18,6 +18,7 @@ import {reviewCardEvidence} from './review-card-evidence.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentRequired} from './candidate-assessment.mjs';
 import {buildMarketMethodShadow} from './market-method-shadow.mjs';
 import {buildEventResearchPlan, buildResearchWorkPlan} from './event-research-plan.mjs';
+import {buildSlateWorkload,loadGameAssessments,SLATE_FOCUSED_FROM} from './report-workload.mjs';
 import {repairDraftCoreTaxonomy} from './core-draft-taxonomy.mjs';
 import {bindIntelligence,buildGameIntelligence} from './game-intelligence.mjs';
 import {CARD_EVIDENCE_IDENTITY_FROM, CARD_EVIDENCE_IDENTITY_VERSION, inspectCardEvidence, sidecarSelectionKey} from './card-evidence-identity.mjs';
@@ -132,6 +133,12 @@ export function buildEvidenceAudit({root = process.cwd(), report, sidecar, feedF
     forecastFollowUps:ctx.forecastFollowUps?.leads, priorReceipts:ctx.priorReceipts, forecastCoverage: forecasts});
   const eventResearchPlan=buildEventResearchPlan({report, sidecar, candidateAssessment, forecastCoverage: forecasts, priorReceipts: ctx.priorReceipts,
     checkpointResearch:ctx.checkpointResearch?.bySelection});
+  if(Date.parse(report.ts)>=Date.parse(SLATE_FOCUSED_FROM)){
+    const prior=loadGameAssessments(root,report);
+    eventResearchPlan.workload=buildSlateWorkload({report,events:eventResearchPlan.events,inventory:ctx.universe,
+      inputs:sidecar.gameIntelligenceInputs,observer:ctx.observer,previous:prior.assessments});
+    eventResearchPlan.warnings.push(...prior.warnings);
+  }
   const gameIntelligence=ctx.feed&&ctx.universe?buildGameIntelligence({report,sidecar,feed:ctx.feed,universe:ctx.universe,forecastCoverage:forecasts,candidateAssessment,eventResearchPlan,observer:ctx.observer}):null;
   return {schema: 1, version: EVIDENCE_REPAIR_VERSION, mode: 'ADVISORY_ONLY', publicationBlocking: false,
     reportTs: report.ts, forecastCoverage: forecasts,

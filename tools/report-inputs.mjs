@@ -10,6 +10,7 @@ import {derivePrimarySelectionInventory, mergedFeedEvents} from './major-sport-m
 import {bindIntelligence,buildGameIntelligence,projectGameIntelligence} from './game-intelligence.mjs';
 import {exactMarketReference} from './market-price-assessment.mjs';
 import {inspectPrimaryFeedHealth} from './primary-feed-health.mjs';
+import {buildSlateWorkload,loadGameAssessments,SLATE_FOCUSED_FROM} from './report-workload.mjs';
 
 // Price acquisition is checked before research, independently of decision gates.
 export function buildPinnacleInputCoverage(report, inventory, observer, {eventId = null} = {}) {
@@ -71,6 +72,9 @@ export function buildReportInputs({root = process.cwd(), at, reportTime, eventId
   const sidecar={};
   bindIntelligence({root,report,sidecar,feed:feed.value,universe:inventory});
   const intelligence=buildGameIntelligence({report,sidecar,feed:feed.value,universe:inventory,observer:observer.value});
+  const acquisition=inspectPrimaryFeedHealth(report,feed.value,inventory.selections.length);
+  const prior=Date.parse(at)>=Date.parse(SLATE_FOCUSED_FROM)?loadGameAssessments(root,report):null;
+  const workload=prior?buildSlateWorkload({report,events,inventory,inputs:sidecar.gameIntelligenceInputs,observer:observer.value,previous:prior.assessments,acquisition}):null;
   return {
     schema: 1, kind: 'REPORT_INPUT_PROJECTION', decisionAuthority: false,
     validationState: 'NOT_RUN',
@@ -79,13 +83,14 @@ export function buildReportInputs({root = process.cwd(), at, reportTime, eventId
     bindings: {feed: feed.binding, coverage: policy.binding,
       observer: observer.binding},
     pinnacleCoverage:buildPinnacleInputCoverage(report,inventory,observer.value,{eventId}),
-    acquisition:inspectPrimaryFeedHealth(report,feed.value,inventory.selections.length),
+    acquisition,
     feed: {generatedAt: feed.value.generatedAt,
       ageMinutesAtReport: (Date.parse(at) - Date.parse(feed.value.generatedAt)) / 60000,
       scheduleMeta: feed.value.scheduleMeta ?? null},
     counts: {events: events.length, available: inventory.selections.length,
       unavailable: inventory.limitations.size,
       required: Object.values(inventory.sports).reduce((sum, sport) => sum + sport.primary.required, 0)},
+    ...(workload?{workload,workloadWarnings:prior.warnings}:{}),
     gameIntelligence:intelligence?(selected?projectGameIntelligence(intelligence,selected.eventId):
       {collectedAt:intelligence.collectedAt,counts:intelligence.counts,sources:intelligence.sources,
         instruction:'Use --event-id for the complete dossier; report-run start binds these observations to the draft.'}):null,

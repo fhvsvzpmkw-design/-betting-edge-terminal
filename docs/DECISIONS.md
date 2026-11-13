@@ -547,3 +547,17 @@ See [the production code audit](reviews/2026-11-07-production-code-audit.md) for
 **Reason:** Stop incomplete analytical work from disappearing between planning, controller continuation and a successful publication, while preserving independently completed decisions and reproducible History.
 
 November 7 15:15 live acceptance failed after deployment. The [audit addendum](reviews/2026-11-07-production-code-audit.md#actual-1515-acceptance-failure-and-correction) records two missed execution paths: typed original points hidden by applicability labels and COMPLETE-labelled proposed decisions left in BLOCKED drafts. From `2026-11-08T00:20:00Z`, original exact captured points remain unverified research leads and current-quote proposed decisions require final valid handoff regardless of custom draft labels. Preserve actual source-linked objections, current eligibility, partial publication and original issued semantics. The existing Late task consumes the [prepared case review](reviews/2026-11-07-late-opportunity-handoff.md) and existing typed queue under normal fresh intake. These are implementation corrections to D-050 and the existing opinion policy, not new grading thresholds or a report-wide veto.
+
+## D-051 — Focus work on the actual slate and changed decisions
+
+**Date:** 2026-11-12, America/Vancouver. **Status:** USER AUTHORIZED; IMPLEMENTED FOR DEPLOYMENT.
+
+The user authorized the redesign after the usage reset: preserve card visuals, make View analysis answer what is worth betting tonight at an available price, and remove duplicated analysis and accumulated operating instructions.
+
+Use the existing controller/checkpoints and pinned game intelligence as one shared game record. Save only small assessment references in that checkpoint, compare content rather than observation timestamps, and route new/unfinished/changed/unchanged games to the appropriate current assessment. Price-only changes need repricing; material personnel, forecast or contract changes need targeted research. Named rechecks and all source/price/applicability gates remain. No saved grade, fair, stake or clearance is inherited.
+
+One analyst handles up to six priced games; zero routine workers at every Main slot. At most one targeted worker may answer a consequential question on a larger slate. Graham retains market-free ownership and its numerical writers, with coordinator-first research and unchanged checks closing as no-ops. Keep the five Main times and existing odds budgets. Optional source catalogues are fallback routes rather than compulsory repeated searches; unfinished source-to-decision work remains visible.
+
+View analysis uses existing issued evidence to answer why tonight, why this price, the strongest concern, and act now or wait. Sources and original timestamps stay accessible in a collapsed drawer. Preserve the visual shell, three meters, American odds, statuses and existing betting controls. Earlier detailed reports remain immutable. Archive superseded Main/staffing instructions rather than destroying their history.
+
+Verify behavior, deployed source and ordinary-run adoption separately. Smaller instructions and fewer workers justify an expected reduction in usage, not an unmeasured credit-saving percentage or guaranteed betting results.
