@@ -78,7 +78,7 @@ WAIT requires its existing current independent actionable signal and concrete tr
 
 PASS requires a game/selection-specific reasoned rejection. A price screen, missing optional model or failed BET gate alone is not an authored PASS. RESEARCH_INCOMPLETE remains unfinished work, separately disclosed. Keep $0/NO BET semantics for opinions.
 
-Resolve decision-sensitive personnel through actual team/league and originating reporting sources. Name the projected/confirmed participant and material alternative; an injury list is not full investigation. Retain real fallback failures. Final material rechecks retain finalRecheck=true and original origin/url/asOf. checked=0 does not certify semantic agreement. Football starter questions use docs/QUARTERBACK_FOLLOW_UP.md and the existing QB_STARTER_FOLLOW_UP route. Preserve unknowns rather than assert clearance.
+Resolve decision-sensitive personnel through actual team/league and originating reporting sources. Name the projected/confirmed participant and material alternative; an injury list is not full investigation. Retain real fallback failures. Final material rechecks retain finalRecheck: true and original origin/url/asOf. checked=0 does not certify semantic agreement. Football starter questions use docs/QUARTERBACK_FOLLOW_UP.md and the existing QB_STARTER_FOLLOW_UP route. Preserve unknowns rather than assert clearance.
 
 Record source URL, original checked time, specific finding, exact application and limitation once in current cardEvidence/sourceEvidence. Keep exact selectionKey equality across report, sidecar and receipt. Capture discovered exact forecasts through the typed controller intake; never leave a usable point only in prose.
 
