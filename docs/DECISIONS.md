@@ -550,7 +550,7 @@ November 7 15:15 live acceptance failed after deployment. The [audit addendum](r
 
 ## D-051 — Focus work on the actual slate and changed decisions
 
-**Date:** 2026-11-12, America/Vancouver. **Status:** USER AUTHORIZED; IMPLEMENTED FOR DEPLOYMENT.
+**Date:** 2026-11-12, America/Vancouver. **Status:** DEPLOYED; EIGHT SERVER CHECKS PASSED; ORDINARY-RUN ACCEPTANCE OPEN.
 
 The user authorized the redesign after the usage reset: preserve card visuals, make View analysis answer what is worth betting tonight at an available price, and remove duplicated analysis and accumulated operating instructions.
 
