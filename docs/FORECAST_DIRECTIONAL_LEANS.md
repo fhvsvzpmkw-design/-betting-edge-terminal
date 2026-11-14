@@ -1,5 +1,7 @@
 # Source-backed directional LEAN
 
+**Forward selection update from `2026-11-14T17:00:00Z`:** Apply [game selection rules](GAME_SELECTION_RULES.md) before the historical guidance below. Eligible exact forecasts use a 0.50-point LEAN threshold/default and 2.00-point supported-fair BET review. A source-led price WAIT with an exact 0.50-point trigger is available for compatible full-game forecast contracts across sports through `createSourceLedForecastWait`. Pinnacle comparison remains separately visible context, with no standalone qualifying strategy. The original-source, materiality, provisional wording, zero-risk and publisher checks remain; no-floors and NHL-only price-WAIT language below applies to earlier replay windows.
+
 Current analytical policy for new Main reports at/after **`2026-11-06T17:00:00Z`** (10:00 Pacific on the project's current America/Vancouver clock). Read [adaptive strategy research](ADAPTIVE_STRATEGY_RESEARCH.md) with [shared scheduled authority section 6](../BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md#6-assessment-routes-one-decision-contract). The original opinion route began October 1; the bounded historical policies below retain replay authority for issued reports. Governance v1.0, Core 1.5, the existing five tasks and issued History remain unchanged.
 
 ## Product decision

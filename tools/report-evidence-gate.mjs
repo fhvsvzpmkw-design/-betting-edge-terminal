@@ -6,6 +6,7 @@ import {validateMarketAssessment} from './market-price-assessment.mjs';
 import {validateCardEvidenceBundle, validateRecommendationCardEvidence} from './card-evidence-identity.mjs';
 import {validateForecastLean,validateForecastWait,validateForecastLeanDirections} from './forecast-lean.mjs';
 import {inspectOpinionReview} from './opinion-review.mjs';
+import {validateGameSelection} from './game-selection-policy.mjs';
 
 // Historical reports remain immutable. This adds evidence requirements for the
 // next scheduled lane; it does not supply a model, a fair, or a betting threshold.
@@ -187,6 +188,7 @@ export function validateRecommendationEvidence(report, rec, item, index) {
   validateForecastLean(report, rec, ids);
   validateForecastWait(report, rec, ids);
   if (!validateMarketAssessment(report, rec, item, ids)) fairEvidence(rec, item, ids, label);
+  validateGameSelection(report,rec);
   benchmarkEvidence(rec, label);
   leanWording(rec, label);
   validateRecommendationCardEvidence(report, rec, item, index);

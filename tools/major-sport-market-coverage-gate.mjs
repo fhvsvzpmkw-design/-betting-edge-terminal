@@ -15,6 +15,7 @@ import {localDateKey, evaluatedDecisionLookup} from './coverage-validation-looku
 import {validatePrimaryFeedHealth} from './primary-feed-health.mjs';
 import {majorSportKey} from './primary-sport-identity.mjs';
 import {researchCompletion,RESEARCH_COMPLETION_FROM} from './research-completion.mjs';
+import {gameSelectionActive} from './game-selection-policy.mjs';
 export {majorSportKey} from './primary-sport-identity.mjs';
 
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
@@ -436,7 +437,7 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
     const bound = analysisBound && receipt && selection.quotes.some(quote => sameQuote(receipt.quote, quote));
     const inherited = researchContext(priorResearch.bySelection.get(selection.selectionId), selection);
     const forecast = researchContext(priorResearch.byForecast?.get(selection.selectionId), selection);
-    let state = 'RESEARCH_PENDING', nextAction = marketAssessmentEnabled(report) ? 'GRADE_MARKET_PRICE' : 'START_STAGE_1';
+    let state = 'RESEARCH_PENDING', nextAction = gameSelectionActive(report) ? 'ASSESS_GAME_FORECAST' : marketAssessmentEnabled(report) ? 'GRADE_MARKET_PRICE' : 'START_STAGE_1';
     if (matches.length > 1 || (receipt && !bound)) nextAction = 'RECONCILE_EXACT_RECEIPT';
     else if (bound && receipt.state === 'EVALUATED') state = 'EVALUATED_RECORDED';
     else if (bound && receipt.state === 'BLOCKED' && PRIMARY_BLOCKER_REASONS.has(receipt.blocker?.reason)) {
@@ -475,7 +476,13 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
     handoff: {matchedSelections: inventory.selections.filter(item => priorResearch.bySelection.has(item.selectionId)).length,
       forecastSelections: inventory.selections.filter(item => priorResearch.byForecast?.has(item.selectionId)).length,
       warnings: priorResearch.warnings, authority: 'HISTORICAL_CONTEXT_ONLY'},
-    workflow: marketAssessmentEnabled(report) ? [
+    workflow: gameSelectionActive(report) ? [
+      'Start with the current game forecast, matchup, personnel and available native fair; share the event research across its exact markets.',
+      'Use the current executable price to assess the game advantage. Preserve the exact signed Pinnacle comparison as context only; it cannot qualify or reject a selection or prioritize price-only research.',
+      'Review eligible exact forecasts at 0.50 probability point for a zero-stake LEAN and 2.00 points for supported-fair BET with conservative-bound/Core/risk clearance. Explain real contrary evidence before rejecting a supported LEAN; no source vote or pick quota.',
+      'Use a concrete source-led price WAIT for a smaller positive forecast gap. Keep a provisional label/recheck for a reviewed material assumption; genuine unfinished research remains incomplete. Do not invent confidence intervals or probabilities from score/point projections.',
+      'Record current game-specific BET/LEAN/WAIT/PASS judgments and publish validated decisions with honest remaining work. Keep original observations, exact settlement, grading, risk and history controls.'
+    ] : marketAssessmentEnabled(report) ? [
       'Grade exact current execution quotes against the qualified paired market reference; first-pull movement history is not required.',
       'Review current roster, lineup, starter, injury, news and conditions for every event once; share the relevant sourced facts across its markets. Reopen initial grades when material information changes them.',
       'Investigate a concrete unresolved dependency or attractive-price/forecast conflict when it can change the conclusion. Retain Stage 2 and final checks when material; no universal forecast/range hunt for non-wager market assessments.',

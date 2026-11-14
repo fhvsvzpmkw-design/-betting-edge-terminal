@@ -44,6 +44,8 @@ on:
       - 'tests/research-completion.test.mjs'
       - 'tests/live-opinion-followthrough.test.mjs'
       - 'tools/opinion-research-brief.mjs'
+      - 'tools/game-selection-policy.mjs'
+      - 'tests/game-selection-policy.test.mjs'
       - 'tools/forecast-follow-ups.mjs'
       - 'tools/forecast-lead-routing.mjs'
       - 'tools/import-forecast-evidence.mjs'
@@ -103,6 +105,8 @@ on:
       - 'tests/research-completion.test.mjs'
       - 'tests/live-opinion-followthrough.test.mjs'
       - 'tools/opinion-research-brief.mjs'
+      - 'tools/game-selection-policy.mjs'
+      - 'tests/game-selection-policy.test.mjs'
       - 'tools/forecast-follow-ups.mjs'
       - 'tools/forecast-lead-routing.mjs'
       - 'tools/import-forecast-evidence.mjs'
@@ -166,6 +170,7 @@ jobs:
           node tools/selection-continuity.mjs self-test
       - name: Verify decision routes and customer output
         run: |
+          node --test tests/game-selection-policy.test.mjs
           node --test tests/forecast-lean-default.test.mjs tests/forecast-wait.test.mjs tests/nhl-forecast-corroboration.test.mjs
           node tests/american-odds-display.test.mjs
           node tests/vigscope-meter-production.test.mjs

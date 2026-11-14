@@ -1,6 +1,7 @@
 // Producer research aid only. Never assigns a grade, stake or publication state.
 import OddsFormat from '../assets/odds-format.js';
 import {adaptiveResearchActive} from './strategy-research.mjs';
+import {gameSelectionActive,forecastQualification,LEAN_MIN_PROBABILITY_POINTS,BET_MIN_PROBABILITY_POINTS} from './game-selection-policy.mjs';
 const list = x => Array.isArray(x) ? x : [];
 const time = x => Date.parse(x || '');
 const finite = x => typeof x === 'number' && Number.isFinite(x);
@@ -34,8 +35,12 @@ export function opinionResearchBrief({report, row, receipt, prior, inputs} = {})
         comparisonBoundaryAmerican:OddsFormat.fromDecimal(f.referenceBreakEvenPriceDecimal),
         marketDependence:f.marketDependence, url:raw?.url || null,
         observedAt:raw?.observedAt || null, forecastAt:raw?.forecastAt || null,
+        ...(gameSelectionActive(report)?{qualification:forecastQualification(f)}:{}),
         limitation:raw?.limitation || 'Inspect the original bound forecast and current applicability.'};
     }),
+    ...(gameSelectionActive(report)?{qualificationPolicy:{leanMinimumProbabilityPoints:LEAN_MIN_PROBABILITY_POINTS,
+      betReviewMinimumProbabilityPoints:BET_MIN_PROBABILITY_POINTS,pinnacleRole:'CONTEXT_ONLY',
+      betRequiresSupportedConservativeBound:true}}:{}),
     benchmark:row.marketComparison ? {direction:row.marketComparison.direction,
       signedProbabilityPoints:row.marketComparison.edgeProbabilityPoints} : null,
     previousDecision:samePrior ? {reportTs:prior.reportTs, reportPath:prior.reportPath || null,

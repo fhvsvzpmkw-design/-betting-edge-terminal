@@ -561,3 +561,15 @@ One analyst handles up to six priced games; zero routine workers at every Main s
 View analysis uses existing issued evidence to answer why tonight, why this price, the strongest concern, and act now or wait. Sources and original timestamps stay accessible in a collapsed drawer. Preserve the visual shell, three meters, American odds, statuses and existing betting controls. Earlier detailed reports remain immutable. Archive superseded Main/staffing instructions rather than destroying their history.
 
 Verify behavior, deployed source and ordinary-run adoption separately. Smaller instructions and fewer workers justify an expected reduction in usage, not an unmeasured credit-saving percentage or guaranteed betting results.
+
+## D-052 — Qualify game advantages and retain Pinnacle as context
+
+**Date:** 2026-11-14. **Status:** IMPLEMENTED; 109 TARGETED CHECKS AND PUBLISHER SELF-TEST PASSED; FINAL-HEAD DEPLOYMENT PENDING.
+
+The user requested revised rules/thresholds after an all-PASS/evidence-blocked slate, and explicitly directed that Pinnacle price comparison remain available without serving as a selection strategy. [Game selection rules](GAME_SELECTION_RULES.md) govern reports from `2026-11-14T17:00:00Z`: start with current game forecasts, matchup/personnel and supported native fairs. Preserve exact signed Pinnacle comparisons and their display; remove their standalone candidate rank, LEAN/WAIT origination and negative-price research route.
+
+Use an initial 0.50-percentage-point probability LEAN threshold/default and 2.00-point supported-fair BET review, with a supported conservative endpoint above break-even plus existing Core/personnel/risk clearance. A suitable single forecast can support a zero-stake opinion; actual contrary evidence and assumptions still matter. Smaller positive gaps can use a source-led price WAIT across compatible full-game contracts, with the exact 0.50-point American-price trigger and no automatic promotion. Native line/total projections retain their own units and existing review rather than acquiring invented probabilities.
+
+Reopen old saved assessments once at the policy change. The saved November 14 Main report's comparison-based PASS cards and unresolved forecast applicability cannot count as a completed new-policy game review. Require the existing current source-linked directional rejection for a new context-route PASS; benchmark-only changes after review refresh context without restarting game research.
+
+Do not require provider-published confidence intervals for every candidate. Assess supported scenario/sensitivity ranges under the existing Core rules with honest uncertainty; unbounded error remains ineligible for a wager. Original-source applicability, exact contracts/settlement, clock integrity, provisional rechecks, bankroll/stakes, immutable history, independent Graham ownership, schedules and odds budgets remain. Initial cutoffs are operating choices to assess with saved prospective results, not a claim of proven profitability or a quota of daily picks. Complete targeted policy/legacy/publisher verification and source readback; verify actual producer adoption separately.

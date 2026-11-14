@@ -1,5 +1,7 @@
 # Core 1.5 current operating contract
 
+**November 14 forward selection amendment, `2026-11-14T17:00:00Z`:** [Game selection rules](../docs/GAME_SELECTION_RULES.md) supersede the conflicting market-only LEAN/WAIT and no-floor descriptions below. Pinnacle comparison remains visible context. A reviewed probability advantage of 0.50 point supports LEAN; 2.00 points permits supported-fair BET review with a positive conservative endpoint and the existing independent-support/model-error/personnel/risk clearance. Compatible full-game source-led price WAIT uses a 0.50-point trigger across sports. Native fair units and pinned Core component manifests remain unchanged; historical reports replay under their original rules.
+
 **November 6 forward amendment, `2026-11-06T17:00:00Z` (10:00 Pacific):** Apply `docs/ADAPTIVE_STRATEGY_RESEARCH.md`. The living strategy catalogue and saved source/strategy feedback can inform research before candidate formation and support documented method revisions. The historical research component's fixed error-floor allowlist remains a component rule; it does not prohibit this separately authorized discovery and current-evidence work. Forward forecast opinions may use `SOURCE_LED_OPINION` without a qualified Pinnacle reference or fixed two-source/one-point gate. They retain original forecast replay and explicit unadopted fair/uncertainty, with zero stake. Existing supported-fair and risk requirements govern any BET.
 
 Status: OPERATIONAL for report timestamps at/after `2026-09-21T06:00:00-07:00`.

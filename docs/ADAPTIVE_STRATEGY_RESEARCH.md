@@ -1,5 +1,7 @@
 # Adaptive strategy research
 
+**Forward selection update from `2026-11-14T17:00:00Z`:** [Game selection rules](GAME_SELECTION_RULES.md) replace the conflicting no-floor/market-first qualification wording below. Keep Pinnacle comparison as context without using it to originate, rank or veto a pick. Current probability cutoffs are 0.50 point for LEAN and 2.00 points for supported-fair BET review with conservative-bound/Core/risk clearance. The historical source quota remains retired; native fair units and the saved learning/source controls below remain valid.
+
 Operational for new reports with `report.ts` at/after **`2026-11-06T17:00:00Z`** (10:00 Pacific on the project's current America/Vancouver clock). This is the exact cutoff in `tools/strategy-research.mjs`; the earlier 09:00 label was incorrect. The user authorized reconsidering old analytical restrictions, restoring previously reviewed strategies, and developing methods from saved results. This forward amendment governs research and opinion flexibility wherever older instructions conflict.
 
 ## Research authority

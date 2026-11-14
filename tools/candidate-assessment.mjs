@@ -10,6 +10,7 @@ import {inspectForecastLeadReview} from './forecast-lead-routing.mjs';
 import {inspectOpinionReview} from './opinion-review.mjs';
 import {aggregateForecastComparisons} from './forecast-aggregation.mjs';
 import {FINAL_DECISION_HANDOFF_FROM} from './research-completion.mjs';
+import {gameSelectionActive,forecastQualification} from './game-selection-policy.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -104,7 +105,7 @@ function compareQuote(report, selection, quote, observer, forecast, records, rec
       pushProbability:raw?.pushProbability ?? null,settlement:raw?.settlement ?? null,...comparison,
       referenceBreakEvenPriceDecimal: comparison.breakEvenProbability * quote.priceDecimal / record.probability} : null;
   }).filter(Boolean).sort((a, b) => b.edgeProbabilityPoints - a.edgeProbabilityPoints);
-  const scores = [market?.edgeProbabilityPoints, ...forecasts.map(row => row.edgeProbabilityPoints)].filter(finite);
+  const scores = [...(gameSelectionActive(report)?[]:[market?.edgeProbabilityPoints]), ...forecasts.map(row => row.edgeProbabilityPoints)].filter(finite);
   const nativeFairComparison = compareRecordedFair(report, selection, quote, receipt);
   const grahamFairHandoff = compareGrahamFair({report,selection,quote,feed,inputs:grahamInputs});
   return {quote, grahamFairHandoff, marketComparison: market, marketUnavailable, forecastComparisons: forecasts,
@@ -113,9 +114,9 @@ function compareQuote(report, selection, quote, observer, forecast, records, rec
     promising: scores.some(score => score > 1e-8) || nativeFairComparison?.supportsPointReview === true || grahamFairHandoff?.supportsPointReview === true};
 }
 
-function conditionFor(review, option, receipt) {
+function conditionFor(review, option, receipt, report) {
   const supplied = review?.priceCondition;
-  const reference = option.marketComparison, forecast = option.forecastComparison;
+  const reference = gameSelectionActive(report)?null:option.marketComparison, forecast = option.forecastComparison;
   const derived = reference ? {state: 'PRICE_THRESHOLD', basis: 'MARKET_REFERENCE_BREAK_EVEN', priceDecimal: reference.referenceBreakEvenPriceDecimal,
     hypothetical: true, rationale: 'Exact qualified market-reference break-even price; this is a comparison boundary, not an instruction to bet.'} :
     forecast ? {state: 'PRICE_THRESHOLD', basis: 'FORECAST_BREAK_EVEN', priceDecimal: forecast.referenceBreakEvenPriceDecimal,
@@ -159,9 +160,14 @@ function completion(report, selection, receipt, best, options, forecast, review,
   const unfinalized=requireFinalHandoff && receipt?.state==='BLOCKED' && ['BET','LEAN','WAIT','PASS'].includes(proposed?.status) && sameQuote(proposed.feed,receipt.quote);
   const missing = unfinalized?['FINAL_DECISION_HANDOFF_REQUIRED']:[], sources = sourceMap(receipt, report), personnel = personnelReview(receipt, review, report);
   const selected = options.find(option => sameQuote(option.quote, receipt?.quote));
-  const condition = conditionFor(review, selected || best, receipt);
-  const technicalLeanEligible = Boolean(best.marketComparison?.direction === 'FAVORABLE' && personnel.resolved);
-  if (!best.promising) return {reviewState: unfinalized?'UNFINISHED':'NOT_REQUIRED', missingResearch: missing, technicalLeanEligible,
+  const condition = conditionFor(review, selected || best, receipt, report);
+  const forward=gameSelectionActive(report);
+  const gamePassReviewRequired=forward && receipt?.decision?.status==='PASS' && receipt.decision.marketAssessment?.basis==='QUALIFIED_PINNACLE' &&
+    !receipt.decision.fairValueEvidence && !receipt.decision.forecastLean && !receipt.decision.forecastWait;
+  const technicalLeanEligible = forward ? best.forecastComparisons.some(row=>forecastQualification(row).lean) && personnel.producerComplete : Boolean(best.marketComparison?.direction === 'FAVORABLE' && personnel.resolved);
+  if(forward && receipt?.decision?.marketAssessment?.basis==='QUALIFIED_PINNACLE' && ['LEAN','WAIT'].includes(receipt.decision.status) &&
+    !receipt.decision.forecastLean && !receipt.decision.forecastWait) missing.push('GAME_FORECAST_REQUIRED_PINNACLE_CONTEXT_ONLY');
+  if (!best.promising && !gamePassReviewRequired) return {reviewState: missing.length?'UNFINISHED':'NOT_REQUIRED', missingResearch: missing, technicalLeanEligible,
     personnel, forecastDispositions: list(review?.forecastDispositions), priceCondition: condition.value};
   // The existing qualified market route is already a completed assessment.
   // New metadata must not erase valid LEAN/PASS work or require an independent
@@ -171,6 +177,7 @@ function completion(report, selection, receipt, best, options, forecast, review,
   const exactIds = unique(list(forecast?.eligibleExactRecordIds));
   const existingComparison = selected?.marketComparison;
   const existingMarketComplete = !review && receipt?.state === 'EVALUATED' && selected && current(receipt?.checkedAt, report) &&
+    !forward &&
     ['LEAN', 'PASS'].includes(rec?.status) && existingMarket?.basis === 'QUALIFIED_PINNACLE' &&
     existingMarket.selectionKey === selected.quote.selectionKey && personnel.resolved && text(existingMarket.decisionRationale) &&
     close(existingMarket.referenceProbability, existingComparison?.benchmarkNoVigProbability) &&
@@ -179,7 +186,7 @@ function completion(report, selection, receipt, best, options, forecast, review,
   if (existingMarketComplete) return {reviewState: 'COMPLETE', completionBasis: 'EXISTING_QUALIFIED_MARKET_ASSESSMENT',
     missingResearch: [], technicalLeanEligible, personnel, forecastDispositions: [], priceCondition: condition.value,
     decisionRationale: existingMarket.decisionRationale};
-  const existingWaitComplete = !review && receipt?.state === 'EVALUATED' && rec?.status === 'WAIT' && selected && sameQuote(best.quote, selected.quote) &&
+  const existingWaitComplete = !forward && !review && receipt?.state === 'EVALUATED' && rec?.status === 'WAIT' && selected && sameQuote(best.quote, selected.quote) &&
     current(receipt.checkedAt, report) && existingMarket?.basis === 'QUALIFIED_PINNACLE' && existingMarket.selectionKey === selected.quote.selectionKey &&
     close(existingMarket.referenceProbability, existingComparison?.benchmarkNoVigProbability) && close(rec.benchmarkComparison?.edgeProbabilityPoints, existingComparison?.edgeProbabilityPoints) &&
     current(existingMarket.informationReview?.checkedAt, report) && text(existingMarket.informationReview?.impact) &&
@@ -226,13 +233,19 @@ function completion(report, selection, receipt, best, options, forecast, review,
   for (const id of list(receipt?.decision?.fairValueEvidence?.forecastRecordIds)) if (!dispositions.some(row => row.recordId === id && row.disposition === 'ADOPTED_FAIR')) missing.push(`FAIR_FORECAST_DISPOSITION_REQUIRED:${id}`);
   if (!personnel.producerComplete) missing.push(personnel.discrepancy ? 'PERSONNEL_MATERIALITY_DISTINCTION_REQUIRED' : 'SOURCE_LINKED_PERSONNEL_RESOLUTION_REQUIRED');
   const decision = review?.decision;
+  if(gamePassReviewRequired) {
+    const rejection=decision?.directionalReview;
+    if(rejection?.state!=='REJECTED' || !text(rejection.rationale) ||
+      !current(rejection.checkedAt || review?.checkedAt,report) || !sourceLinked(rejection.sourceIds,sources,['MODEL','OFFICIAL','REPORTING']))
+      missing.push('GAME_SPECIFIC_PASS_REVIEW_REQUIRED');
+  }
   if (!['BET', 'LEAN', 'WAIT', 'PASS'].includes(decision?.status) || decision.status !== receipt?.decision?.status || !text(decision?.rationale)) missing.push('FINAL_DECISION_EXPLANATION_REQUIRED');
   const forecastSupportsPrice=list(selected?.forecastComparisons).some(row=>row.direction==='SUPPORTS_PRICE');
   if (time(report.ts)>=time(FORECAST_LEAN_FROM) && forecastSupportsPrice && decision?.status==='PASS' &&
       (decision.directionalReview?.state!=='REJECTED' || !text(decision.directionalReview.rationale)))
     missing.push('FORECAST_SUPPORTED_PASS_REQUIRES_DIRECTIONAL_REVIEW');
-  if (best.marketComparison?.direction === 'FAVORABLE' && (decision?.marketRoute?.considered !== true || !text(decision?.marketRoute?.rationale))) missing.push('QUALIFIED_MARKET_LEAN_ROUTE_NOT_ASSESSED');
-  if (technicalLeanEligible && decision?.status === 'PASS' && !text(decision?.marketPassReason)) missing.push('FAVORABLE_MARKET_PASS_REQUIRES_SUBSTANTIVE_REASON');
+  if (!forward && best.marketComparison?.direction === 'FAVORABLE' && (decision?.marketRoute?.considered !== true || !text(decision?.marketRoute?.rationale))) missing.push('QUALIFIED_MARKET_LEAN_ROUTE_NOT_ASSESSED');
+  if (!forward && technicalLeanEligible && decision?.status === 'PASS' && !text(decision?.marketPassReason)) missing.push('FAVORABLE_MARKET_PASS_REQUIRES_SUBSTANTIVE_REASON');
   const eligibility = decision?.betEligibility, fair = receipt?.decision?.fairValueEvidence;
   if (!['ASSESSED', 'NOT_APPLICABLE'].includes(eligibility?.state) || !text(eligibility?.rationale)) missing.push('BET_ELIGIBILITY_ASSESSMENT_REQUIRED');
   if (fair || receipt?.decision?.status === 'BET') {
@@ -241,7 +254,7 @@ function completion(report, selection, receipt, best, options, forecast, review,
       !close(bound.value, conservativeValue(fair, selection.side)) || !text(bound.rationale) || !sourceLinked(bound.sourceIds, sources)) missing.push('SUPPORTED_CONSERVATIVE_FAIR_BOUND_REQUIRED');
   }
   if (!condition.valid) missing.push('DEFENSIBLE_PRICE_CONDITION_REQUIRED');
-  return {reviewState: missing.length ? 'UNFINISHED' : 'COMPLETE', missingResearch: unique(missing), technicalLeanEligible,
+  return {reviewState: missing.length ? 'UNFINISHED' : 'COMPLETE', missingResearch: unique(missing), technicalLeanEligible,gamePassReviewRequired,
     personnel, forecastDispositions: dispositions, priceCondition: condition.value,
     decisionRationale: decision?.rationale || receipt?.decision?.marketAssessment?.decisionRationale || null};
 }
@@ -293,11 +306,11 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const quarterbackFollowUp=inspectQuarterbackFollowUp({report,selection,receipt:researchReceipt});
     reviewed.quarterbackFollowUp=quarterbackFollowUp;
     if(!quarterbackFollowUp.complete){reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...quarterbackFollowUp.missing]);}
-    reviewed.reviewRequired=best.promising || forecastLeadReview.required || grahamReview.required || quarterbackFollowUp.required || opinionReview.required ||
+    reviewed.reviewRequired=best.promising || reviewed.gamePassReviewRequired || forecastLeadReview.required || grahamReview.required || quarterbackFollowUp.required || opinionReview.required ||
       requireFinalHandoff && receipt?.state==='BLOCKED' && ['BET','LEAN','WAIT','PASS'].includes(receipt.candidateDraft?.decision?.status) &&
         sameQuote(receipt.candidateDraft.decision.feed,receipt.quote);
     reviewed.assessedPriceCondition = displayCondition(reviewed.priceCondition, receipt?.quote);
-    for (const option of options) option.priceCondition = displayCondition(conditionFor(sameQuote(review?.quote, option.quote) ? review : null, option, researchReceipt).value, option.quote);
+    for (const option of options) option.priceCondition = displayCondition(conditionFor(sameQuote(review?.quote, option.quote) ? review : null, option, researchReceipt, report).value, option.quote);
     reviewed.priceCondition = best.priceCondition || reviewed.assessedPriceCondition;
     reviewed.forecastDispositions = reviewed.forecastDispositions.map(row => ({...row,
       sourceId: list(forecast?.records).find(record => record.recordId === row.recordId)?.sourceId || null}));
@@ -311,10 +324,11 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
       assessedQuote: receipt?.quote || null, ...best, options, ...reviewed,
       blocker: receipt?.blocker ? {reason: receipt.blocker.reason, missing: receipt.blocker.missing, impact: receipt.blocker.impact} : null,
       forecastGapReasons: list(forecast?.gapReasons), forecastAttempted: list(forecast?.attempts).some(row => row.valid) || list(forecast?.records).some(row => row.revalidatedAt),
-      reason: best.promising ? [best.marketComparison?.direction === 'FAVORABLE' ? 'Favorable exact market-price comparison' : null,
+      marketComparisonAuthority:gameSelectionActive(report)?'CONTEXT_ONLY':'HISTORICAL_QUALIFICATION',
+      reason: best.promising ? [!gameSelectionActive(report)&&best.marketComparison?.direction === 'FAVORABLE' ? 'Favorable exact market-price comparison' : null,
         best.forecastComparisons.some(row => row.direction === 'SUPPORTS_PRICE') ? 'Eligible exact forecast supports the price' : null,
         best.grahamFairHandoff?.supportsPointReview ? 'Graham native spread supports price review' : null,
-        best.nativeFairComparison?.supportsPointReview ? 'Recorded native-unit fair supports a separate LEAN/BET review' : null].filter(Boolean).join('; ') : 'No positive qualified price comparison identified',
+        best.nativeFairComparison?.supportsPointReview ? 'Recorded native-unit fair supports a separate LEAN/BET review' : null].filter(Boolean).join('; ') : gameSelectionActive(report)?'No supported game-forecast or native-fair advantage identified yet':'No positive qualified price comparison identified',
       action: reviewed.reviewState === 'UNFINISHED' ? 'Complete the named research and producer assessment before recording a decision.' :
         reviewed.reviewState === 'COMPLETE' ? 'Producer assessment complete; existing decision and publication rules apply.' : 'Retain the existing assessment; no automatic grade change.'};
   });
@@ -327,7 +341,7 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const market = grouped.get(key);
     const existing = market.selections.find(row => row.selectionId === selection.selectionId);
     const row = {...selection, ...option, title: quoteTitle(option.quote, selection.teamLabel),
-      technicalLeanEligible: Boolean(option.marketComparison?.direction === 'FAVORABLE' && selection.personnel.resolved)};
+      technicalLeanEligible: gameSelectionActive(report) ? option.forecastComparisons.some(row=>forecastQualification(row).lean) && selection.personnel.producerComplete : Boolean(option.marketComparison?.direction === 'FAVORABLE' && selection.personnel.resolved)};
     delete row.options;
     if (!existing) market.selections.push(row);
     else if ((option.score ?? -Infinity) > (existing.score ?? -Infinity)) Object.assign(existing, row);
