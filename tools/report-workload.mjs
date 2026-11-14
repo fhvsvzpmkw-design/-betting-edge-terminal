@@ -4,6 +4,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {parseReportDocument} from './report-document-transport.mjs';
 import {reportRunHealth} from './report-run-health.mjs';
+import {gameSelectionActive,GAME_SELECTION_FROM} from './game-selection-policy.mjs';
 
 export const SLATE_FOCUSED_FROM = '2026-11-13T02:15:00Z';
 const list = value => Array.isArray(value) ? value : [];
@@ -68,6 +69,7 @@ export function rememberEventAssessment(state,eventId,inventory,{reviewedAt,obse
   const incomplete=receipts.length!==rows.length||health.continuationRequired||health.forecastReviewHandoff.pending>0;
   state.gameAssessments ||= {};
   state.gameAssessments[key]={...eventSnapshot({event,selections:rows,inputs:state.sidecar?.gameIntelligenceInputs,observer}),
+    ...(gameSelectionActive(state.report)?{selectionPolicy:GAME_SELECTION_FROM}:{}),
     candidateId:state.identity.candidateId,feedBlobSha:state.identity.feedBlobSha,
     reviewedAt:reviewedAt || state.report.ts,reportTs:state.report.ts,
     state:incomplete?'UNFINISHED':'REVIEWED',available:rows.length,evaluated:receipts.filter(row=>row.state==='EVALUATED').length,
@@ -108,15 +110,18 @@ export function buildSlateWorkload({report,events=[],inventory={},inputs={},obse
   const games=list(events).filter(event=>stamp(event.eventDate || event.startTime)>stamp(report.ts)).map(event=>{
     const current=eventSnapshot({event,selections:inventory.selections,inputs,observer}),prior=previous.get(current.eventKey);
     const changed=prior?Object.keys(current.signatures).filter(key=>current.signatures[key]!==prior.signatures?.[key]):[];
-    const mode=!prior?'INITIAL_REVIEW':prior.state!=='REVIEWED'?'RESUME_REVIEW':changed.some(key=>['contracts','facts','forecasts'].includes(key))?
-      'TARGETED_RESEARCH':changed.length?'REPRICE':'REVALIDATE';
+    const forward=gameSelectionActive(report);
+    if(forward && prior && prior.selectionPolicy!==GAME_SELECTION_FROM)changed.push('selectionPolicy');
+    const decisionChanges=forward?changed.filter(key=>key!=='benchmark'):changed;
+    const mode=!prior?'INITIAL_REVIEW':prior.state!=='REVIEWED'?'RESUME_REVIEW':decisionChanges.some(key=>['contracts','facts','forecasts','selectionPolicy'].includes(key))?
+      'TARGETED_RESEARCH':decisionChanges.length?'REPRICE':'REVALIDATE';
     return {eventId:current.eventId,sport:event.sport,startTime:current.eventDate,label:event.label || [event.away,event.home].filter(Boolean).join(' @ '),
       mode,changed,priorAssessment:prior?{checkpointPath:prior.checkpointPath,candidateId:prior.candidateId,reviewedAt:prior.reviewedAt,
         state:prior.state,documentedShortfalls:prior.documentedShortfalls}:null,
       rechecks:prior?.rechecks || [],
       nextAction:mode==='REVALIDATE'?'Reuse the saved game reasoning. Check current applicability, exact prices and named rechecks; do not repeat broad source discovery.':
         mode==='REPRICE'?'Reassess the changed exact quote or sharp comparison using the saved game research. Research further only if it changes the judgment.':
-        mode==='TARGETED_RESEARCH'?'Review the changed contract, personnel facts or forecast, then update affected decisions in the existing queue.':
+        mode==='TARGETED_RESEARCH'?(changed.includes('selectionPolicy')?'Review this game once under the current game-forecast selection rules; prior Pinnacle-price PASS work cannot stand in for a game forecast/applicability review. Preserve original research and the comparison.':'Review the changed contract, personnel facts or forecast, then update affected decisions in the existing queue.'):
         mode==='RESUME_REVIEW'?'Resume the saved unfinished event review and its named gaps; preserve completed source work.':
         'Assess this game once using captured forecasts, current personnel and exact prices; share the facts across its markets and hotlines.'};
   });

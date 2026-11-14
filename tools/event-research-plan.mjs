@@ -83,6 +83,7 @@ function routeFor(row, receipt, report) {
   if(row.opinionReview?.required && !row.opinionReview.complete)return 'DIRECTIONAL_OPINION_REVIEW';
   if(row.quarterbackFollowUp?.required && !row.quarterbackFollowUp.complete)return 'QB_STARTER_FOLLOW_UP';
   if (row.forecastLeadReview?.required && !row.forecastLeadReview.complete) return 'FORECAST_CAPTURE_REVIEW';
+  if(forward && row.gamePassReviewRequired && row.reviewState!=='COMPLETE')return 'GAME_FORECAST_RESEARCH';
   if (row.state === 'EVALUATED' && ['BET', 'LEAN', 'WAIT', 'PASS'].includes(row.status) && !((row.promising || row.reviewRequired) && row.reviewState === 'UNFINISHED')) return 'COMPLETED';
   if (receipt?.cardEvidenceDetachment || receipt?.blocker?.progress?.stage === 'CARD_EVIDENCE_REBUILD') return 'REPAIR_EXACT_EVIDENCE';
   const options = [row, ...list(row.options)];

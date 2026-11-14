@@ -14,6 +14,8 @@ Start with a current game forecast or supported native fair, assess the matchup 
 
 These are initial operating cutoffs, not established profit rates or a guarantee of daily selections. Preserve all suitable supporting and contrary forecasts and shared source families; do not select a favorable provider merely to clear a cutoff. Reuse the existing prospective strategy/source feedback and grading to assess the rules. No new task, broad model build, extra odds request, worker quota or pick quota is introduced.
 
+Prior saved game assessments reopen once at this policy change, preserving their research rather than restarting it. A completed Pinnacle-price PASS is not a completed game forecast. A new context-route PASS must have its existing `candidateAssessment.decision.directionalReview` with a current game-specific rejection and linked MODEL/OFFICIAL/REPORTING evidence; price-only reasoning cannot close it. Changed Pinnacle prices refresh context without restarting game research after the current policy has been reviewed.
+
 ## Probability, settlement and uncertainty
 
 For a conditional-on-no-push probability, the gap in percentage points is `100 * (p - 1 / priceDecimal)`. For an unconditional win probability with refund probability `q`, it is `100 * (p - (1 - q) / priceDecimal)`. Zero-push markets use `q = 0`. Preserve the original basis and actual settlement; the two kinds of probability cannot be pooled. At -110 with no push, break-even is about 52.38%, LEAN starts near 52.88%, and BET review starts near 54.38%, with its supported downside still above 52.38%. These are probability points, not ROI percentages.

@@ -11,6 +11,7 @@ import {buildPrimaryResearchPlan,validatePrimaryAnalysis} from '../tools/major-s
 import {inspectOpinionReview} from '../tools/opinion-review.mjs';
 import {evaluate,matchCondition,loadProductionFramework} from '../tools/core-handicap-framework.mjs';
 import {validateCoreAssessment} from '../tools/core-v14-publication-gate.mjs';
+import {buildSlateWorkload,eventSnapshot,rememberEventAssessment} from '../tools/report-workload.mjs';
 
 const at='2026-11-14T17:30:00Z',startTime='2026-11-14T23:00:00Z';
 function fixture({p=.505,sport='NHL'}={}) {
@@ -232,4 +233,53 @@ test('a genuinely adopted scenario fair can pass new BET evidence and Core gates
   rec.coreAssessment.context.independentCurrentSupport='NONE';
   rec.coreAssessment={...rec.coreAssessment,...evaluate(framework,rec.coreAssessment.context)};
   assert.throws(()=>validateCoreAssessment({framework},rec.coreAssessment,rec,0,{report:f.report}),/blocked/);
+});
+
+test('prior price-only PASS work reopens for an actual game review, rather than closing as no advantage',()=>{
+  const f=fixture(),observer=addBenchmark(f);
+  f.base.forecastReview={records:[],eligibleExactRecordIds:[]};
+  f.sidecar.forecastEvidence.records=[];f.sidecar.forecastEvidence.revalidations=[];
+  f.base.marketAssessment={basis:'QUALIFIED_PINNACLE',informationReview:f.judgment.informationReview,
+    decisionRationale:'Synthetic old price-only PASS.'};
+  f.bind(f.base);
+  const args={report:f.report,sidecar:f.sidecar,universe:{selections:[f.selection]},observer};
+  let row=buildCandidateAssessment(args).selections[0];
+  assert.equal(row.reviewRequired,true);assert.equal(row.reviewState,'UNFINISHED');
+  assert.ok(row.missingResearch.includes('GAME_SPECIFIC_PASS_REVIEW_REQUIRED'));
+  assert.equal(buildEventResearchPlan({report:f.report,sidecar:f.sidecar,candidateAssessment:{selections:[row]}}).events[0].selections[0].route,'GAME_FORECAST_RESEARCH');
+  f.receipt.candidateAssessment={schema:1,selectionId:f.selection.selectionId,checkedAt:at,quote:structuredClone(f.receipt.quote),forecastDispositions:[],
+    personnel:{state:'NOT_MATERIAL',sourceIds:['info'],rationale:'Synthetic current assumption review.'},
+    decision:{status:'PASS',rationale:'Synthetic current game evidence invalidates the forecast preference.',
+      directionalReview:{state:'REJECTED',checkedAt:at,sourceIds:['info'],rationale:'Synthetic named personnel assumption has been invalidated by the current team report.'},
+      betEligibility:{state:'NOT_APPLICABLE',rationale:'No supported game advantage survives the current assumption review.'}},
+    priceCondition:{state:'NO_PRICE_ONLY_CHANGE',rationale:'A new applicable game forecast is needed; a quote comparison cannot resolve the assumption.'}};
+  row=buildCandidateAssessment(args).selections[0];
+  assert.equal(row.reviewState,'COMPLETE',JSON.stringify(row.missingResearch));
+  assert.equal(buildEventResearchPlan({report:f.report,sidecar:f.sidecar,candidateAssessment:{selections:[row]}}).events[0].selections[0].route,'COMPLETED');
+});
+
+test('policy change reopens saved reasoning once; future Pinnacle-only changes refresh context without new game research',()=>{
+  const f=fixture(),event={eventId:'synthetic',sport:'NHL',eventDate:startTime},inventory={selections:[f.selection]};
+  const inputs={records:[f.raw]},observer={fixtures:[{primaryMatch:{eventId:'synthetic'},startTime,pinnacle:{price:2}}]};
+  const prior={...eventSnapshot({event,selections:inventory.selections,inputs,observer}),state:'REVIEWED',reviewedAt:'2026-11-14T16:00:00Z'};
+  const args={report:f.report,events:[event],inventory,inputs,observer,previous:new Map([[prior.eventKey,prior]])};
+  let assessment=buildSlateWorkload(args).assessments[0];
+  assert.equal(assessment.mode,'TARGETED_RESEARCH');assert.ok(assessment.changed.includes('selectionPolicy'));
+  prior.selectionPolicy=GAME_SELECTION_FROM;
+  assert.equal(buildSlateWorkload(args).assessments[0].mode,'REVALIDATE');
+  observer.fixtures[0].pinnacle.price=2.1;
+  assessment=buildSlateWorkload(args).assessments[0];
+  assert.equal(assessment.mode,'REVALIDATE');assert.deepEqual(assessment.changed,['benchmark']);
+  f.selection.quotes[0].priceDecimal=2.1;
+  assert.equal(buildSlateWorkload(args).assessments[0].mode,'REPRICE');
+});
+
+test('the existing saved game reference records the policy version without changing original evidence',()=>{
+  const f=fixture();f.bind(createSourceLedForecastLean(f.report,f.base,f.judgment));
+  const state={report:f.report,sidecar:f.sidecar,identity:{candidateId:'synthetic-candidate',feedBlobSha:'a'.repeat(40)}};
+  const original=JSON.stringify(f.sidecar.forecastEvidence);
+  rememberEventAssessment(state,'synthetic',{selections:[f.selection]});
+  const saved=Object.values(state.gameAssessments)[0];
+  assert.equal(saved.selectionPolicy,GAME_SELECTION_FROM);
+  assert.equal(JSON.stringify(f.sidecar.forecastEvidence),original);
 });
