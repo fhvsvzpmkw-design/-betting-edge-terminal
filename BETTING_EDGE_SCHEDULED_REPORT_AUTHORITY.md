@@ -45,7 +45,7 @@ Unbounded card-output amendment: there is no numeric card minimum, target, profi
 
 ## 4. Pinnacle official sharp benchmark
 
-Use loadBoundMarketObserver and exactMarketReference from tools/market-price-assessment.mjs for exact paired no-vig comparisons. Pinnacle is non-executable sharp context, never independent BET authority or a replacement for an unavailable execution quote. Preserve a valid signed comparison, including disagreement.
+Use loadBoundMarketObserver and exactMarketReference from tools/market-price-assessment.mjs for exact paired no-vig comparisons. Preserve a valid signed comparison and its display, including disagreement. From `2026-11-14T17:00:00Z` this is context only: it cannot originate/rank a candidate, qualify a LEAN/WAIT/BET or veto a supported game opinion. It cannot replace an unavailable execution quote.
 
 The existing exact full-game alternate-total exception retains its exact bookmakerMarketId and referenceKind EXACT_FULL_GAME_ALTERNATE_TOTAL. Other points/periods/settlements never inherit it. A missing reference is a named selection limitation, not a whole-report veto or automatic PASS.
 
@@ -70,11 +70,13 @@ Work in start-time order; Sunday's unstarted early NFL group keeps existing prio
 
 ## 6. Current assessment routes and useful card analysis
 
-BET requires a sourced exact fair/range, conservative-bound and model-error clearance, independent support, current personnel, executable price, playTo, exposure and stake checks.
+From `2026-11-14T17:00:00Z`, apply docs/GAME_SELECTION_RULES.md and the existing helpers. Start with the game forecast or supported native fair, then assess the actual price. These forward rules supersede conflicting market-first/no-floor directions in older guides.
 
-LEAN is a completed zero-stake directional opinion through the current qualified exact market route, adopted-fair route or reviewed source-led forecast route. Current source-led opinions have no universal Pinnacle, fixed source-count or one-point gate. Original exact forecast replay, settlement/applicability review, explicit uncertainty and an honest provisional label/recheck still apply. Missing BET intervals or ordinary unconfirmed lineups alone do not reject an otherwise eligible provisional opinion. Use docs/FORECAST_DIRECTIONAL_LEANS.md and the existing helpers when authoring these routes.
+Probability-based BET review starts at 2.00 percentage points above exact break-even from the supported fair. BET also requires its supported conservative endpoint above break-even, Core model-error/independent-support clearance, current personnel, executable price, playTo, exposure and stake checks. A source-published confidence interval is not compulsory: assess a genuinely sourced scenario/sensitivity range with its real limitations; do not invent one.
 
-WAIT requires its existing current independent actionable signal and concrete trigger; retain the HIGH-error support rule. The existing narrow NHL forecast price-WAIT helper remains a separate zero-stake opinion exception. Unfinished work alone is never WAIT.
+Probability-based LEAN starts at 0.50 percentage point from a reviewed eligible game forecast or adopted fair. Default to assessing that zero-stake opinion unless real source-grounded assumptions/contrary evidence defeat it; record the existing meaningful LEAN-default exception for a supported PASS. One suitable source can be enough; retain all actual contrary models and avoid choosing a favorable provider solely to clear a cutoff. Original exact forecast replay, settlement/applicability, uncertainty and provisional label/recheck remain. Missing BET intervals or ordinary unconfirmed lineups alone do not reject a provisional opinion. Use docs/FORECAST_DIRECTIONAL_LEANS.md and its source-led helper. Native fair points retain their existing own-unit review; do not invent cover probabilities.
+
+Ordinary WAIT retains its current independent actionable signal, concrete trigger and HIGH-error support rule. A smaller positive eligible forecast gap can use the separate zero-stake source-led price-WAIT helper across compatible full-game contracts, with an exact American-price trigger reaching the 0.50-point LEAN review cutoff. It never auto-promotes or authorizes a wager. Unfinished work alone is never WAIT.
 
 PASS requires a game/selection-specific reasoned rejection. A price screen, missing optional model or failed BET gate alone is not an authored PASS. RESEARCH_INCOMPLETE remains unfinished work, separately disclosed. Keep $0/NO BET semantics for opinions.
 

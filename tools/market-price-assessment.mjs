@@ -6,6 +6,7 @@ import {execFileSync} from 'node:child_process';
 import {AUTHORITY, QUALIFIED, qualifyMarket, isFullGameAlternateTotalMarket} from './pinnacle-sharp-benchmark.mjs';
 import {validateForecastLean, validateForecastWait} from './forecast-lean.mjs';
 import {adaptiveResearchActive} from './strategy-research.mjs';
+import {gameSelectionActive} from './game-selection-policy.mjs';
 
 // Applies only to new assessments; issued reports keep their original evidence.
 export const MARKET_ASSESSMENT_FROM = '2026-09-07T18:31:00-07:00';
@@ -97,6 +98,8 @@ export function validateMarketAssessment(report, rec, item, ids) {
   ensure(marketAssessmentEnabled(report), `${label} predates the completion amendment`);
   ensure(m?.schema === 1 && m.basis === 'QUALIFIED_PINNACLE', `${label} requires the qualified reference basis`);
   ensure(['PASS', 'LEAN', 'WAIT'].includes(rec.status) && /^\$?0(?:\.0+)?$/.test(String(rec.stake)), `${label} cannot authorize BET or stake`);
+  if(gameSelectionActive(report) && rec.status!=='PASS') ensure(rec.forecastLean!=null || rec.forecastWait!=null,
+    `${label} Pinnacle comparison is context only; LEAN/WAIT requires a supported game forecast`);
   ensure(rec.playTo === 'NO BET' && !rec.priceWatch, `${label} cannot create a wagering threshold or price watch`);
   ensure(rec.fairValueEvidence == null, `${label} must keep market reference separate from independent fair evidence`);
   ensure(rec.coreAssessment?.context?.fairValueBasis === 'MARKET_DERIVED_ONLY', `${label} must retain MARKET_DERIVED_ONLY Core classification`);

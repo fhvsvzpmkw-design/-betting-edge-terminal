@@ -4,6 +4,7 @@ import {eventStrategyResearch} from './strategy-research.mjs';
 import {opinionResearchBrief} from './opinion-research-brief.mjs';
 import {unfinishedCandidateReviews} from './research-completion.mjs';
 import {SLATE_FOCUSED_FROM} from './report-workload.mjs';
+import {gameSelectionActive} from './game-selection-policy.mjs';
 export const EVENT_RESEARCH_VERSION = '2026-10-25.1';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 export const SOURCE_AGGREGATION_FROM = '2026-10-06T17:05:06Z';
@@ -77,7 +78,8 @@ function personnelSourceView(source) {
   return {url:source.url, origin:source.origin || source.title || null, asOf:source.asOf || source.checkedAt,
     fact:source.fact || source.finding, finalRecheck:source.finalRecheck === true};
 }
-function routeFor(row, receipt) {
+function routeFor(row, receipt, report) {
+  const forward=gameSelectionActive(report);
   if(row.opinionReview?.required && !row.opinionReview.complete)return 'DIRECTIONAL_OPINION_REVIEW';
   if(row.quarterbackFollowUp?.required && !row.quarterbackFollowUp.complete)return 'QB_STARTER_FOLLOW_UP';
   if (row.forecastLeadReview?.required && !row.forecastLeadReview.complete) return 'FORECAST_CAPTURE_REVIEW';
@@ -87,11 +89,12 @@ function routeFor(row, receipt) {
   const directionalFinding = list(receipt?.decision?.cardEvidence?.findings).some(finding => finding.stance === 'SUPPORT') ||
     list(receipt?.candidateDraft?.decision?.cardEvidence?.findings).some(finding => finding.stance === 'SUPPORT');
   if (receipt?.researchRouting?.requiresDeepReview === true || row.promising || directionalFinding || options.some(option =>
-    option.nativeFairComparison?.supportsPointReview === true || option.marketComparison?.direction === 'FAVORABLE' || Number(option.marketComparison?.edgeProbabilityPoints) > 0 ||
+    option.nativeFairComparison?.supportsPointReview === true || !forward && (option.marketComparison?.direction === 'FAVORABLE' || Number(option.marketComparison?.edgeProbabilityPoints) > 0) ||
     list(option.forecastComparisons).some(forecast => forecast.direction === 'SUPPORTS_PRICE'))) return 'DEEP_REVIEW';
   // A negative screen is permission to REVIEW a PASS, never an automatic PASS.
   // Producer-identified close calls, contrary model findings and material uncertainty
   // must be escalated after the shared event scan; no numerical betting buffer is added.
+  if(forward)return 'GAME_FORECAST_RESEARCH';
   if (options.some(option => Number.isFinite(option.marketComparison?.edgeProbabilityPoints) && option.marketComparison.edgeProbabilityPoints < 0)) return 'MARKET_PASS_REVIEW';
   return 'REFERENCE_OR_FORECAST_RESEARCH';
 }
@@ -104,6 +107,7 @@ const actionFor = route => ({
   DEEP_REVIEW: 'Use the event package, disposition applicable forecasts and directional findings, resolve material inputs, then assess the exact paired market under existing Core rules.',
   MARKET_PASS_REVIEW: 'Finish the shared event scan and selection-specific applicability check. A justified unfavorable market comparison may conclude PASS without an exhaustive exact-probability search. Escalate close calls, contradictory forecasts or decision-sensitive facts; do not auto-PASS.',
   REFERENCE_OR_FORECAST_RESEARCH: 'Reuse the event scan, then obtain a compatible exact reference or defensible sourced forecast. Missing reference is not proof of no value.',
+  GAME_FORECAST_RESEARCH: 'Assess the current game forecast, matchup, personnel and native fair at the exact offered contract. Pinnacle is retained comparison context, not a strategy, qualifier or rejection. Review an eligible 0.50-point forecast advantage for LEAN and 2.00 points for supported-fair BET with conservative-bound/Core/risk clearance. Smaller positive gaps may receive a source-led price WAIT; unfinished research remains incomplete.',
   IDENTITY_REVIEW: 'Resolve exact sport, event and start-time identity before sharing research.'
 }[route]);
 
@@ -127,7 +131,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     const event = groups.get(eventKey), matches = receipts.filter(receipt => receipt.selectionId === row.selectionId);
     const receipt = matches.length === 1 ? matches[0] : null;
     if (matches.length > 1) warnings.push(`Duplicate receipts for ${row.selectionId}; no research reuse or completion inferred.`);
-    const route = !identity || matches.length > 1 ? 'IDENTITY_REVIEW' : routeFor(row, receipt);
+    const route = !identity || matches.length > 1 ? 'IDENTITY_REVIEW' : routeFor(row, receipt, report);
     if (!event.label && row.eventLabel) event.label = row.eventLabel;
     const recordedMissing=receipt?.blocker?.missing || row.blocker?.missing;
     event.selections.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side,

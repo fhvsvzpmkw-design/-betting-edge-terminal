@@ -2,6 +2,7 @@ import {nhlCorroborationApplies,inspectNhlCorroboration,buildNhlCorroboration,va
   nhlCorroborationPriceTarget,nhlCorroborationText,buildNhlPinnacleReview,nhlPinnacleReviewText} from './nhl-forecast-corroboration.mjs';
 import {adaptiveResearchActive} from './strategy-research.mjs';
 import {evaluate,matchCondition,loadProductionFramework} from './core-handicap-framework.mjs';
+import {gameSelectionActive,forecastQualification,forecastLeanPriceTarget,LEAN_MIN_PROBABILITY_POINTS,BET_MIN_PROBABILITY_POINTS} from './game-selection-policy.mjs';
 
 // A reviewed published probability can support an opinion without becoming
 // an independently validated fair or acquiring BET/staking authority.
@@ -25,9 +26,26 @@ function targetPrice(probability) {
   const american = Math.ceil(raw - 1e-9);
   return {decimal, american: american > 0 ? `+${american}` : String(american)};
 }
+const leanMinimum = report => gameSelectionActive(report) ? LEAN_MIN_PROBABILITY_POINTS : FORECAST_LEAN_DEFAULT_MIN_POINTS;
+const waitPriceTarget = (report, rec, r) => gameSelectionActive(report) ? forecastLeanPriceTarget(r) :
+  nhlCorroborationApplies(report,rec) ? nhlCorroborationPriceTarget(report,rec,r.recordId) : targetPrice(r.probability);
 // Producer guidance only: current exact forecast comparisons still come from
 // the bound-record/applicability validators. This does not create a decision.
 export function forecastLeanDefault(report, decision, comparisons = []) {
+  if (gameSelectionActive(report)) {
+    const exact=list(comparisons).filter(r=>close(r.priceDecimal,Number(decision?.feed?.priceDecimal)));
+    const qualified=exact.filter(r=>forecastQualification(r).lean);
+    const waiting=exact.filter(r=>forecastQualification(r).priceWait && list(decision?.forecastReview?.records).some(record=>{
+      if(record.recordId!==r.recordId)return false;
+      try {forecastLeanPriceTarget(record);return true;}catch{return false;}
+    }));
+    return {active:true,applies:qualified.length>0,flexible:false,decisionAuthority:false,
+      minimumEdgeProbabilityPoints:LEAN_MIN_PROBABILITY_POINTS,betReviewMinimumProbabilityPoints:BET_MIN_PROBABILITY_POINTS,
+      qualifyingRecordIds:qualified.map(r=>r.recordId),betReviewRecordIds:exact.filter(r=>forecastQualification(r).betReview).map(r=>r.recordId),
+      waitApplies:!qualified.length&&waiting.length>0,waitingRecordIds:waiting.map(r=>r.recordId),
+      recommendedStatus:qualified.length?'LEAN':waiting.length?'WAIT':null,
+      instruction:'Use the current game forecast: 0.50 probability point supports LEAN review; 2.00 points triggers supported-fair BET review with a conservative endpoint above break-even and normal Core/risk clearance. An eligible supported LEAN is the default unless actual source-grounded contrary evidence invalidates the preference. A smaller positive gap can support a source-led price WAIT with a concrete 0.50-point trigger. Pinnacle is retained context and cannot qualify or veto the pick. Ordinary unconfirmed lineups or missing published confidence intervals alone do not reject a provisional zero-stake opinion. Review original opposing forecasts and material assumptions; never choose a source just for the desired answer or invent a range.'};
+  }
   if (adaptiveResearchActive(report)) return {active:true,applies:false,flexible:true,
     minimumEdgeProbabilityPoints:null,recommendedStatus:null,decisionAuthority:false,
     qualifyingRecordIds:list(comparisons).filter(r=>r.direction==='SUPPORTS_PRICE' && close(r.priceDecimal,Number(decision?.feed?.priceDecimal))).map(r=>r.recordId),
@@ -95,6 +113,10 @@ export function validateForecastLean(report, rec, ids = new Map(list(rec?.source
   if (rec?.forecastLean == null) return false;
   ensure(rec.forecastWait == null, 'cannot carry both forecast LEAN and forecast WAIT');
   const valid = validateForecastPoint(report, rec, rec.forecastLean, ids, {status:'LEAN',basis:'REVIEWED_FORECAST_POINT',from:FORECAST_LEAN_FROM});
+  if (gameSelectionActive(report)) {
+    const r=list(rec.forecastReview.records).find(r=>r.recordId===rec.forecastLean.forecastRecordId);
+    ensure(forecastQualification(r.comparison).lean,'forecast LEAN requires at least 0.50 probability point at the exact current price');
+  }
   if (nhlPriceOpinion(report, rec) && !adaptiveResearchActive(report)) {
     const r = list(rec.forecastReview?.records).find(r => r.recordId === rec.forecastLean.forecastRecordId);
     ensure(r.probabilityBasis === 'UNCONDITIONAL' && points(r) >= FORECAST_LEAN_DEFAULT_MIN_POINTS - 1e-8,
@@ -107,14 +129,15 @@ export function validateForecastLean(report, rec, ids = new Map(list(rec?.source
 export function validateForecastWait(report, rec, ids = new Map(list(rec?.sourceEvidence).map(s=>[s.id,s]))) {
   const a = rec?.forecastWait;
   if (a == null) return false;
-  ensure(rec.forecastLean == null && nhlPriceOpinion(report, rec), 'forecast price WAIT is forward-only NHL full-game moneyline opinion');
+  const forward=gameSelectionActive(report);
+  ensure(rec.forecastLean == null && (forward ? /^full_game_/.test(rec.coreAssessment?.context?.marketDetail||'') : nhlPriceOpinion(report, rec)), forward?'forecast price WAIT requires a supported full-game opinion':'forecast price WAIT is forward-only NHL full-game moneyline opinion');
   validateForecastPoint(report, rec, a, ids, {status:'WAIT',basis:'REVIEWED_FORECAST_PRICE_WAIT',from:NHL_FORECAST_PRICE_WAIT_FROM});
-  const r = list(rec.forecastReview.records).find(r => r.recordId === a.forecastRecordId), edge = points(r);
+  const r = list(rec.forecastReview.records).find(r => r.recordId === a.forecastRecordId), edge = forward ? r.comparison.edgeProbabilityPoints : points(r);
   const corroborated=nhlCorroborationApplies(report,rec);
-  const target=corroborated ? nhlCorroborationPriceTarget(report,rec,r.recordId) : targetPrice(r.probability);
-  ensure(r.probabilityBasis === 'UNCONDITIONAL' && edge > 0 && (corroborated || edge < FORECAST_LEAN_DEFAULT_MIN_POINTS - 1e-8),
-    'forecast price WAIT requires a positive gap below one probability point or an unresolved forward corroboration price condition');
-  ensure(close(a.currentEdgeProbabilityPoints, edge) && a.targetEdgeProbabilityPoints === FORECAST_LEAN_DEFAULT_MIN_POINTS &&
+  const target=waitPriceTarget(report,rec,r), minimum=leanMinimum(report);
+  ensure((forward || r.probabilityBasis === 'UNCONDITIONAL') && edge > 0 && (corroborated || edge < minimum - 1e-8),
+    'forecast price WAIT requires a positive gap below the active LEAN threshold or an unresolved historical corroboration price condition');
+  ensure(close(a.currentEdgeProbabilityPoints, edge) && a.targetEdgeProbabilityPoints === minimum &&
     close(a.targetPriceDecimal, target.decimal) && a.targetPriceAmerican === target.american, 'forecast WAIT price/edge threshold arithmetic must match the original point');
   ensure(a.targetKind === 'LEAN_REASSESSMENT' && text(a.recheckCondition) && rec.analysis.includes(a.recheckCondition) &&
     a.recheckCondition.includes(a.targetPriceAmerican), 'forecast WAIT must visibly name the exact price condition for LEAN reassessment');
@@ -140,7 +163,7 @@ export function validateForecastLeanDirections(report) {
 }
 
 /** Producer-supplied judgment is mandatory; this never auto-promotes cards. */
-export function createSourceLedForecastLean(report, rec, judgment, framework=loadProductionFramework()) {
+function createSourceLedForecastOpinion(report, rec, judgment, framework, waiting) {
   ensure(adaptiveResearchActive(report),'source-led opinions predate activation');
   const r=list(rec.forecastReview?.records).find(r=>r.recordId===judgment?.forecastRecordId);
   ensure(r,'reviewed record required');
@@ -156,7 +179,16 @@ export function createSourceLedForecastLean(report, rec, judgment, framework=loa
     settlementRationale:judgment.settlementRationale||rec.marketAssessment?.settlementRationale,
     limitations:judgment.limitations,decisionRationale:judgment.rationale};
   if(next.pinnacleBenchmark?.state!=='QUALIFIED')next.benchmarkComparison=null;
-  return createForecastLean(report,next,judgment);
+  return waiting ? createForecastWait(report,next,judgment) : createForecastLean(report,next,judgment);
+}
+
+export function createSourceLedForecastLean(report, rec, judgment, framework=loadProductionFramework()) {
+  return createSourceLedForecastOpinion(report,rec,judgment,framework,false);
+}
+
+export function createSourceLedForecastWait(report, rec, judgment, framework=loadProductionFramework()) {
+  ensure(gameSelectionActive(report),'source-led price WAIT predates the forward selection policy');
+  return createSourceLedForecastOpinion(report,rec,judgment,framework,true);
 }
 
 /** Producer-supplied judgment is mandatory; this never auto-promotes cards. */
@@ -198,12 +230,12 @@ export function createForecastLean(report, rec, judgment) {
 export function createForecastWait(report, rec, judgment) {
   const r = list(rec.forecastReview?.records).find(r => r.recordId === judgment?.forecastRecordId);
   ensure(r, 'reviewed record required');
-  const target = nhlCorroborationApplies(report,rec) ? nhlCorroborationPriceTarget(report,rec,r.recordId) : targetPrice(r.probability), next = structuredClone(rec);
+  const target = waitPriceTarget(report,rec,r), next = structuredClone(rec), minimum=leanMinimum(report);
   next.status = 'WAIT'; next.stake = '$0'; next.playTo = 'NO BET'; delete next.priceWatch; delete next.forecastLean;
   next.forecastWait = {...judgment, schema:1,basis:'REVIEWED_FORECAST_PRICE_WAIT',selectionKey:rec.feed.selectionKey,
     checkedAt:report.ts,forecastRecordId:r.recordId,probability:r.probability,probabilityBasis:r.probabilityBasis,
-    uncertaintyState:'UNQUANTIFIED',independentFairClaimed:false,currentEdgeProbabilityPoints:points(r),
-    targetKind:'LEAN_REASSESSMENT',targetEdgeProbabilityPoints:FORECAST_LEAN_DEFAULT_MIN_POINTS,
+    uncertaintyState:'UNQUANTIFIED',independentFairClaimed:false,currentEdgeProbabilityPoints:gameSelectionActive(report)?r.comparison.edgeProbabilityPoints:points(r),
+    targetKind:'LEAN_REASSESSMENT',targetEdgeProbabilityPoints:minimum,
     targetPriceDecimal:target.decimal,targetPriceAmerican:target.american};
   const a = next.forecastWait;
   if (a.provisional) {
@@ -212,21 +244,22 @@ export function createForecastWait(report, rec, judgment) {
   }
   a.recheckCondition = nhlCorroborationApplies(report,next)
     ? `Recheck ${rec.title} at ${a.targetPriceAmerican} or better with the two bound approved forecasts, or after a fresh applicable forecast update establishes two of MoneyPuck, DRatings and Dimers above break-even with at least one at 1.00 probability point at the current price. Reassess Pinnacle and goalie/personnel applicability; reaching the condition permits review only and does not authorize a wager.`
+    : gameSelectionActive(report) ? `Recheck ${rec.title} at ${a.targetPriceAmerican} or better with this forecast, or when a fresh applicable forecast gives at least ${minimum.toFixed(2)} probability point at the current price. Reassess the forecast and material personnel assumptions; reaching the condition does not authorize a wager.`
     : `Recheck ${rec.title} at ${a.targetPriceAmerican} or better with this forecast, or when a fresh applicable forecast gives at least 1.00 probability point at the current price. Reassess Pinnacle and goalie/personnel applicability; reaching the condition does not authorize a wager.`;
   if (a.provisional) a.recheckCondition += ` ${a.personnelRecheckCondition}`;
   next.analysis = `WAIT — ${a.rationale} ${a.provisional?'Provisional forecast opinion. ':''}${a.uncertainty} ${a.conflictReview} ${a.recheckCondition} No wager; waiting for a meaningful LEAN gap.`;
   attachNhlCorroboration(report,next,a,judgment,{waiting:true});
   next.edge = nhlCorroborationApplies(report,next)
     ? `${r.publisher} published ${(r.probability*100).toFixed(2)}%; current forecast gap ${a.currentEdgeProbabilityPoints.toFixed(2)} probability points. Two-source corroboration and the 1.00-point LEAN condition are not both met.`
-    : `${r.publisher} published ${(r.probability*100).toFixed(2)}%; current forecast gap ${a.currentEdgeProbabilityPoints.toFixed(2)} probability points, below the 1.00-point LEAN threshold.`;
+    : `${r.publisher} published ${(r.probability*100).toFixed(2)}%; current forecast gap ${a.currentEdgeProbabilityPoints.toFixed(2)} probability points, below the ${minimum.toFixed(2)}-point LEAN threshold.`;
   next.support = next.edge; next.contrary = `${a.uncertainty} ${a.conflictReview} ${a.limitations}`;
   next.waitQualification = {mode:'FORECAST_PRICE_WAIT',actionableIfResolved:false,leanReassessmentIfResolved:true,
-    forecastRecordId:r.recordId,independentSignals:[],blockers:[nhlCorroborationApplies(report,next)?'NHL two-source corroboration / 1.00-point condition incomplete':'Forecast price gap below 1.00 probability point'],rationale:a.recheckCondition};
+    forecastRecordId:r.recordId,independentSignals:[],blockers:[nhlCorroborationApplies(report,next)?'NHL two-source corroboration / 1.00-point condition incomplete':`Forecast price gap below ${minimum.toFixed(2)} probability point`],rationale:a.recheckCondition};
   next.coreAssessment.rationale = next.analysis; next.marketAssessment.decisionRationale = next.analysis;
   if (next.cardEvidence) {
     next.cardEvidence.decisionExplanation = next.analysis;
     next.cardEvidence.waitCondition = {trigger:a.recheckCondition,checkSource:r.url,
-      remainingBetRequirements:'Fresh source, quote, Pinnacle, goalie/personnel and full independent-fair/range, Core, staking and exposure review. This trigger permits LEAN reassessment only.'};
+      remainingBetRequirements:'Fresh source, quote, material personnel and supported independent-fair/range, Core, staking and exposure review. This trigger permits LEAN reassessment only.'};
     next.cardEvidence.findings.push({stance:'SUPPORT',sourceIds:a.sourceIds,finding:next.edge,application:a.rationale,limitation:a.limitations});
   }
   validateForecastWait(report,next);
