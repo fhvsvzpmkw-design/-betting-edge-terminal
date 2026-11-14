@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v3-slate-focused",
+  "group": "main",
+  "taskId": "main-2026-11-14-0600",
+  "executionRunId": "20261114-open-0600-065540",
+  "workBinding": {
+    "candidateId": "2026-11-14T06:55:40-07:00|1",
+    "authorityBlobSha": "261c2deed9ca10279ce3e060e5a1c6b40778a272",
+    "coreFrameworkBlobSha": "a898067ae6777e276ab7f45284d4c5f472c9f895",
+    "feedBlobSha": "9a7567339938203458f0e421f02e7938cc6ef212",
+    "observerBlobSha": "c8220638ea1ab4ddd2388c5db23bdb0231a19751",
+    "initialCheckpointCommit": "4d2aef49f327ee0e8eadaf097ba0a8c509922a3d",
+    "retimedCheckpointBlobSha": "2dcb37c1a40587750e48ffee80eefbc349a78579",
+    "completedEventCheckpointBlobSha": "b700865056725068ed7e5111c9c4bfca34522281",
+    "frozenStagingBlobSha": "9c0f1c4630de334eceae66aca52adc5604e80067",
+    "stagingCommit": "5dc0b3e853b5d4ac52101fc5b6774968a3e17bd3",
+    "finalControllerCheckpointBlobSha": "cd503c2ed0ff22918958f07bad47f1cb6efdb677",
+    "issuedReportBlobSha": "8c64e9a7d9819ce0977a14d77621b85980264333",
+    "issuedResearchFitBlobSha": "20b964c8f01479c9855ebdc2e6677f32c9bb0b2b"
+  },
+  "mode": "TARGETED_RESEARCH",
+  "reason": "The deterministic intake contained 133 priced games, above the six-game coordinator-only threshold. After coordinator screening, one targeted read-only worker answered the consequential question of whether a current central authoritative NCAA/FBS availability source could clear player and quarterback status across the slate.",
+  "workers": [
+    {
+      "role": "targeted_researcher",
+      "actualId": "/root/ncaaf_availability_source",
+      "readOnlyBoundary": true,
+      "freshContextBoundary": "Bound to feed 9a7567339938203458f0e421f02e7938cc6ef212, observer c8220638ea1ab4ddd2388c5db23bdb0231a19751 and the named NCAA/FBS-wide official availability-source question. No odds collection, shared-state writes, grading, staging, publication or child agents.",
+      "assignmentId": "ncaaf-authoritative-availability-source-0600",
+      "bindings": {
+        "feedBlobSha": "9a7567339938203458f0e421f02e7938cc6ef212",
+        "observerBlobSha": "c8220638ea1ab4ddd2388c5db23bdb0231a19751",
+        "scope": "Current authoritative NCAA/FBS-wide availability source and reporting deadlines"
+      },
+      "launchObservedAt": "2026-11-14T13:20:53Z",
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": "2026-11-14T13:25:28Z",
+      "clockLimitation": "The collaboration interface confirmed the exact-bound acknowledgment within 60 seconds but did not expose a reliable coordinator-observed acknowledgment timestamp; no timestamp was invented.",
+      "acknowledgmentState": "EXACT_BINDING_ACKNOWLEDGED_WITHIN_60_SECONDS",
+      "state": "RETURNED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "START_ZERO_WORKERS",
+      "reason": "The coordinator first resolved the lane, completed the exact odds intake and screened the 311-event in-scope inventory and 133 priced games."
+    },
+    {
+      "decision": "LAUNCH_ONE_TARGETED_RESEARCHER",
+      "namedQuestion": "Is there a current central authoritative NCAA/FBS-wide player-availability source that can clear named player and quarterback status for this slate, and what are its reporting deadlines?",
+      "expectedQualityBenefit": "Avoid unsupported blanket personnel clearance and distinguish a genuine central-source gap from an unsearched source.",
+      "releaseCondition": "Return official-source findings, reporting deadlines, fragmentation limitations and the decision impact without assigning grades or clearing any player.",
+      "result": "RETURNED; no current authoritative FBS-wide hub was found, conference reporting remains fragmented and final reports were not yet due, so no player or quarterback was cleared by inference."
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "reason": "The coordinator completed and saved all 133 priced-event reviews; no second named consequential question justified another worker."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "No current authoritative NCAA/FBS-wide player-availability hub was identified; the NCAA national availability pilot is basketball-only and football reporting remains conference-specific.",
+      "decisionImpact": "No NCAAF player or quarterback status was cleared through a nonexistent central source, and source-led preferences requiring current applicability remained unfinished."
+    },
+    {
+      "finding": "Available official materials did not establish that all relevant final conference or team reports were due at the report clock.",
+      "decisionImpact": "The report retained named availability rechecks instead of inheriting personnel clearance or refreshing an original observation clock."
+    }
+  ],
+  "completedWork": {
+    "workersLaunched": 1,
+    "workersReturned": 1,
+    "inventoryEventsScreened": 311,
+    "pricedEventsReviewedByCoordinator": 133,
+    "unpricedEventsRecorded": 178,
+    "availableSelections": 798,
+    "evaluatedSelections": 346,
+    "documentedSourceShortfalls": 394,
+    "capturedForecastRecordsReviewed": 148,
+    "decisions": {
+      "BET": 0,
+      "LEAN": 0,
+      "WAIT": 0,
+      "PASS": 346
+    }
+  },
+  "remainingWork": {
+    "producerUnfinishedSelections": 58,
+    "documentedSourceShortfalls": 394,
+    "sourceShortfallFamilies": [
+      "Forty-six source-led positive leads lacked verified current applicability: 36 ESPN observations and 10 MoneyPuck observations retained at their original source clocks.",
+      "Eleven favorable market-comparison leads lacked an independent directional signal or current availability clearance, and one neutral case remained unsupported.",
+      "Three hundred ninety-four selections carried documented exact-reference or fair-value shortfalls.",
+      "One thousand sixty-eight required same-day selections had no saved executable price in the exact feed."
+    ],
+    "namedRechecks": [
+      "Current applicability for the 36 ESPN and 10 MoneyPuck source-led positive observations.",
+      "Conference or team final NCAAF availability and quarterback confirmations where required.",
+      "Final NBA team submissions, active lineups and named availability after the 07:45 ET official report.",
+      "Remaining NHL starting goaltenders, lineup confirmations and scratches not populated at the report clock."
+    ],
+    "publication": "DURABLY_VERIFIED"
+  },
+  "publication": {
+    "workflowRunId": 43602451584,
+    "workflowState": "SUCCESS_NON_SKIPPED",
+    "publisherCommit": "578f64e00f03e2f11a2fe4b06dd5b57272ae873a",
+    "reportPath": "data/history/runs/2026-11-14/open-065540.json",
+    "researchFitPath": "data/history/research-fit/2026-11-14/open-065540.json",
+    "controllerReadback": "PASS"
+  },
+  "recordedAt": "2026-11-14T14:16:39.890Z"
+}
