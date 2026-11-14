@@ -9,6 +9,13 @@ export const MAX_DOCUMENT_BYTES=256*1024*1024;
 export const COMPRESSION_THRESHOLD=256*1024;
 const json=value=>JSON.stringify(value)+'\n';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+function validBase64(value){
+  if(typeof value!=='string'||value.length===0||value.length%4!==0)return false;
+  const padding=value.endsWith('==')?2:value.endsWith('=')?1:0;
+  const end=value.length-padding,chunk=64*1024;
+  for(let offset=0;offset<end;offset+=chunk)if(!/^[A-Za-z0-9+/]*$/.test(value.slice(offset,Math.min(end,offset+chunk))))return false;
+  return padding===0||value.slice(end)=== '='.repeat(padding);
+}
 
 export function serializeReportDocument(value,documentType){
   if(!['REPORT_CHECKPOINT','STAGED_REPORT'].includes(documentType))throw Error('Unknown report document type');
@@ -38,7 +45,7 @@ export function parseReportDocument(bytes,documentType){
     envelope.documentType!==documentType)throw Error('Invalid report transport envelope');
   if(!Number.isSafeInteger(envelope.decodedBytes)||envelope.decodedBytes<1||envelope.decodedBytes>MAX_DOCUMENT_BYTES ||
     !/^[a-f0-9]{64}$/.test(envelope.sha256||'')||typeof envelope.data!=='string' ||
-    !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(envelope.data))throw Error('Invalid report transport integrity metadata');
+    !validBase64(envelope.data))throw Error('Invalid report transport integrity metadata');
   let decoded;
   try{decoded=gunzipSync(Buffer.from(envelope.data,'base64'),{maxOutputLength:envelope.decodedBytes});}
   catch{throw Error('Report transport decompression failed');}
