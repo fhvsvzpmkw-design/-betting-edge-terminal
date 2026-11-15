@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v3-slate-focused",
+  "group": "main",
+  "taskId": "main-2026-11-14-1815",
+  "executionRunId": "20261114-late-1815-184909",
+  "workBinding": {
+    "candidateId": "2026-11-14T18:49:09-07:00|5",
+    "slot": "late",
+    "canonicalSlot": 5,
+    "authorityBlobSha": "7b1f49f98aebc8ef44ff52f2496cb5d650a6080c",
+    "operatingRevision": "2026-11-12.SlateFocused",
+    "feedBlobSha": "78b68a687472d796721d81fe64fc0905f4a5aa4d",
+    "feedGeneratedAt": "2026-11-15T01:19:01.942Z",
+    "observerBlobSha": "20979cffa16a1e8476bab98d41ed2c13fabf3d18",
+    "oddsSlotReceiptBlobSha": "cd0e6bf7c3e9cad6dd2f44248968276fcacb71c3",
+    "checkpoint": "data/report-production/checkpoints/20261114-late-1815-182259.json",
+    "initialCheckpointCommit": "de77ecca9806ef75c02036ddf1a03d4a2ae915fd",
+    "frozenStagingBlobSha": "7f734c9105b5cf90bf7e82bc528a1a59dfb53e83",
+    "stagingCommit": "abde5942677da5e5f0f905d0f078a48c5ab31ca8",
+    "finalControllerCheckpointCommit": "b8687ec26c4ae42a5bcc3199e50ff90f2a3eb24c",
+    "finalControllerCheckpointBlobSha": "7ba61038bcd651fd4e7aa60ae104ba2723338a7e",
+    "issuedReportBlobSha": "f0233d53b406bc52ea20600a13099ddd7a201354",
+    "issuedResearchFitBlobSha": "89f7d5b0dc4e8353d6291082ce69c59f24b9af31",
+    "eventIds": [
+      "70918998",
+      "70924596",
+      "72909484",
+      "70900972",
+      "70919018",
+      "70899098",
+      "72909486",
+      "72909488",
+      "70899090",
+      "70924502",
+      "70920500",
+      "70899106"
+    ]
+  },
+  "mode": "TARGETED_READ_ONLY_REUSED",
+  "reason": "The deterministic 18:15 intake contained 12 priced games, above the six-game coordinator-only threshold. After the coordinator screened the full exact inventory, one targeted read-only worker answered the consequential NHL starting-goaltender and final-lineup question and was reused for named NCAAF quarterback and availability follow-ups. The coordinator alone merged findings, made every decision, checkpointed events, staged and published.",
+  "workers": [
+    {
+      "role": "targeted_read_only_researcher",
+      "actualId": "/root/late_nhl_goalies",
+      "readOnlyBoundary": true,
+      "freshContextBoundary": "Bound to feed 78b68a687472d796721d81fe64fc0905f4a5aa4d, observer 20979cffa16a1e8476bab98d41ed2c13fabf3d18, checkpoint data/report-production/checkpoints/20261114-late-1815-182259.json and the named NHL goalie/lineup and NCAAF quarterback/availability questions. No odds collection, shared-state writes, grading, fair-value adoption, staging, publication or child agents.",
+      "assignmentId": "late-goalies-lineups-qb-availability-1815",
+      "bindings": {
+        "feedBlobSha": "78b68a687472d796721d81fe64fc0905f4a5aa4d",
+        "observerBlobSha": "20979cffa16a1e8476bab98d41ed2c13fabf3d18",
+        "checkpoint": "data/report-production/checkpoints/20261114-late-1815-182259.json",
+        "scope": "Three NHL starting-goaltender/final-lineup checks and seven named NCAAF quarterback or final-availability checks"
+      },
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnObservedAt": null,
+      "researchCheckedAt": "2026-11-15T01:36:02Z",
+      "clockLimitation": "The collaboration interface confirmed the exact-bound acknowledgment within 60 seconds but did not expose a reliable coordinator-observed acknowledgment or return timestamp; no timestamp was invented.",
+      "acknowledgmentState": "EXACT_BINDING_ACKNOWLEDGED_WITHIN_60_SECONDS",
+      "state": "RETURNED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "START_ZERO_WORKERS",
+      "reason": "The coordinator first resolved the lane, verified the exact odds acquisition, ran deterministic inputs and screened all 12 priced games and 72 available selections."
+    },
+    {
+      "decision": "LAUNCH_ONE_TARGETED_RESEARCHER",
+      "namedQuestion": "Which NHL starting goalies and material final-lineup changes are confirmed for the three late games, and do the named NCAAF quarterback or final-availability rechecks materially change the current exact moneyline opinions?",
+      "expectedQualityBenefit": "Prevent inherited personnel clearance, preserve original source clocks and distinguish confirmed goaltenders or named absences from unresolved warmup and final-report conditions.",
+      "releaseCondition": "Return current source findings and unresolved conditions without assigning grades, adopting fairs or writing shared state.",
+      "result": "RETURNED; confirmed Askarov/Vejmelka and Wolf/Forsberg, identified Panarin out, preserved the Islanders-Ducks goalie/lineup uncertainty, identified Tyler Hughes out and supplied the named NCAAF warmup or final-report conditions."
+    },
+    {
+      "decision": "REUSE_WORKER_FOR_FOLLOW_UP",
+      "reason": "The same exact-bound worker handled the named NCAAF follow-ups; no second launch was required."
+    },
+    {
+      "decision": "NO_EXPANSION",
+      "reason": "The coordinator completed all 12 event reviews and no additional consequential unresolved question justified another worker."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "San Jose-Utah had Askarov and Vejmelka confirmed in goal; the final skater sheet remained projected at the research clock.",
+      "decisionImpact": "Utah Mammoth moneyline remained a zero-stake LEAN at DraftKings -185, with final skater availability retained as a limitation rather than cleared by inference."
+    },
+    {
+      "finding": "Calgary-Los Angeles had Wolf and Forsberg confirmed in goal and Panarin out; the final skater sheet remained projected.",
+      "decisionImpact": "The exact current moneyline assessment was completed without treating projected skaters as a final lineup."
+    },
+    {
+      "finding": "Islanders-Ducks still lacked resolution for Varlamov/Dostal, Pageau and the 11-forward/7-defense configuration.",
+      "decisionImpact": "No unsupported personnel clearance or positive opinion was issued for that game."
+    },
+    {
+      "finding": "Wyoming quarterback Tyler Hughes was out, leaving Sims' warmup and first-snap role as the operative late condition; the other named NCAAF checks retained conference, team or warmup rechecks where final confirmation was unavailable.",
+      "decisionImpact": "Wyoming remained a zero-stake LEAN at FanDuel -265, and the remaining NCAAF opinions preserved their explicit late conditions without refreshing original observation clocks."
+    }
+  ],
+  "completedWork": {
+    "workersLaunched": 1,
+    "workersReturned": 1,
+    "inventoryEventsScreened": 12,
+    "pricedEventsReviewedByCoordinator": 12,
+    "availableSelections": 72,
+    "evaluatedSelections": 20,
+    "documentedSourceShortfalls": 52,
+    "capturedForecastRecordsReviewed": 26,
+    "checkpointedEvents": 12,
+    "decisions": {
+      "BET": 0,
+      "LEAN": 7,
+      "WAIT": 1,
+      "PASS": 12
+    }
+  },
+  "remainingWork": {
+    "producerUnfinishedSelections": 0,
+    "documentedSourceShortfalls": 52,
+    "sourceShortfallFamilies": [
+      "Forty NCAAF spread, total or FCS selections lacked an eligible exact calibrated probability, native fair or settlement-matched range.",
+      "Twelve NHL puck-line or total selections lacked an eligible exact calibrated probability, native fair or settlement-matched range."
+    ],
+    "namedRechecks": [
+      "Utah-Arizona Big 12 final availability and listed quarterback status.",
+      "Wyoming Sims warmups and first snap after Tyler Hughes was ruled out.",
+      "Hawaii conference final report and warmups.",
+      "Texas Tech-Oklahoma State late warmup scratches.",
+      "North Texas-UTSA receiver, offensive-line and quarterback late scratches.",
+      "Utah State-San Diego State Iosua and Denegal warmup roles.",
+      "Colorado State-Washington State final conference availability, which was unavailable at the report clock.",
+      "Islanders-Ducks Varlamov/Dostal, Pageau and 11-forward/7-defense resolution.",
+      "Final projected skater sheets for San Jose-Utah and Calgary-Los Angeles."
+    ],
+    "publication": "DURABLY_VERIFIED"
+  },
+  "publication": {
+    "workflowRunId": 43665175115,
+    "workflowState": "SUCCESS_NON_SKIPPED",
+    "stagingCommit": "abde5942677da5e5f0f905d0f078a48c5ab31ca8",
+    "publisherCommit": "212ffc687a4e5fb6e6294e9d10f9c8fb2dfbaf8d",
+    "finalCheckpointCommit": "b8687ec26c4ae42a5bcc3199e50ff90f2a3eb24c",
+    "reportPath": "data/history/runs/2026-11-14/late-184909.json",
+    "researchFitPath": "data/history/research-fit/2026-11-14/late-184909.json",
+    "reportBlobSha": "f0233d53b406bc52ea20600a13099ddd7a201354",
+    "researchFitBlobSha": "89f7d5b0dc4e8353d6291082ce69c59f24b9af31",
+    "controllerPhase": "PUBLISHED",
+    "controllerRevision": 21,
+    "controllerReadbackAt": "2026-11-15T02:12:59.407Z",
+    "controllerReadback": "PASS"
+  },
+  "recordedAt": "2026-11-15T02:14:36.567Z"
+}
