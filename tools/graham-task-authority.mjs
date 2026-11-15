@@ -36,6 +36,16 @@ function ruleParts(rule) {
 }
 export function validateLiveGrahamTasks(tasks,{registry,schedule}) {
   if(!Array.isArray(tasks)) throw Error('Live task snapshot missing');
+  if(registry.executionBinding?.mode==='CONSOLIDATED') {
+    const binding=registry.executionBinding;
+    const matches=tasks.filter(t=>t.id===binding.automationId || t.title===binding.title);
+    if(matches.length!==1 || matches[0].id!==binding.automationId || matches[0].title!==binding.title) throw Error('Live consolidated Graham identity/duplicate mismatch');
+    const live=matches[0];
+    if(live.is_enabled!==true || live.default_timezone!==schedule.timezone || live.timing_mode!==schedule.timingMode) throw Error('Live consolidated Graham state/timezone mismatch');
+    if(live.schedule?.replace(/\\r/g,'')!==binding.schedule || live.prompt!==binding.prompt) throw Error('Live consolidated Graham schedule/prompt drift');
+    if(tasks.some(t=>t.is_enabled && registry.tasks.some(old=>old.automationId===t.id))) throw Error('Retired Graham scheduler still enabled');
+    return registry.tasks.map(t=>({taskKey:t.taskKey,automationId:binding.automationId,time:schedule.tasks.find(s=>s.taskKey===t.taskKey).time,state:'VERIFIED'}));
+  }
   const result=[];
   for(const expected of registry.tasks) {
     const matches=tasks.filter(t=>t.id===expected.automationId || t.title===expected.title);

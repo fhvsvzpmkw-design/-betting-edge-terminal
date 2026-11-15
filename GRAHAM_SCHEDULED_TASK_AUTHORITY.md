@@ -9,6 +9,10 @@ Current-week replacement-estimate amendment: `GRAHAM_CURRENT_PERSONNEL_ESTIMATES
 - Schedule authority: `data/walters/nfl/graham-schedule-authority-v1.json`
 - Task binding authority: `data/walters/nfl/graham-task-authority-v1.json`
 
+## November 15 five-task execution consolidation
+
+The user authorized five total enabled project automations. Read docs/FIVE_TASK_OPERATIONS.md. One Graham NFL Production automation owns the five logical task keys plus the existing weekly/90-10 coordinator. The registry executionBinding owns the live automation identity, prompt and cadence; task-level automationId values are retained historical migration identifiers, not separately enabled schedulers. Logical task schedules now project into 07:00, 11:00 and 16:00 Vancouver checkpoints. DELTA_1645 retains its stable key while executing at 16:00 daily. Each logical phase retains its own scope, runtime, ownership and completion receipt. These explicit schedule changes supersede older unchanged-cadence/separate-task statements below, without granting any new numerical or market authority.
+
 ## Scope and precedence
 
 This is the common execution contract for the five existing Graham tasks. Resolve the supplied TASK_KEY through the binding authority and read its exact task-specific authority/version. The schedule manifest owns days and Vancouver times; ChatGPT scheduled tasks own execution. Do not change schedules, enable retired tasks, add a task, or infer the active NFL week from the clock. The enabled 90/10 task and retired Saturday task are outside this five-task consolidation. The October 7 v1.8 amendment in `GRAHAM_WEEKLY_90_10_AUTHORITY.md` governs the user-authorized 90/10 cadence, earlier evidence preparation and separate published-rating-to-fair handoff. The five schedules in the common manifest remain unchanged. A delayed or explicitly requested recovery may run after its scheduled clock; never discard research merely because a scheduler started late.

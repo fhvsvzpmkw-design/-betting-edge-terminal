@@ -7,13 +7,13 @@
 **Branch:** main
 **Effective from:** 2026-11-13T02:15:00Z (November 12, 19:15 Vancouver)
 
-This is the single operating path for the five existing Main tasks. The user authorized this redesign to reduce usage, preserve card visuals, and answer: what is worth betting on tonight, at an available price, why, and what could change the decision?
+This is the single operating path for the three active Main tasks. The user authorized this redesign to reduce usage, preserve card visuals, and answer: what is worth betting on tonight, at an available price, why, and what could change the decision?
 
 The previous accumulated authority is retained in archive/authorities/BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.2026-11-07.md for historical replay only. Do not load it for routine forward runs. This edition supersedes exhaustive source-catalogue review, slot-based broad research, routine research teams and dated recovery handoffs. It preserves the current analytical routes and the existing executable validators. Resolve schema details in the relevant guide only when authoring that route; do not reload every guide, research catalogue or historical review for every game.
 
 ## 1. Main schedule gate and Core production preflight
 
-Use authoritative main and data/main-schedule.json. EXPECTED_REPORT_TIME resolves one of 06:00, 08:00, 09:30, 15:15, 18:15 America/Vancouver. Preserve activation, schedules and timezone. Use actual timestamps with current timezone data; do not hand-code winter offsets. A failure never authorizes disabling or rescheduling a task.
+Use authoritative main and data/main-schedule.json. The active report tasks use EXPECTED_REPORT_TIME 08:00, 15:15 and 18:15 America/Vancouver. The 06:00 and 09:30 producers are retired by the November 15 user-authorized consolidation. data/main-schedule.json retains their canonical identities for historical replay and existing validators; retaining a canonical lane does not authorize a scheduled run or odds request. Read docs/FIVE_TASK_OPERATIONS.md for current physical-task bindings. Preserve activation, schedules and timezone. Use actual timestamps with current timezone data; do not hand-code winter offsets. A failure never authorizes disabling or rescheduling a task.
 
 Routine connected GitHub reads, governed checkpoint/request/staging/receipt writes, publication and readback are already authorized. Do not ask again to resume or publish. Respect actual tool-enforced denials and preserve saved work.
 
