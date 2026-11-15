@@ -1,0 +1,550 @@
+{
+  "schema": 1,
+  "policyId": "graham-weekly-production-v2",
+  "season": 2026,
+  "sourceWeek": 10,
+  "recordedAt": "2026-11-15T18:12:42Z",
+  "scope": "Additive paired NE-DET official-final inventory after the official NFL gamebook became available. Binds New England 10, Detroit 35; audits the complete printed starter, substitution, DNP, inactive, quarterback, specialist and play-level injury-status record; preserves the immutable issued DET +3 prediction; and records the exact remaining source/method gates. This is not a numerical completion and changes no carried rating, QB production input, fair, terminal or completed baseline receipt.",
+  "inputCommit": "15cce161659870547bbb90bb20bc899e437a3079",
+  "inputBlobs": {
+    "data/walters/nfl/active-week.json": "f449f03bdfbe68147e1efee6c786fa7294e751e5",
+    "data/walters/nfl/2026/week-10-personnel-ledger.json": "2508d026723219442effe94fd00cfb8d9317f8f6",
+    "data/walters/nfl/2026/week-10-current-numbers.json": "b9e7a07940181db9c90664816b9b63426f1b75fd",
+    "data/walters/nfl/2026/week-10-research-ledger.json": "d9e479606661e6654893226db326161435076b71",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "9742cdf1ec46832d829e5791011fe232ba5b0efd",
+    "data/walters/nfl/matchup-production-current.json": "3a34b442ab0eed10b372f2c71b636a966a2705d9",
+    "data/walters/nfl-power-ratings-ledger.json": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "data/walters/nfl/home-field/h4-current.json": "15c734e711d8fd531ec3703a23966c5a0aca8bfd"
+  },
+  "marketViewed": false,
+  "estimationPolicy": "Factual preparation only. Missing phase exposure, exact unprinted injury boundaries, replacement allocation and locked values are not zero. Current-week labelled estimates are retained as pregame evidence but are not silently rebound as completed historical learning. No new numerical method is authorized.",
+  "sources": [
+    {
+      "id": "ne-det-official-gamebook",
+      "kind": "OFFICIAL",
+      "url": "https://static.clubs.nfl.com/image/upload/patriots/usgxnpwmy9liwcs4zq0v.pdf",
+      "checkedAt": "2026-11-15T17:45:00Z",
+      "gameKeys": [
+        "2026-W10-NE-DET"
+      ],
+      "finding": "Complete 16-page official NFL gamebook records New England 10, Detroit 35; both teams' starters, substitutions, blank DNP sections and final inactives; full play-by-play and printed injury/status notices; individual and team statistics; quarterback duty; and specialist duty. It does not contain per-player offense, defense and special-teams snap tables."
+    },
+    {
+      "id": "ne-official-final-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.patriots.com/news/week-10-inactives-patriots-vs-lions",
+      "checkedAt": "2026-11-15T17:47:00Z",
+      "gameKeys": [
+        "2026-W10-NE-DET"
+      ],
+      "finding": "Official Patriots inactive notice records Carlton Davis III, Ben Brown, Dametrious Crownover, Brenden Schooler, Walter Rouse and third quarterback Behren Morton inactive."
+    },
+    {
+      "id": "ne-official-final-injury-report",
+      "kind": "OFFICIAL",
+      "url": "https://www.patriots.com/news/week-10-injury-report-patriots-at-lions",
+      "checkedAt": "2026-11-15T17:49:00Z",
+      "gameKeys": [
+        "2026-W10-NE-DET"
+      ],
+      "finding": "Official final report lists Ben Brown, Carlton Davis III and TreVeyon Henderson Out; A.J. Brown, Kevin Byard, Reggie Gilliam, Cameron Latu, Walter Rouse, Brenden Schooler, Rhamondre Stevenson, Greg Van Roten and Charles Woods Questionable; and Hunter Henry, Drake Maye and Morgan Moses without final status."
+    },
+    {
+      "id": "ne-official-game-day-transactions",
+      "kind": "OFFICIAL",
+      "url": "https://www.patriots.com/news/patriots-activate-fb-reggie-gilliam-and-ol-greg-van-roten-to-the-53-man-roster-from-injured-reserve-announce-additional-roster-moves",
+      "checkedAt": "2026-11-15T17:51:00Z",
+      "gameKeys": [
+        "2026-W10-NE-DET"
+      ],
+      "finding": "Official transaction notice records Reggie Gilliam and Greg Van Roten activated from injured reserve, TreVeyon Henderson placed on injured reserve and Andrew Rupcich elevated for the game."
+    },
+    {
+      "id": "det-official-final-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.detroitlions.com/news/inactives-lions-vs-patriots-stbrown-vaki-cisco",
+      "checkedAt": "2026-11-15T17:53:00Z",
+      "gameKeys": [
+        "2026-W10-NE-DET"
+      ],
+      "finding": "Official Lions notice records D.J. Reed, Keith Abney II, Amen Ogbongbemiga, Cade Mays, Mekhi Wingo and Ahmed Hassanein inactive and separately states Kerby Joseph did not make the trip and was Out."
+    },
+    {
+      "id": "det-official-final-injury-report",
+      "kind": "OFFICIAL",
+      "url": "https://www.detroitlions.com/news/lions-vs-patriots-injury-report-nov-13-stbrown-vaki-goff",
+      "checkedAt": "2026-11-15T17:55:00Z",
+      "gameKeys": [
+        "2026-W10-NE-DET"
+      ],
+      "finding": "Official final report lists Cade Mays, Kerby Joseph and D.J. Reed Out; Amon-Ra St. Brown and Sione Vaki Questionable; and Brian Branch, Jared Goff, Jacob Saylors and D.J. Wonnum without final status."
+    },
+    {
+      "id": "ne-det-official-snap-follow-up",
+      "kind": "OFFICIAL",
+      "url": "https://www.patriots.com/news/",
+      "checkedAt": "2026-11-15T18:05:00Z",
+      "gameKeys": [
+        "2026-W10-NE-DET"
+      ],
+      "finding": "One focused fresh follow-up across the official Patriots and Lions postgame news surfaces found the complete gamebook but no published official per-player offense, defense and special-teams snap-count article at the capture cutoff."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W10-NE-DET",
+      "away": "NE",
+      "home": "DET",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "ne-det-official-gamebook",
+        "ne-official-final-inactives",
+        "ne-official-final-injury-report",
+        "ne-official-game-day-transactions",
+        "det-official-final-inactives",
+        "det-official-final-injury-report",
+        "ne-det-official-snap-follow-up"
+      ],
+      "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+      "checklist": {
+        "exactFinal": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE_REUSED_IMMUTABLE",
+        "finalInactives": "COMPLETE_OFFICIAL",
+        "reserveElevationsAndTransactions": "COMPLETE_SOURCE_BOUND",
+        "participationAndDnp": "COMPLETE_GAMEBOOK_STARTERS_SUBSTITUTIONS_DNP_SECTION",
+        "inGameInjuryAndReturnInventory": "COMPLETE_PRINTED_ANNOTATIONS_WITH_UNPRINTED_BOUNDARIES_EXPLICIT",
+        "quarterbackInventory": "COMPLETE_GAMEBOOK_DUTY_WITH_HISTORICAL_VALUE_ADAPTER_PENDING",
+        "specialistInventory": "COMPLETE_GAMEBOOK_DUTY",
+        "officialSnapCounts": "UNRESOLVED_NOT_PUBLISHED",
+        "pairedGameDayInjuryLoss": "BLOCKED_PENDING_SNAP_ROLE_VALUE_AND_EXPOSURE_RECONCILIATION"
+      },
+      "final": {
+        "awayScore": 10,
+        "homeScore": 35,
+        "state": "OFFICIAL_FINAL_VERIFIED",
+        "sourceId": "ne-det-official-gamebook"
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-11-15T06:30:00-08:00",
+        "awayRating": 29.7560278866,
+        "homeRating": 26.1441279782,
+        "neutralTeamBaseHome": 3.6118999084,
+        "homeFieldPointsToHomeSpread": 0,
+        "venueClass": "INTERNATIONAL_NEUTRAL",
+        "qbPerformancePointsToHomeSpread": 0.38,
+        "personnelPointsToHomeSpread": -1,
+        "preservedPregameExactFairHome": 2.992,
+        "preservedPregameDisplayedFairHome": 3,
+        "preservedH4": true,
+        "grahamAsOf": "2026-11-15T07:10:21-07:00",
+        "weeklyRatingInputState": "PARTIAL_BLOCKED",
+        "awayRatingState": "PRESERVED_BLOCKED",
+        "homeRatingState": "PRESERVED_BLOCKED",
+        "marketViewed": false
+      },
+      "teams": [
+        {
+          "team": "NE",
+          "side": "AWAY",
+          "finalInactives": [
+            "Carlton Davis III",
+            "Ben Brown",
+            "Dametrious Crownover",
+            "Brenden Schooler",
+            "Walter Rouse",
+            "Behren Morton (third quarterback)"
+          ],
+          "finalInjuryStatus": {
+            "out": [
+              "Ben Brown — knee",
+              "Carlton Davis III — knee",
+              "TreVeyon Henderson — illness"
+            ],
+            "questionable": [
+              "A.J. Brown",
+              "Kevin Byard",
+              "Reggie Gilliam",
+              "Cameron Latu",
+              "Walter Rouse — concussion",
+              "Brenden Schooler — hamstring",
+              "Rhamondre Stevenson",
+              "Greg Van Roten",
+              "Charles Woods"
+            ],
+            "noFinalStatus": [
+              "Hunter Henry",
+              "Drake Maye",
+              "Morgan Moses"
+            ]
+          },
+          "reserveElevationsAndTransactions": [
+            "Reggie Gilliam activated from injured reserve.",
+            "Greg Van Roten activated from injured reserve.",
+            "TreVeyon Henderson placed on injured reserve before the game and therefore is not silently treated as an omitted inactive.",
+            "Andrew Rupcich elevated for the game."
+          ],
+          "starters": {
+            "offense": [
+              "W.Campbell",
+              "G.Van Roten",
+              "J.Wilson",
+              "M.Pryor",
+              "M.Moses",
+              "H.Henry",
+              "E.Raridon",
+              "D.Maye",
+              "R.Stevenson",
+              "A.Brown",
+              "M.Hollins"
+            ],
+            "defense": [
+              "Dr.Jones",
+              "M.Williams",
+              "C.Durden",
+              "E.Ponder",
+              "R.Spillane",
+              "C.Elliss",
+              "C.Gonzalez",
+              "M.Jones",
+              "C.Woods",
+              "C.Woodson",
+              "K.Byard"
+            ]
+          },
+          "substitutions": [
+            "D.Douglas",
+            "A.Borregales",
+            "C.Kiner",
+            "T.DeVito",
+            "K.Williams",
+            "M.Wishnowsky",
+            "K.Prunty",
+            "J.Reed",
+            "C.Canada",
+            "M.Brown",
+            "L.Larison",
+            "C.Latu",
+            "R.Gilliam",
+            "J.Ashby",
+            "N.Obiazor",
+            "E.Hunter",
+            "G.Jacas",
+            "M.Bryant",
+            "D.Muasau",
+            "A.Rupcich",
+            "C.Lomu",
+            "E.Chism",
+            "C.Barmore",
+            "J.Farmer",
+            "L.Taylor",
+            "Da.Jones"
+          ],
+          "dnp": {
+            "gamebookSection": "BLANK",
+            "finding": "The official gamebook prints no active New England player in its DNP section; this does not substitute for phase snap counts."
+          },
+          "inGameInjuriesAndReturns": [
+            {
+              "player": "Drake Maye",
+              "printedBoundary": "Q1 9:43 injured on the Aidan Hutchinson sack; return Questionable after Q1 5:57 timeout; ruled Out at Q2 5:53.",
+              "unprintedBoundary": "The gamebook does not print a later return; Tommy DeVito's first play is Q1 5:47. No exact medical impairment is inferred outside these printed facts."
+            },
+            {
+              "player": "Morgan Moses",
+              "printedBoundary": "Injured Q1 6:08; return Questionable after Q1 3:25 timeout; recorded returned at Q2 9:44.",
+              "unprintedBoundary": "The exact replacement identity and offensive snap allocation during the absence are not printed."
+            },
+            {
+              "player": "Robert Spillane",
+              "printedBoundary": "Injured Q2 0:12 and recorded returned Q3 14:56; a later Q4 update says return Questionable.",
+              "unprintedBoundary": "The later Q4 onset and terminal return/outcome are not printed; the separate intervals cannot be merged or extended."
+            },
+            {
+              "player": "A.J. Brown",
+              "printedBoundary": "Injured Q3 1:54; return Questionable before Q4 15:00; later ruled Out between the Q4 11:54 and 11:08 play entries.",
+              "unprintedBoundary": "The notice does not identify a more precise terminal play boundary."
+            },
+            {
+              "player": "Dre'Mont Jones",
+              "printedBoundary": "Return Questionable notice after Q4 4:54.",
+              "unprintedBoundary": "The injury onset and terminal return/out outcome are not printed."
+            }
+          ],
+          "quarterback": {
+            "starter": "Drake Maye",
+            "starterLine": "3 completions on 4 attempts, 48 yards; injury printed at Q1 9:43; no later return; ruled Out Q2 5:53.",
+            "relief": "Tommy DeVito",
+            "reliefLine": "First play Q1 5:47; 12 completions on 24 attempts, 81 yards, one touchdown and one interception; handled the remaining quarterback duty.",
+            "inactive": "Behren Morton — inactive third quarterback",
+            "governedStatus": "Source-bound actual duty only. Historical Maye-to-DeVito loss requires the existing QB timeline adapter and exact contiguous exposure/value validation; the current QB performance model is not rewritten."
+          },
+          "specialists": [
+            "Andres Borregales — kicker, extra point, 33-yard field goal and kickoffs",
+            "Mitch Wishnowsky — punter and holder",
+            "Julian Ashby — long snapper",
+            "Corey Kiner — kickoff returner",
+            "Marcus Jones — punt returner"
+          ],
+          "reusedCurrentCases": [
+            "Ben Brown — ZERO_CALIBRATED_LOSS pregame estimate retained; not rebound as a new historical receipt.",
+            "Carlton Davis III to Charles Woods — 1.2-point labelled pregame primary-replacement estimate retained; gamebook confirms Woods started but official snap/cluster reconciliation is still required for historical completion.",
+            "Brenden Schooler — ZERO_CALIBRATED_LOSS pregame estimate retained; special-teams duty is not declared immaterial."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W10-NE-TreVeyon-Henderson",
+              "exactMissingFact": "Complete Henderson counterfactual duty and distinct Kiner/Stevenson/Larison relief allocation with source-bound values and phase exposure.",
+              "footballImpact": "IR status and actual participation do not establish which incremental running-back and return duties were lost; Corey Kiner and Lan Larison are absent from the locked registry, though an existing eligible EA supplement must be checked before declaring a value unavailable.",
+              "reopenWhen": "Official snap evidence plus the eligible current/historical value adapter or immutable supplement supplies complete disjoint role/value bindings."
+            },
+            {
+              "caseKey": "2026-W10-NE-Walter-Rouse",
+              "exactMissingFact": "Established Week 10 role, exact replacement and a valid Week 10 identity/value binding for the inactive Questionable tackle.",
+              "footballImpact": "The exact-name locked registry entry is MIN-tagged and cannot be silently rebound to New England; his concussion designation also precludes an unsupported healthy-scratch closure.",
+              "reopenWhen": "An eligible immutable identity/value adapter and official role/participation source bind the named New England player and replacement."
+            },
+            {
+              "caseKey": "2026-W10-NE-MAYE-DEVITO-QB-TIMELINE",
+              "exactMissingFact": "Governed historical quarterback exposure acceptance for the printed Maye-to-DeVito timeline.",
+              "footballImpact": "The 9.25 and 6 frozen QB values are available, but only the existing historical QB timeline writer may convert source-bound duty to a numerical game-day loss.",
+              "reopenWhen": "The governed historical QB timeline adapter validates the exact contiguous interval and all required official source/value bindings."
+            },
+            {
+              "caseKey": "2026-W10-NE-PARTIAL-GAME-INTERVALS",
+              "exactMissingFact": "Eligible exposure and replacement allocations for Moses, Spillane, A.J. Brown and Dre'Mont Jones without extending unprinted boundaries.",
+              "footballImpact": "Moses has one printed return interval; Spillane has a second unprinted onset; A.J. Brown lacks a precise terminal play; Jones lacks onset and terminal status. Missing intervals and replacements are not zero.",
+              "reopenWhen": "Official phase snaps or an already approved bounded-absence/exposure route can use only the printed intervals and source-bound roles."
+            },
+            {
+              "caseKey": "2026-W10-NE-HEALTHY-SCRATCH-CANDIDATES",
+              "exactMissingFact": "Official no-injury classification and established-duty checks for Dametrious Crownover and inactive third quarterback Behren Morton.",
+              "footballImpact": "Absence from the final injury report does not alone establish healthy scratch or zero lost duty.",
+              "reopenWhen": "The approved healthy-scratch or backup-QB-no-lost-duty route has both required official sources and archive/role checks."
+            }
+          ]
+        },
+        {
+          "team": "DET",
+          "side": "HOME",
+          "finalInactives": [
+            "D.J. Reed",
+            "Keith Abney II",
+            "Amen Ogbongbemiga",
+            "Cade Mays",
+            "Mekhi Wingo",
+            "Ahmed Hassanein"
+          ],
+          "separateOutNotInInactiveRow": [
+            "Kerby Joseph — official club notice says he did not make the trip and was Out; exact roster/reserve classification remains unresolved and is not invented."
+          ],
+          "finalInjuryStatus": {
+            "out": [
+              "Cade Mays — ankle",
+              "Kerby Joseph — knee",
+              "D.J. Reed — hip"
+            ],
+            "questionable": [
+              "Amon-Ra St. Brown",
+              "Sione Vaki"
+            ],
+            "noFinalStatus": [
+              "Brian Branch",
+              "Jared Goff",
+              "Jacob Saylors",
+              "D.J. Wonnum"
+            ]
+          },
+          "starters": {
+            "offense": [
+              "I.TeSlaa",
+              "S.LaPorta",
+              "P.Sewell",
+              "C.Mahogany",
+              "J.Scruggs",
+              "T.Ratledge",
+              "B.Miller",
+              "J.Williams",
+              "A.St. Brown",
+              "J.Goff",
+              "J.Gibbs"
+            ],
+            "defense": [
+              "A.Hutchinson",
+              "A.McNeill",
+              "T.Williams",
+              "T.Lacy",
+              "T.Nowaske",
+              "M.Rodriguez",
+              "D.Barnes",
+              "B.Branch",
+              "R.Ya-Sin",
+              "R.McCreary",
+              "C.Clark"
+            ]
+          },
+          "substitutions": [
+            "E.Rakestraw",
+            "J.Fox",
+            "C.Izien",
+            "D.Moore",
+            "J.Dobbs",
+            "T.Martin",
+            "J.Saylors",
+            "A.Cisco",
+            "K.Dorsey",
+            "S.Vaki",
+            "J.Bachie",
+            "N.Whiteside",
+            "J.Bates",
+            "K.Britt",
+            "H.Hatten",
+            "S.Gill-Howard",
+            "O.Pappoe",
+            "S.McLaughlin",
+            "E.O'Neill",
+            "M.Frazier",
+            "L.Borom",
+            "T.Conklin",
+            "D.Carter",
+            "B.Wright",
+            "L.Onwuzurike",
+            "D.Wonnum"
+          ],
+          "dnp": {
+            "gamebookSection": "BLANK",
+            "finding": "The official gamebook prints no active Detroit player in its DNP section; this does not substitute for phase snap counts."
+          },
+          "inGameInjuriesAndReturns": [
+            {
+              "player": "Aidan Hutchinson",
+              "printedBoundary": "Injured on the Q1 9:43 sack of Drake Maye; return Questionable after the Q1 6:13 timeout; ruled Out at the Q3 2:21 boundary.",
+              "unprintedBoundary": "Exact defensive snap share and relief allocation during the absence are not printed."
+            },
+            {
+              "player": "Khalil Dorsey",
+              "printedBoundary": "Injured Q3 1:54; recorded returned on the Q4 8:56 kickoff.",
+              "unprintedBoundary": "Phase snap distribution is absent; the player's calibrated zero value does not prove the cluster has zero historical effect without the governed zero-loss and role review."
+            }
+          ],
+          "quarterback": {
+            "starter": "Jared Goff",
+            "starterLine": "20 completions on 31 attempts, 303 yards, three touchdowns and two interceptions.",
+            "relief": "Josh Dobbs",
+            "reliefLine": "Late fourth-quarter cleanup duty, one completion and kneel-down duty.",
+            "governedStatus": "No injury-driven Detroit quarterback loss is asserted; Josh Dobbs is absent from the locked registry and no value is invented for cleanup duty."
+          },
+          "specialists": [
+            "Jake Bates — kicker and kickoffs",
+            "Jack Fox — punter and holder",
+            "Hogan Hatten — long snapper",
+            "DeAndre Carter — punt and kickoff returner",
+            "Jacob Saylors — kickoff returner"
+          ],
+          "reusedCurrentCases": [
+            "Cade Mays to Juice Scruggs — 0.2-point labelled pregame primary-replacement estimate retained; the gamebook confirms Scruggs started at center, but the original current-week receipt is not rewritten.",
+            "D.J. Reed and Kerby Joseph — existing pregame cases remain unresolved; final starter/substitution identities do not by themselves prove distinct defensive-back relief shares."
+          ],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W10-DET-D-J-Reed",
+              "exactMissingFact": "Final corner role allocation and distinct additional duties across Rock Ya-Sin, Roger McCreary, Ennis Rakestraw Jr. and the broader secondary.",
+              "footballImpact": "Starter/substitution status is complete but phase snaps and counterfactual relief allocation are not; the 0.9 frozen Reed value cannot be converted without a supported replacement chain.",
+              "reopenWhen": "Official defensive and special-teams snaps or an already approved role-chain source supplies complete disjoint allocation."
+            },
+            {
+              "caseKey": "2026-W10-DET-Kerby-Joseph",
+              "exactMissingFact": "Exact roster/reserve status and final safety/multi-role allocation across Brian Branch, C.Clark, Christian Izien and Andre Cisco.",
+              "footballImpact": "The official notice confirms Joseph Out and not traveling, but the gamebook inactive row omits him. Andre Cisco's locked registry entry is NYJ-tagged and cannot be rebound silently; a substitute label does not establish Joseph's full 1.7-point role relief.",
+              "reopenWhen": "Official roster classification plus phase snaps and an eligible identity/value and role-chain binding resolve the named cluster."
+            },
+            {
+              "caseKey": "2026-W10-DET-AIDAN-HUTCHINSON-PARTIAL",
+              "exactMissingFact": "Eligible Q1-to-Q3 absence exposure and distinct edge/front relief allocation.",
+              "footballImpact": "The 1.7 frozen value and printed injury/status boundaries are available, but official defensive snaps and source-bound replacement roles are not.",
+              "reopenWhen": "Official snaps or an approved bounded-absence/exposure method supports only the printed interval and complete edge/front allocation."
+            },
+            {
+              "caseKey": "2026-W10-DET-KHALIL-DORSEY-PARTIAL",
+              "exactMissingFact": "Governed role and cluster review for the printed Dorsey absence interval.",
+              "footballImpact": "A calibrated zero player value may support a governed zero-loss proof, but no missing phase exposure or overlapping secondary duty is assigned zero.",
+              "reopenWhen": "The existing zero-calibrated-loss route and complete secondary/special-teams cluster review validate the interval."
+            },
+            {
+              "caseKey": "2026-W10-DET-HEALTHY-SCRATCH-CANDIDATES",
+              "exactMissingFact": "Official no-injury classification and established-duty checks for Keith Abney II, Amen Ogbongbemiga, Mekhi Wingo and Ahmed Hassanein.",
+              "footballImpact": "Absence from the final injury report does not alone establish healthy scratch, no lost duty or zero historical injury loss.",
+              "reopenWhen": "The approved healthy-scratch route has both official sources and archive/established-role checks for each named player."
+            }
+          ]
+        }
+      ],
+      "safeguards": [
+        "The issued DET +3 board and exact +2.992 fair remain frozen after kickoff; final-game evidence does not rewrite the prediction.",
+        "The complete printed gamebook inventory is retained even while numerical evaluation remains blocked.",
+        "A printed Questionable/Out update is not extended to an unprinted injury onset, return or terminal boundary.",
+        "Maye-to-DeVito duty remains under the existing historical QB timeline adapter and is isolated from the active QB performance model.",
+        "Henderson's committee, Moses's relief, Reed/Joseph secondary allocation and Hutchinson's edge relief remain disjoint replacement questions; no overlapping player receives duplicate credit.",
+        "The pregame Brown, Davis/Woods, Schooler and Mays/Scruggs estimates are preserved as their original labelled current-week records and are not rebound as a later completed fair snapshot.",
+        "Registry entries with stale team tags and players absent from the locked registry require eligible identity/value adapters or immutable supplements; missing values are never zero.",
+        "No market source or price was viewed."
+      ],
+      "blockers": [
+        {
+          "code": "OFFICIAL_SNAP_COUNTS_NOT_YET_AVAILABLE",
+          "finding": "The complete official final gamebook is available and fully audited, but it does not contain per-player offense, defense and special-teams snap tables, and one focused official-team follow-up found no published official snap-count article at the cutoff.",
+          "footballImpact": "Final starter/substitution identities alone cannot prove complete phase exposure or disjoint replacement allocation.",
+          "nextAction": "Reopen only when official per-player phase snap counts publish; bind the exact official URL/capture and reconcile the already preserved inventory without restaging it.",
+          "sourceIds": [
+            "ne-det-official-gamebook",
+            "ne-det-official-snap-follow-up"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+          "finding": "All printed gamebook injury/status annotations are preserved, but the later Robert Spillane onset, Dre'Mont Jones onset/terminal status, the precise A.J. Brown terminal play and phase exposure for the printed Hutchinson/Moses intervals remain unprinted or method-gated.",
+          "footballImpact": "Extending a status clock beyond official evidence would invent unavailable exposure and may double count role clusters.",
+          "nextAction": "Use only eligible existing interval/exposure methods on printed boundaries; otherwise retain the exact unresolved boundary until a material official source or approved method arrives.",
+          "sourceIds": [
+            "ne-det-official-gamebook"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Henderson committee duty, Reed/Joseph secondary allocation, Moses relief, Hutchinson edge relief, Walter Rouse identity/value, and several active-game relief players lack complete disjoint source/value bindings. Existing eligible supplement and value adapters must be checked before any value is declared unavailable.",
+          "footballImpact": "A final inactive, starter or substitute label does not authorize a fictional one-for-one replacement, an unsupported team-tag rebind or a zero value.",
+          "nextAction": "After official phase snaps publish, reconcile each named cluster once through existing approved value and replacement routes; park any still-unknown fact with its exact gate.",
+          "sourceIds": [
+            "ne-det-official-gamebook",
+            "ne-official-final-inactives",
+            "ne-official-final-injury-report",
+            "det-official-final-inactives",
+            "det-official-final-injury-report"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "QB_HISTORICAL_TIMELINE_REQUIRES_GOVERNED_ADAPTER",
+          "finding": "The official gamebook source-binds Maye's injury/status and DeVito's actual relief duty, and the locked registry contains both QB values, but no historical QB numerical loss has been validated or written.",
+          "footballImpact": "Treating the source capture as numerical completion would bypass the exact timeline/exposure writer and improperly alter the active QB model or fair.",
+          "nextAction": "Run the existing historical QB timeline adapter only after the paired game-day evidence can otherwise satisfy its required source/value bindings; do not change the started-game prediction.",
+          "sourceIds": [
+            "ne-det-official-gamebook"
+          ],
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ],
+  "reviewConclusion": {
+    "exactFinal": "NE 10, DET 35 — OFFICIAL_FINAL_VERIFIED",
+    "completePrintedFinalInventory": "SOURCE_BOUND_GAMEBOOK_AUDIT_COMPLETE",
+    "completeOfficialPhaseSnapInventory": "UNAVAILABLE_AT_CAPTURE_CUTOFF",
+    "numericStagingState": "BLOCKED_NO_PAIRED_INJURY_TOTAL_OR_RATING_CHANGE",
+    "followUpDisposition": "WAITING_SOURCE_OR_METHOD",
+    "nextAction": "Reopen on official per-player phase snap publication or a material approved method/value change. Reuse this additive inventory; do not repeat the gamebook search, rewrite the original pregame estimates or alter the frozen DET +3 prediction."
+  }
+}
