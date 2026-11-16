@@ -4,7 +4,14 @@ import { fileURLToPath } from 'node:url';
 import { resolveGrahamActiveWeek } from './graham-active-week.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const DEFAULT_ROOT = path.resolve(HERE, '..');
+const SCRIPT_ROOT = path.resolve(HERE, '..');
+// Production invokes repository tools from the checkout root. Tests also invoke
+// this tool from an isolated repository copy while retaining the original tool
+// path, so prefer the active checkout and fall back to the script checkout only
+// when the caller is outside a Graham repository.
+const DEFAULT_ROOT = fs.existsSync(path.join(process.cwd(), 'data/walters/nfl/active-week.json'))
+  ? process.cwd()
+  : SCRIPT_ROOT;
 export const GRAHAM_SCHEDULE_MANIFEST = 'data/walters/nfl/graham-schedule-authority-v1.json';
 export const GRAHAM_SCHEDULE_AUTHORITY_ID = 'graham-schedule-metadata-v1';
 
