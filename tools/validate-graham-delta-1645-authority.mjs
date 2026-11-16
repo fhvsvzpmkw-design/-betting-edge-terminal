@@ -92,12 +92,12 @@ if (
 }
 validateProductionQbScope(qbProduction, productionQbScope(qbContract, ROOT));
 if (
-  delta?.time !== '16:45' ||
-  delta?.rrule !== 'FREQ=WEEKLY;BYDAY=TU,WE,TH,FR,SA;BYHOUR=16;BYMINUTE=45;BYSECOND=0'
+  delta?.time !== '16:00' ||
+  delta?.rrule !== 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;BYHOUR=16;BYMINUTE=0;BYSECOND=0'
 ) {
   throw new Error('GRAHAM_DELTA_1645_SCHEDULE_INVALID');
 }
 
 console.log(
-  'GRAHAM DELTA 16:45 AUTHORITY: PASS // V2.1 // RUNTIME CHECKPOINT + 32 PLAYER-VALUE SHARDS + QB OPERATIONAL SCOPED',
+  'GRAHAM DELTA 16:00 AUTHORITY: PASS // V2.1 // RUNTIME CHECKPOINT + 32 PLAYER-VALUE SHARDS + QB OPERATIONAL SCOPED',
 );
