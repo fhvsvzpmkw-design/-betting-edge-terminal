@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {matchNflFixture,extractPinnacleHomeSpread} from '../tools/graham-market-utils.mjs';
 import {selectCompletedResearchReview} from '../tools/graham-research-review.mjs';
+import {resolveGrahamActiveWeek} from '../tools/graham-active-week.mjs';
 import {
   buildResearchLedgerCadenceProjection,
   loadGrahamScheduleAuthority,
@@ -11,7 +12,8 @@ import {
 } from '../tools/graham-schedule-authority.mjs';
 
 const numbers=JSON.parse(fs.readFileSync('data/walters/nfl/2026/week-01-current-numbers.json','utf8'));
-const research=JSON.parse(fs.readFileSync('data/walters/nfl/2026/week-01-research-ledger.json','utf8'));
+const active=resolveGrahamActiveWeek();
+const research=JSON.parse(fs.readFileSync(active.paths.researchLedger,'utf8'));
 const authority=loadGrahamScheduleAuthority();
 const hotline=fs.readFileSync('syndicates/generated/graham-mercer/hotline.html','utf8');
 const builder=fs.readFileSync('tools/build-graham-current-week.mjs','utf8');
