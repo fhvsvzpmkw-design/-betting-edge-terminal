@@ -1,0 +1,1376 @@
+{
+  "schema": 1,
+  "publication": "THE PRIVATE LINE",
+  "timezone": "America/Vancouver",
+  "rules": {
+    "marketIsolation": "Finish each independent Graham fair number before viewing or comparing the contemporaneous Pinnacle spread.",
+    "ratingCarryForward": "Team ratings move only by explicit carried-rating delta with reason, source and timestamp. No silent reset to the origin seed.",
+    "noForcedMove": "A research sweep may end with no rating or fair-number move when current information does not justify one.",
+    "eventSpecificFactors": "Venue, rest, travel, weather and game-specific uncertainty may remain matchup adjustments rather than permanent team-rating changes.",
+    "pinnacleAuthority": "Pinnacle is a comparison benchmark only and may not set or silently overwrite Graham's fair number."
+  },
+  "researchCadence": {
+    "tuesdayBaseline": "11:00 PT Tuesday full 32-team weekly review after Monday Night Football",
+    "wednesdayFriday": "11:00 PT Monday/Wednesday/Thursday/Friday/Saturday main information review",
+    "saturday": "11:00 PT Saturday review is included in Graham Daily Review; no separate active Saturday task",
+    "sunday": "07:00 PT Sunday pregame information review",
+    "pre315Delta": "16:00 PT Monday through Sunday late-day change-only delta review"
+  },
+  "scheduleAuthority": {
+    "schema": 1,
+    "authorityId": "graham-schedule-metadata-v1",
+    "state": "SYNCHRONIZED",
+    "manifestPath": "data/walters/nfl/graham-schedule-authority-v1.json",
+    "timezone": "America/Vancouver",
+    "timingMode": "exact_schedule",
+    "executionAuthority": "CHATGPT_SCHEDULED_TASKS",
+    "tasks": [
+      {
+        "taskKey": "WEEK_ROLLOVER",
+        "title": "Graham Week Rollover",
+        "days": [
+          "TU"
+        ],
+        "time": "07:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=7;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Mechanical completion-gated active-week rollover."
+      },
+      {
+        "taskKey": "TUESDAY_BASELINE",
+        "title": "Graham Tuesday Baseline",
+        "days": [
+          "TU"
+        ],
+        "time": "11:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=11;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Full weekly 32-team information baseline after Monday Night Football."
+      },
+      {
+        "taskKey": "DAILY_REVIEW",
+        "title": "Graham Daily Review",
+        "days": [
+          "MO",
+          "WE",
+          "TH",
+          "FR",
+          "SA"
+        ],
+        "time": "11:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=MO,WE,TH,FR,SA;BYHOUR=11;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Main information review, including the Saturday review function."
+      },
+      {
+        "taskKey": "DELTA_1645",
+        "title": "Graham 16:45 Delta",
+        "days": [
+          "MO",
+          "TU",
+          "WE",
+          "TH",
+          "FR",
+          "SA",
+          "SU"
+        ],
+        "time": "16:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;BYHOUR=16;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Late-day change-only information delta."
+      },
+      {
+        "taskKey": "SUNDAY_PREGAME",
+        "title": "Graham Sunday Pregame",
+        "days": [
+          "SU"
+        ],
+        "time": "07:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=SU;BYHOUR=7;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Sunday pregame information review for active-week games awaiting kickoff."
+      }
+    ]
+  },
+  "bettingBoundary": {
+    "betIssued": false,
+    "marketMaySetGrahamNumber": false,
+    "rolloverMayIssueBet": false
+  },
+  "boardId": "graham-mercer-nfl-2026-week-11-current-numbers-v1",
+  "title": "GRAHAM MERCER // WEEK 11 CURRENT NUMBERS",
+  "season": 2026,
+  "week": 11,
+  "state": "PROVISIONAL_BASELINE_PENDING",
+  "createdAt": "2026-11-17T14:11:05.261Z",
+  "updatedAt": "2026-11-17T14:11:05.261Z",
+  "lastResearchAt": null,
+  "researchLedgerPath": "data/walters/nfl/2026/week-11-research-ledger.json",
+  "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
+  "marketComparisonLedgerPath": "data/walters/nfl/2026/week-11-daily-market-ledger.json",
+  "researchEventsDir": "data/walters/nfl/2026/week-11-research-events",
+  "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
+  "rolloverProvenance": {
+    "authority": "GRAHAM_WEEK_ROLLOVER",
+    "fromSeason": 2026,
+    "fromWeek": 10,
+    "activatedAt": "2026-11-17T14:11:05.261Z",
+    "completionGate": "PASS_14_OF_14_FINAL",
+    "completionFactsPath": "data/walters/nfl/2026/week-10-final-facts-20261117.json",
+    "completionFactsBlobSha": "c1314b1052a7267e50a679387dcc7f7058a1619a",
+    "carriedRatingSource": "data/walters/nfl-power-ratings-ledger.json",
+    "carriedRatingSourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+    "carriedRatingSourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+    "carriedTeamCount": 32,
+    "learningAtRollover": {
+      "sourceWeek": 7,
+      "targetWeek": 8,
+      "state": "PARTIAL_BLOCKED",
+      "gamesApplied": 7,
+      "gamesExpected": 14
+    },
+    "fullResearchBaselinePerformed": false,
+    "marketViewed": false
+  },
+  "homeFieldProduction": {
+    "state": "OPERATIONAL_SCOPED",
+    "productionId": "walters-nfl-home-field-production-v1",
+    "calibrationId": "walters-nfl-home-field-calibration-v1",
+    "productionAuthority": true,
+    "marketViewed": false,
+    "domesticHomeAdvantagePoints": 2.082,
+    "domesticPointsToHomeSpread": -2.082,
+    "neutralPointsToHomeSpread": 0,
+    "selectiveVenueAdjustmentsEnabled": false,
+    "teamVenueBlanketEnabled": false,
+    "unresolvedVenueAction": "FAIL_CLOSED_EXPLICIT_REVIEW"
+  },
+  "scheduleSource": {
+    "url": "https://www.nfl.com/schedules/2026/by-week/week-11",
+    "scheduleChangeUrl": "https://www.nfl.com/news/week-11-schedule-change",
+    "factsPath": "data/walters/nfl/2026/week-11-schedule-facts-20261117.json",
+    "verifiedAt": "2026-11-17T14:11:05.261Z",
+    "marketViewed": false
+  },
+  "games": [
+    {
+      "gameKey": "2026-W11-IND-HOU",
+      "away": "IND",
+      "home": "HOU",
+      "startTimePacific": "2026-11-19T17:15:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -7,
+      "grahamExactFairHome": -7.2191145886,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -5.1371145886,
+      "ratingCarryForward": {
+        "awayRating": 20.8930818394,
+        "homeRating": 26.030196428,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 20.8930818394,
+        "homeCurrentRating": 26.030196428,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "IND",
+          "HOU"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -7.2191145886,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -5.1371145886,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "IND",
+        "HOU"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -5.137,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -7.219,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -7.219,
+        "displayedFairHome": -7,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -5.137; home field -2.082; other governed +0.000; pre-personnel exact -7.219; personnel +0.000; matchup +0.000; exact Graham home fair -7.219; displayed -7.0."
+    },
+    {
+      "gameKey": "2026-W11-MIA-BUF",
+      "away": "MIA",
+      "home": "BUF",
+      "startTimePacific": "2026-11-22T10:00:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -13,
+      "grahamExactFairHome": -13.02484035,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -10.94284035,
+      "ratingCarryForward": {
+        "awayRating": 16.9730291,
+        "homeRating": 27.91586945,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 16.9730291,
+        "homeCurrentRating": 27.91586945,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "MIA",
+          "BUF"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -13.02484035,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -10.94284035,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "MIA",
+        "BUF"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -10.943,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -13.025,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -13.025,
+        "displayedFairHome": -13,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -10.943; home field -2.082; other governed +0.000; pre-personnel exact -13.025; personnel +0.000; matchup +0.000; exact Graham home fair -13.025; displayed -13.0."
+    },
+    {
+      "gameKey": "2026-W11-BAL-CAR",
+      "away": "BAL",
+      "home": "CAR",
+      "startTimePacific": "2026-11-22T10:00:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": 1,
+      "grahamExactFairHome": 0.92302434134,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": 3.00502434134,
+      "ratingCarryForward": {
+        "awayRating": 25.2200677378,
+        "homeRating": 22.21504339646,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 25.2200677378,
+        "homeCurrentRating": 22.21504339646,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "BAL",
+          "CAR"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": 0.92302434134,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 3.00502434134,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "BAL",
+        "CAR"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 3.005,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 0.923,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 0.923,
+        "displayedFairHome": 1,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base +3.005; home field -2.082; other governed +0.000; pre-personnel exact +0.923; personnel +0.000; matchup +0.000; exact Graham home fair +0.923; displayed +1.0."
+    },
+    {
+      "gameKey": "2026-W11-NO-CHI",
+      "away": "NO",
+      "home": "CHI",
+      "startTimePacific": "2026-11-22T10:00:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -9,
+      "grahamExactFairHome": -8.9031992154,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -6.8211992154,
+      "ratingCarryForward": {
+        "awayRating": 20.726750612,
+        "homeRating": 27.5479498274,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 20.726750612,
+        "homeCurrentRating": 27.5479498274,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "NO",
+          "CHI"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -8.9031992154,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -6.8211992154,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "NO",
+        "CHI"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -6.821,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -8.903,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -8.903,
+        "displayedFairHome": -9,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -6.821; home field -2.082; other governed +0.000; pre-personnel exact -8.903; personnel +0.000; matchup +0.000; exact Graham home fair -8.903; displayed -9.0."
+    },
+    {
+      "gameKey": "2026-W11-TEN-DAL",
+      "away": "TEN",
+      "home": "DAL",
+      "startTimePacific": "2026-11-22T10:00:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -8,
+      "grahamExactFairHome": -7.8133718836,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -5.7313718836,
+      "ratingCarryForward": {
+        "awayRating": 17.4401628744,
+        "homeRating": 23.171534758,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 17.4401628744,
+        "homeCurrentRating": 23.171534758,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "TEN",
+          "DAL"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -7.8133718836,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -5.7313718836,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "TEN",
+        "DAL"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -5.731,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -7.813,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -7.813,
+        "displayedFairHome": -8,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -5.731; home field -2.082; other governed +0.000; pre-personnel exact -7.813; personnel +0.000; matchup +0.000; exact Graham home fair -7.813; displayed -8.0."
+    },
+    {
+      "gameKey": "2026-W11-TB-DET",
+      "away": "TB",
+      "home": "DET",
+      "startTimePacific": "2026-11-22T10:00:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -3.5,
+      "grahamExactFairHome": -3.5177471934,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -1.4357471934,
+      "ratingCarryForward": {
+        "awayRating": 24.7083807848,
+        "homeRating": 26.1441279782,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 24.7083807848,
+        "homeCurrentRating": 26.1441279782,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "TB",
+          "DET"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -3.5177471934,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -1.4357471934,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "TB",
+        "DET"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -1.436,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -3.518,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -3.518,
+        "displayedFairHome": -3.5,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -1.436; home field -2.082; other governed +0.000; pre-personnel exact -3.518; personnel +0.000; matchup +0.000; exact Graham home fair -3.518; displayed -3.5."
+    },
+    {
+      "gameKey": "2026-W11-ARI-KC",
+      "away": "ARI",
+      "home": "KC",
+      "startTimePacific": "2026-11-22T10:00:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -12.5,
+      "grahamExactFairHome": -12.578149908,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -10.496149908,
+      "ratingCarryForward": {
+        "awayRating": 16.500259358,
+        "homeRating": 26.996409266,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 16.500259358,
+        "homeCurrentRating": 26.996409266,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "ARI",
+          "KC"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -12.578149908,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -10.496149908,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "ARI",
+        "KC"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -10.496,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -12.578,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -12.578,
+        "displayedFairHome": -12.5,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -10.496; home field -2.082; other governed +0.000; pre-personnel exact -12.578; personnel +0.000; matchup +0.000; exact Graham home fair -12.578; displayed -12.5."
+    },
+    {
+      "gameKey": "2026-W11-PIT-PHI",
+      "away": "PIT",
+      "home": "PHI",
+      "startTimePacific": "2026-11-22T10:00:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -3,
+      "grahamExactFairHome": -2.915578632,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -0.833578632,
+      "ratingCarryForward": {
+        "awayRating": 23.671395616,
+        "homeRating": 24.504974248,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 23.671395616,
+        "homeCurrentRating": 24.504974248,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "PIT",
+          "PHI"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -2.915578632,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -0.833578632,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "PIT",
+        "PHI"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -0.834,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -2.916,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -2.916,
+        "displayedFairHome": -3,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -0.834; home field -2.082; other governed +0.000; pre-personnel exact -2.916; personnel +0.000; matchup +0.000; exact Graham home fair -2.916; displayed -3.0."
+    },
+    {
+      "gameKey": "2026-W11-NYJ-LAC",
+      "away": "NYJ",
+      "home": "LAC",
+      "startTimePacific": "2026-11-22T13:05:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -3.5,
+      "grahamExactFairHome": -3.392293638,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -1.310293638,
+      "ratingCarryForward": {
+        "awayRating": 19.765524156,
+        "homeRating": 21.075817794,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 19.765524156,
+        "homeCurrentRating": 21.075817794,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "NYJ",
+          "LAC"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -3.392293638,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -1.310293638,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "NYJ",
+        "LAC"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -1.31,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -3.392,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -3.392,
+        "displayedFairHome": -3.5,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -1.310; home field -2.082; other governed +0.000; pre-personnel exact -3.392; personnel +0.000; matchup +0.000; exact Graham home fair -3.392; displayed -3.5."
+    },
+    {
+      "gameKey": "2026-W11-LV-DEN",
+      "away": "LV",
+      "home": "DEN",
+      "startTimePacific": "2026-11-22T13:25:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -11.5,
+      "grahamExactFairHome": -11.4165556368,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -9.3345556368,
+      "ratingCarryForward": {
+        "awayRating": 17.5377255832,
+        "homeRating": 26.87228122,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 17.5377255832,
+        "homeCurrentRating": 26.87228122,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "LV",
+          "DEN"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -11.4165556368,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -9.3345556368,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "LV",
+        "DEN"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -9.335,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -11.417,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -11.417,
+        "displayedFairHome": -11.5,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -9.335; home field -2.082; other governed +0.000; pre-personnel exact -11.417; personnel +0.000; matchup +0.000; exact Graham home fair -11.417; displayed -11.5."
+    },
+    {
+      "gameKey": "2026-W11-JAX-NYG",
+      "away": "JAX",
+      "home": "NYG",
+      "startTimePacific": "2026-11-22T13:25:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": 4.5,
+      "grahamExactFairHome": 4.387130104,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": 6.469130104,
+      "ratingCarryForward": {
+        "awayRating": 27.167817452,
+        "homeRating": 20.698687348,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 27.167817452,
+        "homeCurrentRating": 20.698687348,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "JAX",
+          "NYG"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": 4.387130104,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 6.469130104,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "JAX",
+        "NYG"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 6.469,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 4.387,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 4.387,
+        "displayedFairHome": 4.5,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base +6.469; home field -2.082; other governed +0.000; pre-personnel exact +4.387; personnel +0.000; matchup +0.000; exact Graham home fair +4.387; displayed +4.5."
+    },
+    {
+      "gameKey": "2026-W11-MIN-SF",
+      "away": "MIN",
+      "home": "SF",
+      "startTimePacific": "2026-11-22T17:20:00-08:00",
+      "venueClass": "INTERNATIONAL_NEUTRAL",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": -5,
+      "grahamExactFairHome": -5.1247251834,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": -5.1247251834,
+      "ratingCarryForward": {
+        "awayRating": 25.1652697866,
+        "homeRating": 30.28999497,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 25.1652697866,
+        "homeCurrentRating": 30.28999497,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "MIN",
+          "SF"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": 0,
+          "homeLocationAdvantagePoints": 0,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "INTERNATIONAL_NEUTRAL",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 international neutral venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": -5.1247251834,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -5.1247251834,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "INTERNATIONAL_NEUTRAL",
+      "homeFieldAdvantagePoints": 0,
+      "homeFieldPointsToHomeSpread": 0,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "MIN",
+        "SF"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -5.125,
+        "homeFieldPointsToHomeSpread": 0,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -5.125,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -5.125,
+        "displayedFairHome": -5,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base -5.125; home field +0.000; other governed +0.000; pre-personnel exact -5.125; personnel +0.000; matchup +0.000; exact Graham home fair -5.125; displayed -5.0."
+    },
+    {
+      "gameKey": "2026-W11-CIN-WAS",
+      "away": "CIN",
+      "home": "WAS",
+      "startTimePacific": "2026-11-23T17:15:00-08:00",
+      "venueClass": "DOMESTIC_HOME",
+      "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-11",
+      "status": "SCHEDULED",
+      "grahamFairHome": 4,
+      "grahamExactFairHome": 3.8840382542,
+      "grahamAsOf": "2026-11-17T14:11:05.261Z",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "CARRIED_RATINGS_CURRENT_INFORMATION_REVIEW_PENDING",
+      "neutralBaseHome": 5.9660382542,
+      "ratingCarryForward": {
+        "awayRating": 27.3900341042,
+        "homeRating": 21.42399585,
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "sourceUpdatedAt": "2026-11-05T03:48:36.788Z",
+        "marketViewed": false
+      },
+      "weeklyRatingInput": {
+        "state": "PARTIAL_BLOCKED",
+        "sourceWeek": 10,
+        "targetWeek": 11,
+        "awayCurrentRating": 27.3900341042,
+        "homeCurrentRating": 21.42399585,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "PRESERVED_BLOCKED",
+        "blockedTeams": [
+          "CIN",
+          "WAS"
+        ],
+        "appliedToFair": true,
+        "applicationStatus": "APPLIED",
+        "sourceBlobSha": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
+        "marketViewed": false
+      },
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-11-17T14:11:05.261Z",
+          "reason": "Verified Week 11 domestic venue and governed H4 applied to carried ratings. Current-information review is pending.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/home-field/h4-current.json",
+        "data/walters/nfl/2026/week-11-schedule-facts-20261117.json"
+      ],
+      "personnelBaselineExactFairHome": 3.8840382542,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 5.9660382542,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-11-17T14:11:05.261Z",
+      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceFailClosedTeams": [
+        "CIN",
+        "WAS"
+      ],
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 5.966,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 3.884,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 3.884,
+        "displayedFairHome": 4,
+        "arithmeticVerified": true
+      },
+      "researchSummary": "Governed fair decomposition: neutral/team base +5.966; home field -2.082; other governed +0.000; pre-personnel exact +3.884; personnel +0.000; matchup +0.000; exact Graham home fair +3.884; displayed +4.0."
+    }
+  ],
+  "fairDecompositionPolicyId": "graham-fair-decomposition-v1",
+  "fairExplanationState": "SYNCHRONIZED"
+}
