@@ -1,86 +1,48 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-w10-daily-review-lac-bal-receivers-20261116T112217-0700",
+  "batchId": "graham-w10-delta-1645-final-inactive-gates-20261117T000200Z",
   "season": 2026,
   "week": 10,
-  "startedAt": "2026-11-16T11:12:05-07:00",
-  "effectiveAt": "2026-11-16T11:22:17-07:00",
-  "sourceTask": "DAILY_REVIEW",
+  "startedAt": "2026-11-16T23:00:31.000Z",
+  "effectiveAt": "2026-11-17T00:02:00.978Z",
+  "sourceTask": "DELTA_1645",
   "marketViewed": false,
-  "valueSupplements": [
-    {
-      "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json",
-      "blobSha": "82d2a67a14f58ea21b9174f8d9622ac78e9d7a9d",
-      "eaPlayerIds": ["15079"],
-      "estimateAcknowledged": true,
-      "rationale": "Reuse the immutable EA Week 5 capture for Theo Wease Jr through the existing current-value adapter and frozen curve; the locked registry and prior capture are not rewritten."
-    }
-  ],
   "cases": [
     {
-      "personnelEventId": "2026-W10-LAC-Ladd-McConkey-20261116T112217-0700",
-      "caseKey": "2026-W10-LAC-Ladd-McConkey",
+      "personnelEventId": "2026-W10-LAC-Justin-Eboigbe-20261117T000200Z",
+      "caseKey": "2026-W10-LAC-Justin-Eboigbe",
       "gameKey": "2026-W10-LAC-BAL",
       "team": "LAC",
       "side": "AWAY",
-      "player": "Ladd McConkey",
-      "playerEaId": "14651",
+      "player": "Justin Eboigbe",
+      "playerEaId": "14873",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "The official Sunday designation downgraded McConkey to out. The current roster and Week 10 depth chart identify Tre' Harris as the available next receiver on McConkey's line, while the model preserves Harris' existing baseline duties and assigns only the added vacant role.",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "PLAYER_LOOKUP_NOT_FOUND:Myles Adams:0",
+      "reason": "The official final list makes Eboigbe inactive with an ankle injury. The active defensive-line replacement inventory includes locked zero-valued reserve Nick Barrett and game-elevated Myles Adams. Adams is absent from the locked registry, existing approved supplements, and the approved current EA result set, so the complete committee cannot be valued and no missing value is assigned zero.",
       "sourceRefs": [
-        "https://www.chargers.com/team/injury-report/",
-        "https://www.chargers.com/news/chargers-vs-ravens-injury-report-ladd-mcconkey-daiyan-henley-2026",
-        "https://www.chargers.com/team/players-roster/",
+        "https://www.chargers.com/news/ravens-inactives-week-10-2026",
         "https://www.chargers.com/team/depth-chart",
-        "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj",
-        "https://www.chargers.com/news/players-to-watch-ravens-week-10-tre-harris",
+        "https://www.chargers.com/news/activate-david-njoku-denzel-perryman-2026",
+        "https://www.chargers.com/news/chargers-vs-ravens-injury-report-ladd-mcconkey-daiyan-henley-2026",
+        "https://www.ea.com/games/madden-nfl/ratings",
+        "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json",
         "data/walters/nfl/player-values/by-team-v1/lac.json",
         "data/walters/nfl/player-values/player-values-access-v1.json",
-        "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json"
+        "data/walters/nfl/player-values/player-values-2026-v1.json"
       ],
       "availabilitySourceRefs": [
-        "https://www.chargers.com/team/injury-report/",
-        "https://www.chargers.com/news/chargers-vs-ravens-injury-report-ladd-mcconkey-daiyan-henley-2026"
+        "https://www.chargers.com/news/ravens-inactives-week-10-2026",
+        "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json"
       ],
       "roleSourceRefs": [
-        "https://www.chargers.com/team/players-roster/",
         "https://www.chargers.com/team/depth-chart",
-        "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj",
-        "https://www.chargers.com/news/players-to-watch-ravens-week-10-tre-harris"
+        "https://www.chargers.com/news/activate-david-njoku-denzel-perryman-2026",
+        "https://www.chargers.com/news/ravens-inactives-week-10-2026",
+        "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json"
       ],
-      "reopenOn": "Reopen before kickoff if final inactives make Harris unavailable, an official source assigns McConkey's vacant role differently, or a governed source/value correction changes the bound inputs.",
-      "replacementModel": {
-        "modelId": "graham-replacement-role-estimate-v1",
-        "resolution": "PRIMARY_REPLACEMENT",
-        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
-        "estimateAcknowledged": true,
-        "assumptionRationale": "Use the official Week 10 depth ordering to assign McConkey's added vacant receiving duty to Tre' Harris. This is a labelled Graham depth estimate, not a claim about exact routes or targets.",
-        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
-        "baselineDutiesDisplaced": false,
-        "baselineRationale": "Harris already has an independent receiving baseline, documented by the club's current usage note. Preserve those duties and apply his frozen value only to McConkey's additional vacant role; Johnston and every other receiver retain their baseline assignments.",
-        "baselineSourceIds": [
-          "https://www.chargers.com/team/players-roster/",
-          "https://www.chargers.com/team/depth-chart",
-          "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj",
-          "https://www.chargers.com/news/players-to-watch-ravens-week-10-tre-harris"
-        ],
-        "replacements": [
-          {
-            "player": "Tre' Harris",
-            "eaPlayerId": "15058",
-            "availabilityStatus": "ACTIVE",
-            "roleRationale": "Harris is active, off the injury report, and listed immediately behind McConkey on the official Week 10 depth chart.",
-            "sourceRefs": [
-              "https://www.chargers.com/news/chargers-vs-ravens-injury-report-ladd-mcconkey-daiyan-henley-2026",
-              "https://www.chargers.com/team/players-roster/",
-              "https://www.chargers.com/team/depth-chart",
-              "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj"
-            ]
-          }
-        ]
-      },
+      "reopenOn": "Reopen only if an immutable approved EA source capture supplies Myles Adams' exact identity and value, or a current official source names a distinct complete replacement allocation that excludes the missing candidate.",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
@@ -90,101 +52,49 @@
         "candidateValuesChecked": true,
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "replacementCandidatesConsidered": ["Quentin Johnston", "Tre' Harris", "Derius Davis", "KeAndre Lambert-Smith", "Theo Wease Jr"],
-        "replacementClassification": "ONE_FOR_ONE",
-        "conclusion": "RESOLVED_MODEL_ESTIMATE",
-        "finding": "McConkey's final out status, the complete current active receiver roster, current Week 10 depth ordering, current and supplemented locked values, baseline double-count risk and the simultaneous Thompson absence were reviewed. Harris is the distinct source-bound primary for McConkey's added role; his existing baseline work is retained."
-      },
-      "receiverClusterReview": {
-        "estimateAcknowledged": true,
-        "inventoryComplete": true,
-        "rationale": "Complete current active and return-window receiving inventory. McConkey and Thompson are out, but Johnston remains active, so the two highest-valued expected receiving options are not simultaneously unavailable and the governed nonlinear receiver multiplier does not apply.",
-        "sourceRefs": [
-          "https://www.chargers.com/team/injury-report/",
-          "https://www.chargers.com/team/players-roster/",
-          "https://www.chargers.com/team/depth-chart",
-          "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj",
-          "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json"
+        "replacementCandidatesConsidered": [
+          "Nick Barrett",
+          "Myles Adams",
+          "Jamaree Caldwell",
+          "Dalvin Tomlinson",
+          "Teair Tart"
         ],
-        "expectedReceivers": [
-          {"player": "Ladd McConkey", "eaPlayerId": "14651", "healthyExpectedRole": "Listed Week 10 starting wide receiver and lead receiving option.", "availabilityStatus": "OUT"},
-          {"player": "Quentin Johnston", "eaPlayerId": "22695", "healthyExpectedRole": "Listed Week 10 starting wide receiver on the opposite receiver line.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Tre' Harris", "eaPlayerId": "15058", "healthyExpectedRole": "Active receiver with existing baseline work and next depth position behind McConkey.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Brenen Thompson", "eaPlayerId": "10176", "healthyExpectedRole": "Listed backup wide receiver behind Johnston and backup punt returner.", "availabilityStatus": "OUT"},
-          {"player": "Derius Davis", "eaPlayerId": "22819", "healthyExpectedRole": "Active reserve receiver and primary returner with retained baseline duties.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "KeAndre Lambert-Smith", "eaPlayerId": "15073", "healthyExpectedRole": "Active reserve receiver in the official Week 10 receiver group.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Theo Wease Jr", "eaPlayerId": "15079", "healthyExpectedRole": "Active reserve receiver in the official Week 10 receiver group.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Charlie Kolar", "eaPlayerId": "22096", "healthyExpectedRole": "Active starting tight end in the official Week 10 depth chart.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Oronde Gadsden", "eaPlayerId": "15122", "healthyExpectedRole": "Active backup tight end in the official Week 10 depth chart.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "David Njoku", "eaPlayerId": "12532", "healthyExpectedRole": "Reserve/Injured designated-for-return tight end listed questionable for Week 10; availability remains unresolved until activation and final inactives.", "availabilityStatus": "UNRESOLVED"}
-        ]
+        "replacementClassification": "UNRESOLVED_COMMITTEE_AFTER_COMPLETE_SEARCH",
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "Final availability, the complete active defensive-line inventory, the official depth chart, the Adams elevation, Eboigbe and Barrett locked values, the locked registry and the approved current EA source were reviewed. Myles Adams has no governed identity/value row, so the complete replacement committee remains nonnumeric."
       }
     },
     {
-      "personnelEventId": "2026-W10-LAC-Brenen-Thompson-20261116T112217-0700",
-      "caseKey": "2026-W10-LAC-Brenen-Thompson",
+      "personnelEventId": "2026-W10-LAC-Bud-Dupree-20261117T000200Z",
+      "caseKey": "2026-W10-LAC-Bud-Dupree",
       "gameKey": "2026-W10-LAC-BAL",
       "team": "LAC",
       "side": "AWAY",
-      "player": "Brenen Thompson",
-      "playerEaId": "10176",
-      "availabilityStatus": "OUT",
-      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "The current official injury page now lists Thompson out after the dated Sunday article listed him doubtful. The complete active receiver roster leaves three unreserved reserve candidates after preserving Johnston's baseline and assigning Harris only to McConkey; their governed values are all zero, making the committee value share-invariant.",
+      "player": "Bud Dupree",
+      "playerEaId": "2532",
+      "availabilityStatus": "HEALTHY_SCRATCH",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "UNSUPPORTED_RESOLVED_STATUS:HEALTHY_SCRATCH",
+      "reason": "The official final list expressly classifies Dupree as a healthy inactive after the final injury assessment cleared him. The current-week personnel production policy has no resolved HEALTHY_SCRATCH status or zero-loss route; the approved source-confirmed healthy-scratch method is historical-only. No current numerical loss or replacement credit is invented.",
       "sourceRefs": [
-        "https://www.chargers.com/team/injury-report/",
+        "https://www.chargers.com/news/ravens-inactives-week-10-2026",
         "https://www.chargers.com/news/chargers-vs-ravens-injury-report-ladd-mcconkey-daiyan-henley-2026",
-        "https://www.chargers.com/team/players-roster/",
         "https://www.chargers.com/team/depth-chart",
-        "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj",
+        "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json",
         "data/walters/nfl/player-values/by-team-v1/lac.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
-        "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json"
+        "data/walters/nfl/player-values/player-values-access-v1.json"
       ],
-      "availabilitySourceRefs": ["https://www.chargers.com/team/injury-report/"],
+      "availabilitySourceRefs": [
+        "https://www.chargers.com/news/ravens-inactives-week-10-2026",
+        "https://www.chargers.com/news/chargers-vs-ravens-injury-report-ladd-mcconkey-daiyan-henley-2026",
+        "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json"
+      ],
       "roleSourceRefs": [
-        "https://www.chargers.com/team/players-roster/",
         "https://www.chargers.com/team/depth-chart",
-        "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj"
+        "https://www.chargers.com/news/ravens-inactives-week-10-2026",
+        "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json"
       ],
-      "reopenOn": "Reopen before kickoff if Thompson's final status changes, final inactives change the available reserve set, an official source supplies a different distinct role allocation, or a governed source/value correction changes the bound inputs.",
-      "replacementModel": {
-        "modelId": "graham-replacement-role-estimate-v1",
-        "resolution": "EQUAL_SHARE_COMMITTEE",
-        "estimateAcknowledged": true,
-        "assumptionRationale": "After retaining Johnston's starting baseline and reserving Harris only for McConkey's vacancy, use the complete remaining active reserve receiver set for Thompson's added vacant duty. All three locked candidate values are zero, so the model result is invariant to the unknown committee shares; equal weights are only a labelled allocation device, not predicted snaps.",
-        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
-        "baselineDutiesDisplaced": false,
-        "baselineRationale": "Preserve every candidate's existing receiving and special-teams baseline duties. Assign only Thompson's additional vacant reserve and return-contingency duty; no Johnston or Harris baseline work is displaced and no candidate is reused from the McConkey case.",
-        "baselineSourceIds": [
-          "https://www.chargers.com/team/players-roster/",
-          "https://www.chargers.com/team/depth-chart",
-          "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj"
-        ],
-        "replacements": [
-          {
-            "player": "Derius Davis",
-            "eaPlayerId": "22819",
-            "availabilityStatus": "ACTIVE",
-            "roleRationale": "Active reserve receiver on the official depth chart; his primary return duties remain in the baseline.",
-            "sourceRefs": ["https://www.chargers.com/team/players-roster/", "https://www.chargers.com/team/depth-chart", "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj"]
-          },
-          {
-            "player": "KeAndre Lambert-Smith",
-            "eaPlayerId": "15073",
-            "availabilityStatus": "ACTIVE",
-            "roleRationale": "Active reserve receiver in the official Week 10 receiver group with no separate vacancy reservation in this batch.",
-            "sourceRefs": ["https://www.chargers.com/team/players-roster/", "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj"]
-          },
-          {
-            "player": "Theo Wease Jr",
-            "eaPlayerId": "15079",
-            "availabilityStatus": "ACTIVE",
-            "roleRationale": "Active reserve receiver in the official Week 10 receiver group; the existing immutable EA capture supplies the governed frozen-curve value without altering the registry.",
-            "sourceRefs": ["https://www.chargers.com/team/players-roster/", "https://www.chargers.com/team/depth-chart", "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj", "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json"]
-          }
-        ]
-      },
+      "reopenOn": "Reopen only if current-week authority adds a source-confirmed healthy-scratch method, or an official correction changes the non-injury inactive classification.",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
@@ -194,34 +104,13 @@
         "candidateValuesChecked": true,
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "replacementCandidatesConsidered": ["Quentin Johnston", "Tre' Harris", "Derius Davis", "KeAndre Lambert-Smith", "Theo Wease Jr"],
-        "replacementClassification": "COMMITTEE",
-        "conclusion": "RESOLVED_MODEL_ESTIMATE",
-        "finding": "The current official page's out status, complete active roster, Week 10 depth order, specialist role, current and supplemented locked values, McConkey's separate allocation, baseline double-count risk and M4 value-invariance were reviewed. The distinct remaining reserve committee is source-bound and all three candidate values are zero."
-      },
-      "receiverClusterReview": {
-        "estimateAcknowledged": true,
-        "inventoryComplete": true,
-        "rationale": "Complete current active and return-window receiving inventory. McConkey and Thompson are out, but Johnston remains active, so the two highest-valued expected receiving options are not simultaneously unavailable and the governed nonlinear receiver multiplier does not apply.",
-        "sourceRefs": [
-          "https://www.chargers.com/team/injury-report/",
-          "https://www.chargers.com/team/players-roster/",
-          "https://www.chargers.com/team/depth-chart",
-          "https://static.clubs.nfl.com/image/upload/chargers/bxzhbbsnc8ti75506dtj",
-          "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json"
+        "replacementCandidatesConsidered": [
+          "Tuli Tuipulotu",
+          "Akheem Mesidor"
         ],
-        "expectedReceivers": [
-          {"player": "Ladd McConkey", "eaPlayerId": "14651", "healthyExpectedRole": "Listed Week 10 starting wide receiver and lead receiving option.", "availabilityStatus": "OUT"},
-          {"player": "Quentin Johnston", "eaPlayerId": "22695", "healthyExpectedRole": "Listed Week 10 starting wide receiver on the opposite receiver line.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Tre' Harris", "eaPlayerId": "15058", "healthyExpectedRole": "Active receiver with existing baseline work and next depth position behind McConkey.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Brenen Thompson", "eaPlayerId": "10176", "healthyExpectedRole": "Listed backup wide receiver behind Johnston and backup punt returner.", "availabilityStatus": "OUT"},
-          {"player": "Derius Davis", "eaPlayerId": "22819", "healthyExpectedRole": "Active reserve receiver and primary returner with retained baseline duties.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "KeAndre Lambert-Smith", "eaPlayerId": "15073", "healthyExpectedRole": "Active reserve receiver in the official Week 10 receiver group.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Theo Wease Jr", "eaPlayerId": "15079", "healthyExpectedRole": "Active reserve receiver in the official Week 10 receiver group.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Charlie Kolar", "eaPlayerId": "22096", "healthyExpectedRole": "Active starting tight end in the official Week 10 depth chart.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "Oronde Gadsden", "eaPlayerId": "15122", "healthyExpectedRole": "Active backup tight end in the official Week 10 depth chart.", "availabilityStatus": "ACTIVE_FULL"},
-          {"player": "David Njoku", "eaPlayerId": "12532", "healthyExpectedRole": "Reserve/Injured designated-for-return tight end listed questionable for Week 10; availability remains unresolved until activation and final inactives.", "availabilityStatus": "UNRESOLVED"}
-        ]
+        "replacementClassification": "SOURCE_CONFIRMED_HEALTHY_SCRATCH_CURRENT_METHOD_UNAVAILABLE",
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "The official injury assessment, final healthy-inactive classification, depth role and locked values were reviewed. The existing current writer does not authorize HEALTHY_SCRATCH as a resolved status; the historical zero-loss route cannot be imported into current numbers."
       }
     }
   ]
