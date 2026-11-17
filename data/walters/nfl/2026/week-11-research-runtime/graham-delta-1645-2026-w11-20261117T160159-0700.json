@@ -6,15 +6,21 @@
   "season": 2026,
   "week": 11,
   "ledgerPath": "data/walters/nfl/2026/week-11-research-ledger.json",
-  "state": "RUN_STARTED",
-  "checkpoint": "STARTED",
+  "state": "BLOCKED_WITH_DURABLE_RECORD",
+  "checkpoint": "CONTROLLED_FAILURE",
   "startedAt": "2026-11-17T16:01:59-07:00",
-  "lastCheckpointAt": "2026-11-17T16:01:59-07:00",
+  "lastCheckpointAt": "2026-11-17T16:03:56-07:00",
   "staleAfter": "2026-11-17T17:01:59-07:00",
   "marketViewed": false,
   "ledgerSweepPresent": false,
-  "completionResult": null,
+  "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
   "completionReceipt": null,
-  "failure": null,
-  "taskPromptVersion": "graham-delta-1645-v2.1"
+  "failure": {
+    "phase": "RUNTIME_START_WORKFLOW_VERIFICATION",
+    "code": "START_WORKFLOW_SUCCESS_UNVERIFIED",
+    "summary": "The RUN_STARTED event was committed and its exact remote file/blob was read back, but the connected GitHub Actions read path returned no commit status entries and no workflow-run record for the start commit. The authority requires the start workflow to succeed before source loading; no research, market access, or numerical work was started.",
+    "automatic": false
+  },
+  "taskPromptVersion": "graham-delta-1645-v2.1",
+  "blockedAt": "2026-11-17T16:03:56-07:00"
 }
