@@ -2,107 +2,41 @@
   "schema": 1,
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
-  "activeWeek": 10,
-  "generatedAt": "2026-11-17T14:08:45.070Z",
-  "state": "BLOCKED",
+  "activeWeek": 11,
+  "generatedAt": "2026-11-17T14:16:31.501Z",
+  "state": "CURRENT_WITH_LIMITATIONS",
   "counts": {
     "historicalApplied": 7,
     "historicalExpected": 14,
     "historicalReadyToValidate": 0,
     "stalledHistoricalGames": 7,
     "activeWeekEvidenceReady": 0,
-    "activeWeekEvidenceExpected": 14,
+    "activeWeekEvidenceExpected": 0,
     "ratingBasesBehind": 0,
     "initialBaseline": "INCOMPLETE"
   },
   "historicalSourceWeek": 7,
   "rollover": {
-    "required": true,
-    "nextWeek": 11,
+    "required": false,
+    "nextWeek": null,
     "activeFinals": {
-      "state": "COMPLETE",
-      "gamesVerified": 14,
-      "gamesExpected": 14,
-      "verifiedAt": "2026-11-17T14:06:10.398Z",
-      "path": "data/walters/nfl/2026/week-10-final-facts-20261117.json"
+      "state": "UNVERIFIED",
+      "reason": "FINAL_FACTS_NOT_RECORDED",
+      "gamesVerified": 0,
+      "gamesExpected": 13
     },
     "blockers": [],
-    "nextAction": "RUN_WEEK_ROLLOVER"
+    "nextAction": "PREPARE_EVIDENCE_AS_GAMES_FINISH"
   },
   "completion": {
     "schema": 1,
     "season": 2026,
-    "week": 10,
+    "week": 11,
     "state": "INCOMPLETE",
-    "games": 14,
+    "games": 13,
     "currentGameScope": "UNSTARTED_GAMES_ONLY",
-    "frozenStartedGames": [
-      "2026-W10-WAS-NYG",
-      "2026-W10-NE-DET",
-      "2026-W10-KC-ATL",
-      "2026-W10-HOU-CLE",
-      "2026-W10-MIN-GB",
-      "2026-W10-MIA-IND",
-      "2026-W10-CAR-NO",
-      "2026-W10-BUF-NYJ",
-      "2026-W10-JAX-TEN",
-      "2026-W10-LAR-ARI",
-      "2026-W10-SEA-LV",
-      "2026-W10-SF-DAL",
-      "2026-W10-PIT-CIN",
-      "2026-W10-LAC-BAL"
-    ],
-    "frozenIssuedGameLimitations": [
-      {
-        "gameKey": "2026-W10-NE-DET",
-        "personnelCases": [
-          "2026-W10-NE-TreVeyon-Henderson",
-          "2026-W10-DET-Kerby-Joseph",
-          "2026-W10-DET-D-J-Reed"
-        ],
-        "blockedGroups": [],
-        "qbStatus": "OPERATIONAL_SCOPED_APPLIED",
-        "state": "PRESERVED_AS_ISSUED",
-        "ratingInputsMatchCurrentLedger": true,
-        "numericInputsUnresolved": true
-      },
-      {
-        "gameKey": "2026-W10-KC-ATL",
-        "personnelCases": [
-          "2026-W10-KC-Kenneth-Walker"
-        ],
-        "blockedGroups": [],
-        "qbStatus": "OPERATIONAL_SCOPED_APPLIED",
-        "state": "PRESERVED_AS_ISSUED",
-        "ratingInputsMatchCurrentLedger": true,
-        "numericInputsUnresolved": true
-      },
-      {
-        "gameKey": "2026-W10-HOU-CLE",
-        "personnelCases": [
-          "2026-W10-HOU-David-Montgomery"
-        ],
-        "blockedGroups": [],
-        "qbStatus": "OPERATIONAL_SCOPED_APPLIED",
-        "state": "PRESERVED_AS_ISSUED",
-        "ratingInputsMatchCurrentLedger": true,
-        "numericInputsUnresolved": true
-      },
-      {
-        "gameKey": "2026-W10-LAC-BAL",
-        "personnelCases": [
-          "2026-W10-LAC-Isas-Waxter",
-          "2026-W10-BAL-Jaylinn-Hawkins",
-          "2026-W10-LAC-Justin-Eboigbe",
-          "2026-W10-LAC-Bud-Dupree"
-        ],
-        "blockedGroups": [],
-        "qbStatus": "OPERATIONAL_SCOPED_APPLIED",
-        "state": "PRESERVED_AS_ISSUED",
-        "ratingInputsMatchCurrentLedger": true,
-        "numericInputsUnresolved": true
-      }
-    ],
+    "frozenStartedGames": [],
+    "frozenIssuedGameLimitations": [],
     "components": {
       "initialBaseline": {
         "state": "INCOMPLETE",
@@ -111,8 +45,8 @@
       "historicalLearning": {
         "state": "INCOMPLETE",
         "owner": "GRAHAM_WALTERS_90_10",
-        "sourceWeek": 9,
-        "targetWeek": 10,
+        "sourceWeek": 10,
+        "targetWeek": 11,
         "gamesApplied": 0,
         "gamesExpected": null,
         "blockedGames": [],
@@ -121,15 +55,107 @@
       "ratingPropagation": {
         "state": "COMPLETE",
         "owner": "GRAHAM_RATING_BASE_REFRESH",
-        "gamesVerified": 0,
-        "gamesExpected": 0,
+        "gamesVerified": 13,
+        "gamesExpected": 13,
         "unpropagatedGames": []
       },
       "currentAvailability": {
-        "state": "COMPLETE",
+        "state": "INCOMPLETE",
         "owner": "CURRENT_WEEK_RESEARCH_AND_PRODUCTION",
-        "gamesExpected": 0,
-        "unresolvedGames": []
+        "gamesExpected": 13,
+        "unresolvedGames": [
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-IND-HOU",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-MIA-BUF",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-BAL-CAR",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-NO-CHI",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-TEN-DAL",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-TB-DET",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-ARI-KC",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-PIT-PHI",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-NYJ-LAC",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-LV-DEN",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-JAX-NYG",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-MIN-SF",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          },
+          {
+            "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+            "gameKey": "2026-W11-CIN-WAS",
+            "personnelCases": [],
+            "blockedGroups": [],
+            "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+          }
+        ]
       }
     },
     "problems": [
@@ -140,6 +166,97 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 0,
         "gamesExpected": null
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-IND-HOU",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-MIA-BUF",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-BAL-CAR",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-NO-CHI",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-TEN-DAL",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-TB-DET",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-ARI-KC",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-PIT-PHI",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-NYJ-LAC",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-LV-DEN",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-JAX-NYG",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-MIN-SF",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
+      },
+      {
+        "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+        "gameKey": "2026-W11-CIN-WAS",
+        "personnelCases": [],
+        "blockedGroups": [],
+        "qbStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION"
       }
     ],
     "marketViewed": false
@@ -3476,460 +3593,532 @@
       ],
       "independentGames": 0,
       "readyIndependentGames": 0
-    }
-  ],
-  "activeWeekPreparation": [
-    {
-      "gameKey": "2026-W10-BUF-NYJ",
-      "away": "BUF",
-      "home": "NYJ",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T18:20:27.370Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T18:20:27.370Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
-      "gameKey": "2026-W10-CAR-NO",
-      "away": "CAR",
-      "home": "NO",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T18:20:27.370Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T18:20:27.370Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-HOU-CLE",
-      "away": "HOU",
-      "home": "CLE",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T18:20:27.370Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T18:20:27.370Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-JAX-TEN",
-      "away": "JAX",
-      "home": "TEN",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T18:20:27.370Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T18:20:27.370Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-KC-ATL",
-      "away": "KC",
-      "home": "ATL",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T18:20:27.370Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T18:20:27.370Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-MIA-IND",
-      "away": "MIA",
-      "home": "IND",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T18:20:27.370Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T18:20:27.370Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-MIN-GB",
-      "away": "MIN",
-      "home": "GB",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T18:20:27.370Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T18:20:27.370Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-LAR-ARI",
-      "away": "LAR",
-      "home": "ARI",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T21:46:04.659Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T21:46:04.659Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-SEA-LV",
-      "away": "SEA",
-      "home": "LV",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T21:46:04.659Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T21:46:04.659Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-SF-DAL",
-      "away": "SF",
-      "home": "DAL",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-15T21:46:04.659Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-15T21:46:04.659Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-PIT-CIN",
-      "away": "PIT",
-      "home": "CIN",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-16T02:00:18.780Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-16T02:00:18.780Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-LAC-BAL",
-      "away": "LAC",
-      "home": "BAL",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-11-17T03:48:20.435Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-17T03:48:20.435Z",
-      "stalled": true,
-      "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
-      "followUp": null,
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-WAS-NYG",
-      "away": "WAS",
-      "home": "NYG",
-      "state": "RECONCILE",
-      "workClass": "WAITING_SOURCE_OR_METHOD",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json",
-        "blobSha": "704886d8507b2cdea9167c0a69fb115e604abdfe",
-        "recordedAt": "2026-11-13T05:07:04Z"
-      },
-      "checklist": {
-        "exactFinal": {
-          "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE_REUSED_IMMUTABLE",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "finalInactives": {
-          "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "reserveElevationsAndTransactions": {
-          "state": "COMPLETE_SOURCE_BOUND_WITH_FINAL_GAMEBOOK_RECONCILIATION_PENDING",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "participationAndDnp": {
-          "state": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "inGameInjuryAndReturnInventory": {
-          "state": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "quarterbackInventory": {
-          "state": "PARTIAL_ACTUAL_STARTERS_CONFIRMED_FULL_PARTICIPATION_UNRESOLVED",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "specialistInventory": {
-          "state": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "officialSnapCounts": {
-          "state": "UNRESOLVED_NOT_PUBLISHED",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED_MISSING_COMPLETE_FINAL_SOURCE_INVENTORY",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
-        }
-      },
-      "blockers": [
+      "sourceWeek": 10,
+      "targetWeek": 11,
+      "games": [
         {
-          "code": "SOURCE_NOT_YET_AVAILABLE",
-          "finding": "The official final gamebook, complete participation pages, printed play-by-play injury/return annotations and offense/defense/special-teams snap tables were not published at the stopping boundary.",
-          "footballImpact": "A paired numerical evaluation would otherwise invent missing starters, DNP, exposure, replacements or zero values.",
-          "nextAction": "Reopen only when the official NFL game center exposes the complete final gamebook or another official complete final participation source and official phase snap evidence is available.",
-          "sourceIds": [
-            "was-nyg-official-giants-final",
-            "was-nyg-official-nfl-final-no-gamebook",
-            "was-nyg-official-final-inactives",
-            "was-nyg-bound-completed-baseline"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
+          "gameKey": "2026-W10-BUF-NYJ",
+          "away": "BUF",
+          "home": "NYJ",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
         },
         {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Known final inactives and same-day roster moves do not establish distinct final replacement allocation, complete exposure or immutable values for the recorded offensive-line, tight-end, front, linebacker and defensive-back groups.",
-          "footballImpact": "Missing values are not zero and overlapping clusters cannot be summed without final participation and existing approved bindings.",
-          "nextAction": "After the official inventory posts, reconcile each named cluster once and use only approved existing exposure, replacement and value routes.",
-          "sourceIds": [
-            "was-nyg-official-final-inactives",
-            "was-nyg-official-final-injury-report",
-            "was-nyg-bound-completed-baseline"
+          "gameKey": "2026-W10-CAR-NO",
+          "away": "CAR",
+          "home": "NO",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-HOU-CLE",
+          "away": "HOU",
+          "home": "CLE",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-JAX-TEN",
+          "away": "JAX",
+          "home": "TEN",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-KC-ATL",
+          "away": "KC",
+          "home": "ATL",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-LAC-BAL",
+          "away": "LAC",
+          "home": "BAL",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-LAR-ARI",
+          "away": "LAR",
+          "home": "ARI",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-MIA-IND",
+          "away": "MIA",
+          "home": "IND",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-MIN-GB",
+          "away": "MIN",
+          "home": "GB",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-PIT-CIN",
+          "away": "PIT",
+          "home": "CIN",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-SEA-LV",
+          "away": "SEA",
+          "home": "LV",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-SF-DAL",
+          "away": "SF",
+          "home": "DAL",
+          "state": "PREPARE",
+          "workClass": "AVAILABLE_WORK",
+          "latestEvidence": null,
+          "checklist": {},
+          "blockers": [],
+          "firstSeenAt": "2026-11-17T14:16:31.501Z",
+          "lastEvidenceAt": null,
+          "unchangedSince": "2026-11-17T14:16:31.501Z",
+          "stalled": false,
+          "fingerprint": "1a1131c9bba30029ded2586d4393dd046fc78ebe103ff89b931a8513db342afc",
+          "followUp": null,
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+          "escalation": null,
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-WAS-NYG",
+          "away": "WAS",
+          "home": "NYG",
+          "state": "RECONCILE",
+          "workClass": "WAITING_SOURCE_OR_METHOD",
+          "latestEvidence": {
+            "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json",
+            "blobSha": "704886d8507b2cdea9167c0a69fb115e604abdfe",
+            "recordedAt": "2026-11-13T05:07:04Z"
+          },
+          "checklist": {
+            "exactFinal": {
+              "state": "COMPLETE_OFFICIAL",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "frozenKickoffRatingsAndH4": {
+              "state": "COMPLETE_REUSED_IMMUTABLE",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "finalInactives": {
+              "state": "COMPLETE_OFFICIAL",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "reserveElevationsAndTransactions": {
+              "state": "COMPLETE_SOURCE_BOUND_WITH_FINAL_GAMEBOOK_RECONCILIATION_PENDING",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "participationAndDnp": {
+              "state": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "inGameInjuryAndReturnInventory": {
+              "state": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "quarterbackInventory": {
+              "state": "PARTIAL_ACTUAL_STARTERS_CONFIRMED_FULL_PARTICIPATION_UNRESOLVED",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "specialistInventory": {
+              "state": "UNRESOLVED_OFFICIAL_FINAL_GAMEBOOK_NOT_AVAILABLE",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "officialSnapCounts": {
+              "state": "UNRESOLVED_NOT_PUBLISHED",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            },
+            "pairedGameDayInjuryLoss": {
+              "state": "BLOCKED_MISSING_COMPLETE_FINAL_SOURCE_INVENTORY",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json"
+            }
+          },
+          "blockers": [
+            {
+              "code": "SOURCE_NOT_YET_AVAILABLE",
+              "finding": "The official final gamebook, complete participation pages, printed play-by-play injury/return annotations and offense/defense/special-teams snap tables were not published at the stopping boundary.",
+              "footballImpact": "A paired numerical evaluation would otherwise invent missing starters, DNP, exposure, replacements or zero values.",
+              "nextAction": "Reopen only when the official NFL game center exposes the complete final gamebook or another official complete final participation source and official phase snap evidence is available.",
+              "sourceIds": [
+                "was-nyg-official-giants-final",
+                "was-nyg-official-nfl-final-no-gamebook",
+                "was-nyg-official-final-inactives",
+                "was-nyg-bound-completed-baseline"
+              ],
+              "owner": "GRAHAM_WALTERS_90_10"
+            },
+            {
+              "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+              "finding": "Known final inactives and same-day roster moves do not establish distinct final replacement allocation, complete exposure or immutable values for the recorded offensive-line, tight-end, front, linebacker and defensive-back groups.",
+              "footballImpact": "Missing values are not zero and overlapping clusters cannot be summed without final participation and existing approved bindings.",
+              "nextAction": "After the official inventory posts, reconcile each named cluster once and use only approved existing exposure, replacement and value routes.",
+              "sourceIds": [
+                "was-nyg-official-final-inactives",
+                "was-nyg-official-final-injury-report",
+                "was-nyg-bound-completed-baseline"
+              ],
+              "owner": "GRAHAM_WALTERS_90_10"
+            }
           ],
-          "owner": "GRAHAM_WALTERS_90_10"
+          "firstSeenAt": "2026-11-13T05:07:04Z",
+          "lastEvidenceAt": "2026-11-13T05:07:04Z",
+          "unchangedSince": "2026-11-13T05:07:04Z",
+          "stalled": true,
+          "fingerprint": "9753466fb3ad3a85fdbae9c48ccfcc1c892c0f88a7fa9a7719ad4fd316e49603",
+          "followUp": {
+            "state": "WAITING_SOURCE_OR_METHOD",
+            "reason": "TARGETED_PASS_EXHAUSTED",
+            "resumeWhen": "New source facts or an approved method changes the recorded blocker."
+          },
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
+          "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient.",
+          "blockingSourceWeeks": [
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "gameKey": "2026-W10-NE-DET",
+          "away": "NE",
+          "home": "DET",
+          "state": "RECONCILE",
+          "workClass": "WAITING_SOURCE_OR_METHOD",
+          "latestEvidence": {
+            "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json",
+            "blobSha": "85cd5fbcfdf1e1fc8cb32f3cf5c4e8f4d1044621",
+            "recordedAt": "2026-11-15T18:12:42Z"
+          },
+          "checklist": {
+            "exactFinal": {
+              "state": "COMPLETE_OFFICIAL",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "frozenKickoffRatingsAndH4": {
+              "state": "COMPLETE_REUSED_IMMUTABLE",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "finalInactives": {
+              "state": "COMPLETE_OFFICIAL",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "reserveElevationsAndTransactions": {
+              "state": "COMPLETE_SOURCE_BOUND",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "participationAndDnp": {
+              "state": "COMPLETE_GAMEBOOK_STARTERS_SUBSTITUTIONS_DNP_SECTION",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "inGameInjuryAndReturnInventory": {
+              "state": "COMPLETE_PRINTED_ANNOTATIONS_WITH_UNPRINTED_BOUNDARIES_EXPLICIT",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "quarterbackInventory": {
+              "state": "COMPLETE_GAMEBOOK_DUTY_WITH_HISTORICAL_VALUE_ADAPTER_PENDING",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "specialistInventory": {
+              "state": "COMPLETE_GAMEBOOK_DUTY",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "officialSnapCounts": {
+              "state": "UNRESOLVED_NOT_PUBLISHED",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            },
+            "pairedGameDayInjuryLoss": {
+              "state": "BLOCKED_PENDING_SNAP_ROLE_VALUE_AND_EXPOSURE_RECONCILIATION",
+              "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
+            }
+          },
+          "blockers": [
+            {
+              "code": "OFFICIAL_SNAP_COUNTS_NOT_YET_AVAILABLE",
+              "finding": "The complete official final gamebook is available and fully audited, but it does not contain per-player offense, defense and special-teams snap tables, and one focused official-team follow-up found no published official snap-count article at the cutoff.",
+              "footballImpact": "Final starter/substitution identities alone cannot prove complete phase exposure or disjoint replacement allocation.",
+              "nextAction": "Reopen only when official per-player phase snap counts publish; bind the exact official URL/capture and reconcile the already preserved inventory without restaging it.",
+              "sourceIds": [
+                "ne-det-official-gamebook",
+                "ne-det-official-snap-follow-up"
+              ],
+              "owner": "GRAHAM_WALTERS_90_10"
+            },
+            {
+              "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+              "finding": "All printed gamebook injury/status annotations are preserved, but the later Robert Spillane onset, Dre'Mont Jones onset/terminal status, the precise A.J. Brown terminal play and phase exposure for the printed Hutchinson/Moses intervals remain unprinted or method-gated.",
+              "footballImpact": "Extending a status clock beyond official evidence would invent unavailable exposure and may double count role clusters.",
+              "nextAction": "Use only eligible existing interval/exposure methods on printed boundaries; otherwise retain the exact unresolved boundary until a material official source or approved method arrives.",
+              "sourceIds": [
+                "ne-det-official-gamebook"
+              ],
+              "owner": "GRAHAM_WALTERS_90_10"
+            },
+            {
+              "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+              "finding": "Henderson committee duty, Reed/Joseph secondary allocation, Moses relief, Hutchinson edge relief, Walter Rouse identity/value, and several active-game relief players lack complete disjoint source/value bindings. Existing eligible supplement and value adapters must be checked before any value is declared unavailable.",
+              "footballImpact": "A final inactive, starter or substitute label does not authorize a fictional one-for-one replacement, an unsupported team-tag rebind or a zero value.",
+              "nextAction": "After official phase snaps publish, reconcile each named cluster once through existing approved value and replacement routes; park any still-unknown fact with its exact gate.",
+              "sourceIds": [
+                "ne-det-official-gamebook",
+                "ne-official-final-inactives",
+                "ne-official-final-injury-report",
+                "det-official-final-inactives",
+                "det-official-final-injury-report"
+              ],
+              "owner": "GRAHAM_WALTERS_90_10"
+            },
+            {
+              "code": "QB_HISTORICAL_TIMELINE_REQUIRES_GOVERNED_ADAPTER",
+              "finding": "The official gamebook source-binds Maye's injury/status and DeVito's actual relief duty, and the locked registry contains both QB values, but no historical QB numerical loss has been validated or written.",
+              "footballImpact": "Treating the source capture as numerical completion would bypass the exact timeline/exposure writer and improperly alter the active QB model or fair.",
+              "nextAction": "Run the existing historical QB timeline adapter only after the paired game-day evidence can otherwise satisfy its required source/value bindings; do not change the started-game prediction.",
+              "sourceIds": [
+                "ne-det-official-gamebook"
+              ],
+              "owner": "GRAHAM_WALTERS_90_10"
+            }
+          ],
+          "firstSeenAt": "2026-11-15T18:12:42Z",
+          "lastEvidenceAt": "2026-11-15T18:12:42Z",
+          "unchangedSince": "2026-11-15T18:12:42Z",
+          "stalled": true,
+          "fingerprint": "620d1a32c834fef6c2613b5c13a59b04f5ae9985b41d1056c59eb6d79f8e72c0",
+          "followUp": {
+            "state": "WAITING_SOURCE_OR_METHOD",
+            "reason": "TARGETED_PASS_EXHAUSTED",
+            "resumeWhen": "New source facts or an approved method changes the recorded blocker."
+          },
+          "receiptBlockerSuperseded": false,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
+          "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient.",
+          "blockingSourceWeeks": [
+            8,
+            9
+          ]
         }
       ],
-      "firstSeenAt": "2026-11-13T01:54:58.038Z",
-      "lastEvidenceAt": "2026-11-13T05:07:04Z",
-      "unchangedSince": "2026-11-13T05:07:04Z",
-      "stalled": true,
-      "fingerprint": "9753466fb3ad3a85fdbae9c48ccfcc1c892c0f88a7fa9a7719ad4fd316e49603",
-      "followUp": {
-        "state": "WAITING_SOURCE_OR_METHOD",
-        "reason": "TARGETED_PASS_EXHAUSTED",
-        "resumeWhen": "New source facts or an approved method changes the recorded blocker."
-      },
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W10-NE-DET",
-      "away": "NE",
-      "home": "DET",
-      "state": "RECONCILE",
-      "workClass": "WAITING_SOURCE_OR_METHOD",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json",
-        "blobSha": "85cd5fbcfdf1e1fc8cb32f3cf5c4e8f4d1044621",
-        "recordedAt": "2026-11-15T18:12:42Z"
-      },
-      "checklist": {
-        "exactFinal": {
-          "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE_REUSED_IMMUTABLE",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "finalInactives": {
-          "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "reserveElevationsAndTransactions": {
-          "state": "COMPLETE_SOURCE_BOUND",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "participationAndDnp": {
-          "state": "COMPLETE_GAMEBOOK_STARTERS_SUBSTITUTIONS_DNP_SECTION",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "inGameInjuryAndReturnInventory": {
-          "state": "COMPLETE_PRINTED_ANNOTATIONS_WITH_UNPRINTED_BOUNDARIES_EXPLICIT",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "quarterbackInventory": {
-          "state": "COMPLETE_GAMEBOOK_DUTY_WITH_HISTORICAL_VALUE_ADAPTER_PENDING",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "specialistInventory": {
-          "state": "COMPLETE_GAMEBOOK_DUTY",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "officialSnapCounts": {
-          "state": "UNRESOLVED_NOT_PUBLISHED",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED_PENDING_SNAP_ROLE_VALUE_AND_EXPOSURE_RECONCILIATION",
-          "path": "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "OFFICIAL_SNAP_COUNTS_NOT_YET_AVAILABLE",
-          "finding": "The complete official final gamebook is available and fully audited, but it does not contain per-player offense, defense and special-teams snap tables, and one focused official-team follow-up found no published official snap-count article at the cutoff.",
-          "footballImpact": "Final starter/substitution identities alone cannot prove complete phase exposure or disjoint replacement allocation.",
-          "nextAction": "Reopen only when official per-player phase snap counts publish; bind the exact official URL/capture and reconcile the already preserved inventory without restaging it.",
-          "sourceIds": [
-            "ne-det-official-gamebook",
-            "ne-det-official-snap-follow-up"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
-          "finding": "All printed gamebook injury/status annotations are preserved, but the later Robert Spillane onset, Dre'Mont Jones onset/terminal status, the precise A.J. Brown terminal play and phase exposure for the printed Hutchinson/Moses intervals remain unprinted or method-gated.",
-          "footballImpact": "Extending a status clock beyond official evidence would invent unavailable exposure and may double count role clusters.",
-          "nextAction": "Use only eligible existing interval/exposure methods on printed boundaries; otherwise retain the exact unresolved boundary until a material official source or approved method arrives.",
-          "sourceIds": [
-            "ne-det-official-gamebook"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Henderson committee duty, Reed/Joseph secondary allocation, Moses relief, Hutchinson edge relief, Walter Rouse identity/value, and several active-game relief players lack complete disjoint source/value bindings. Existing eligible supplement and value adapters must be checked before any value is declared unavailable.",
-          "footballImpact": "A final inactive, starter or substitute label does not authorize a fictional one-for-one replacement, an unsupported team-tag rebind or a zero value.",
-          "nextAction": "After official phase snaps publish, reconcile each named cluster once through existing approved value and replacement routes; park any still-unknown fact with its exact gate.",
-          "sourceIds": [
-            "ne-det-official-gamebook",
-            "ne-official-final-inactives",
-            "ne-official-final-injury-report",
-            "det-official-final-inactives",
-            "det-official-final-injury-report"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "QB_HISTORICAL_TIMELINE_REQUIRES_GOVERNED_ADAPTER",
-          "finding": "The official gamebook source-binds Maye's injury/status and DeVito's actual relief duty, and the locked registry contains both QB values, but no historical QB numerical loss has been validated or written.",
-          "footballImpact": "Treating the source capture as numerical completion would bypass the exact timeline/exposure writer and improperly alter the active QB model or fair.",
-          "nextAction": "Run the existing historical QB timeline adapter only after the paired game-day evidence can otherwise satisfy its required source/value bindings; do not change the started-game prediction.",
-          "sourceIds": [
-            "ne-det-official-gamebook"
-          ],
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-11-15T14:32:39.105Z",
-      "lastEvidenceAt": "2026-11-15T18:12:42Z",
-      "unchangedSince": "2026-11-15T18:12:42Z",
-      "stalled": true,
-      "fingerprint": "620d1a32c834fef6c2613b5c13a59b04f5ae9985b41d1056c59eb6d79f8e72c0",
-      "followUp": {
-        "state": "WAITING_SOURCE_OR_METHOD",
-        "reason": "TARGETED_PASS_EXHAUSTED",
-        "resumeWhen": "New source facts or an approved method changes the recorded blocker."
-      },
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "WAIT_FOR_CHANGED_EVIDENCE_OR_APPROVED_METHOD",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+      "independentGames": 0,
+      "readyIndependentGames": 0
     }
   ],
+  "activeWeekPreparation": [],
   "processProblems": [
     {
       "code": "STALLED_HISTORICAL_RECOVERY",
@@ -3947,19 +4136,14 @@
       "code": "INITIAL_BASELINE_RECOVERY_REQUIRED",
       "owner": "TUESDAY_BASELINE",
       "nextAction": "RUN_ACTIVE_BASELINE_RECOVERY"
-    },
-    {
-      "code": "NEXT_WEEK_NOT_ACTIVATED",
-      "expectedWeek": 11,
-      "reason": "Run the mechanical rollover owner with verified carried ratings."
     }
   ],
-  "customerMessage": "Week 11 has not been published. Historical rating updates: 7/14; completed Week 10 evidence ready: 0/14.",
+  "customerMessage": "Week 11: initial baseline pending. Week 7 historical rating updates 7/14.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
   "inputBlobs": {
-    "data/walters/nfl/2026/week-10-current-numbers.json": "67cfea5f83c6575017269690275fac78a92f56e9",
+    "data/walters/nfl/2026/week-11-current-numbers.json": "2c9dc4af0a099b56b2b7778df794fb9fd2055762",
     "data/walters/nfl-power-ratings-ledger.json": "6ac461351a20856551d7ca92d10c7f6bfb2fdfa1",
     "data/walters/nfl/carried-rating-audit-staging.json": "e24c525dd5b0536b6eff6ace7752d48d316c8e77",
     "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
@@ -3989,6 +4173,10 @@
     "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-08-tb-chi-official-gamebook-correction.json": "06783ae87a08900eb538667fb65b02eff5094c03",
     "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-09-buf-min-official-final-source-gate.json": "e53f8e030c4c7602a9ae07092ff5d40dd4313d17",
     "data/walters/nfl/2026/week-09-weekly-evidence/2026-11-10-buf-min-official-gamebook-correction.json": "aa1cc1525387dc7587a9fe275e4944159054490a",
+    "data/walters/nfl/2026/week-10-current-numbers.json": "67cfea5f83c6575017269690275fac78a92f56e9",
+    "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json": "704886d8507b2cdea9167c0a69fb115e604abdfe",
+    "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json": "85cd5fbcfdf1e1fc8cb32f3cf5c4e8f4d1044621",
+    "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json": "cf0dc875868631f033ac65e16b93adab410b6fee",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-current-open-inputs.json": "e4f223e4d3a5eebeb382b4bd052dcf9eb42d78df",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json": "82d2a67a14f58ea21b9174f8d9622ac78e9d7a9d",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-full-current-information-review.json": "8873b10cdde4ec80596991e2360e9a328a30d502",
@@ -4046,9 +4234,6 @@
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-tb-car-targeted-reconciliation.json": "c49e33032044cd25b0c9b75d5620165de9da3078",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-pit-no-healthy-scratch-and-stopping-rule.json": "48778808b87010f7b8d53fa20ffad52f4abfe723",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-04-tb-car-source-confirmed-scratches.json": "9e934d0cb97bb437fc3e05c6f7dd263a414f3147",
-    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json": "8973587abf8a62d97afcd2f195bb12005aa41012",
-    "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-12-was-nyg-official-final-source-gate.json": "704886d8507b2cdea9167c0a69fb115e604abdfe",
-    "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-15-ne-det-official-final-inventory.json": "85cd5fbcfdf1e1fc8cb32f3cf5c4e8f4d1044621",
-    "data/walters/nfl/2026/week-10-weekly-evidence/2026-11-16-lac-bal-final-inactives-closeout.json": "cf0dc875868631f033ac65e16b93adab410b6fee"
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-10-nyg-hou-newsome-role-resolution.json": "8973587abf8a62d97afcd2f195bb12005aa41012"
   }
 }
