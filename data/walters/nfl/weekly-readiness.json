@@ -3,8 +3,8 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 10,
-  "generatedAt": "2026-11-17T13:17:16.441Z",
-  "state": "CURRENT_WITH_LIMITATIONS",
+  "generatedAt": "2026-11-17T14:08:45.070Z",
+  "state": "BLOCKED",
   "counts": {
     "historicalApplied": 7,
     "historicalExpected": 14,
@@ -17,16 +17,17 @@
   },
   "historicalSourceWeek": 7,
   "rollover": {
-    "required": false,
-    "nextWeek": null,
+    "required": true,
+    "nextWeek": 11,
     "activeFinals": {
-      "state": "UNVERIFIED",
-      "reason": "FINAL_FACTS_NOT_RECORDED",
-      "gamesVerified": 0,
-      "gamesExpected": 14
+      "state": "COMPLETE",
+      "gamesVerified": 14,
+      "gamesExpected": 14,
+      "verifiedAt": "2026-11-17T14:06:10.398Z",
+      "path": "data/walters/nfl/2026/week-10-final-facts-20261117.json"
     },
     "blockers": [],
-    "nextAction": "PREPARE_EVIDENCE_AS_GAMES_FINISH"
+    "nextAction": "RUN_WEEK_ROLLOVER"
   },
   "completion": {
     "schema": 1,
@@ -3946,9 +3947,14 @@
       "code": "INITIAL_BASELINE_RECOVERY_REQUIRED",
       "owner": "TUESDAY_BASELINE",
       "nextAction": "RUN_ACTIVE_BASELINE_RECOVERY"
+    },
+    {
+      "code": "NEXT_WEEK_NOT_ACTIVATED",
+      "expectedWeek": 11,
+      "reason": "Run the mechanical rollover owner with verified carried ratings."
     }
   ],
-  "customerMessage": "Week 10: initial baseline pending. Week 7 historical rating updates 7/14.",
+  "customerMessage": "Week 11 has not been published. Historical rating updates: 7/14; completed Week 10 evidence ready: 0/14.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
