@@ -6,13 +6,14 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-11-17T11:19:49-07:00",
-  "updatedAt": "2026-11-18T15:15:28-08:00",
+  "updatedAt": "2026-11-19T11:19:40-07:00",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
   "marketViewed": false,
   "processedBatchIds": [
     "graham-w11-tuesday-baseline-confirmed-availability-20261117T111949-0700",
-    "graham-w11-wed-daily-review-personnel-20261118T151528-0800"
+    "graham-w11-wed-daily-review-personnel-20261118T151528-0800",
+    "graham-w11-thu-daily-review-personnel-20261119T111940-0700"
   ],
   "events": [
     {
@@ -1104,6 +1105,884 @@
       "healthyWaltersPoints": 1.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "DEFENSIVE_BACK"
+    },
+    {
+      "personnelEventId": "2026-W11-HOU-Danielle-Hunter-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Danielle-Hunter",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Danielle Hunter",
+      "playerEaId": "2540",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official NFL Week 11 injury report lists Hunter OUT. The current Houston Week 11 depth chart pairs Hunter and Jadeveon Clowney on the same DE depth line; Clowney is not listed on the current injury report. A labelled PRIMARY_REPLACEMENT depth estimate uses Clowney's locked value 0.9 against Hunter's 1.7, adding only the vacant role and not displacing Clowney's baseline duties.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen if Houston changes the Hunter/Clowney edge depth order, Clowney becomes unavailable, or the official game status changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jadeveon Clowney"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Hunter is confirmed OUT; the official depth chart and current roster establish Clowney as the next available player on the same DE line. Locked values and baseline duties were checked; the one-for-one estimate is explicitly labelled."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Use Jadeveon Clowney only for Hunter's added right-edge duties because the current Week 11 Houston depth chart lists Clowney directly after Hunter on the same DE line. This is a labelled depth estimate, not a predicted snap share.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "The replacement player's existing baseline duties remain intact; only the unavailable player's additional vacant role is estimated. No baseline duty is reassigned or double counted.",
+        "baselineSourceIds": [
+          "https://www.houstontexans.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Jadeveon Clowney",
+            "eaPlayerId": "10845",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "The official Week 11 depth chart lists Clowney directly after Hunter on the same DE line; the current roster lists him active and the league injury report does not list him.",
+            "sourceRefs": [
+              "https://www.houstontexans.com/team/depth-chart",
+              "https://www.houstontexans.com/team/players-roster",
+              "https://www.nfl.com/injuries/"
+            ]
+          }
+        ]
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "5530e2ea7db8ec538708d3ccee662b2da89f459bf5f79da65ce9c7865a457c85",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "EDGE",
+      "maddenOvr": 92,
+      "healthyWaltersPoints": 1.7,
+      "rawTeamContributionDelta": -0.8,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 1.7,
+        "replacementValue": 0.9,
+        "replacementValueRatio": {
+          "numerator": 0.9,
+          "denominator": 1
+        },
+        "injuryLoss": 0.8,
+        "rawTeamContributionDelta": -0.8,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.8,
+          "max": 0.8
+        },
+        "weights": [
+          {
+            "player": "Jadeveon Clowney",
+            "eaPlayerId": "10845",
+            "lockedValue": 0.9,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Use Jadeveon Clowney only for Hunter's added right-edge duties because the current Week 11 Houston depth chart lists Clowney directly after Hunter on the same DE line. This is a labelled depth estimate, not a predicted snap share.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Houston changes the Hunter/Clowney edge depth order, Clowney becomes unavailable, or the official game status changes."
+      }
+    },
+    {
+      "personnelEventId": "2026-W11-HOU-Woody-Marks-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Woody-Marks",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Woody Marks",
+      "playerEaId": "14809",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official NFL Week 11 injury report lists Marks OUT. Houston's current Week 11 depth chart lists David Montgomery, Woody Marks, then Emari Demercado in the RB chain. Emari is the documented next available depth option; his locked value is 0.0 from the exact full-registry fallback because the Houston team shard does not contain this traded identity. The PRIMARY_REPLACEMENT estimate adds only the vacant role.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen if Houston changes the Montgomery/Marks/Demercado depth order, Demercado becomes unavailable, or the official game status changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Emari Demercado"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Marks is confirmed OUT. The current official depth chart places Emari Demercado immediately after Marks in the RB chain; current roster role was checked. The exact full-registry fallback binds Demercado's identity and locked 0.0 value; no team-shard substitution was made."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Use Emari Demercado only for Marks's additional RB duties because the current Week 11 Houston depth chart lists Demercado immediately after Marks. The Houston team shard does not contain this traded identity, so the exact authorized full-registry fallback is used. This is a labelled depth estimate, not a predicted snap share.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "The replacement player's existing baseline duties remain intact; only the unavailable player's additional vacant role is estimated. No baseline duty is reassigned or double counted.",
+        "baselineSourceIds": [
+          "https://www.houstontexans.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Emari Demercado",
+            "eaPlayerId": "23339",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "The official Week 11 Houston depth chart lists Demercado immediately after Marks; the current Houston roster/depth chart establishes the current club role. The exact full-registry fallback provides the locked identity/value.",
+            "sourceRefs": [
+              "https://www.houstontexans.com/team/depth-chart",
+              "https://www.houstontexans.com/team/players-roster",
+              "https://www.nfl.com/injuries/"
+            ]
+          }
+        ]
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "164014379dfa18c010f4d21a6c1a46737dbec39e764fc87732589c9065e22c5c",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "RB",
+      "maddenOvr": 80,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": -0.9,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 0.9,
+        "rawTeamContributionDelta": -0.9,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.9,
+          "max": 0.9
+        },
+        "weights": [
+          {
+            "player": "Emari Demercado",
+            "eaPlayerId": "23339",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Use Emari Demercado only for Marks's additional RB duties because the current Week 11 Houston depth chart lists Demercado immediately after Marks. The Houston team shard does not contain this traded identity, so the exact authorized full-registry fallback is used. This is a labelled depth estimate, not a predicted snap share.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Houston changes the Montgomery/Marks/Demercado depth order, Demercado becomes unavailable, or the official game status changes."
+      }
+    },
+    {
+      "personnelEventId": "2026-W11-HOU-Brevin-Jordan-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Brevin-Jordan",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Brevin Jordan",
+      "playerEaId": "21562",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official NFL Week 11 injury report lists Jordan OUT. His locked Walters value is exactly 0.0, so the approved ZERO_CALIBRATED_LOSS method records no numeric loss and does not assign a missing replacement value zero.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen if the locked value is formally corrected or Jordan's official availability changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Marlin Klein"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Jordan is confirmed OUT. His exact locked value is 0.0; the current depth chart's next TE candidate was checked. The zero-loss invariant is sufficient and no replacement value is inferred."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "d0c133acc6c1cbecd23b9a1cf1fa33805d22e17db5cb6ce3c68fe5ab2c14f893",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 68,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if the locked value is formally corrected or Jordan's official availability changes.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    {
+      "personnelEventId": "2026-W11-HOU-Marvin-Harrison-Jr-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Marvin-Harrison-Jr",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Marvin Harrison Jr.",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "LOCKED_VALUE_MISSING_AFTER_EXACT_TEAM_SHARD_AND_FULL_REGISTRY_FALLBACK",
+      "reason": "The official NFL Week 11 injury report lists Harrison OUT and Houston's current depth chart identifies him as a starting receiver. The exact Houston team shard and authorized full-registry fallback contain no locked identity/value, and the approved supplemental-capture lookup has no matching EA capture. No numerical loss is assigned. The receiver-pair multiplier is not applied: Nico Collins remains available and only one of the top expected options is absent.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "docs/GRAHAM_CURRENT_VALUE_SOURCE_LOOKUP.md",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen only when an approved source-bound current EA capture supplies Harrison's exact identity and locked value, or the official availability designation changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Kayshon Boutte",
+          "Tank Dell",
+          "Xavier Hutchinson",
+          "Jaylin Noel",
+          "Nico Collins",
+          "Niko Remigio"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "Harrison is confirmed OUT, but no locked player identity/value exists in the exact HOU shard or authorized full-registry blob and no approved supplemental EA capture matches. The available receiver inventory was checked; Nico Collins remains active, so the two-top receiver multiplier is not eligible. No numeric adjustment."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "71831ef41783742ce0a0a0204e4762bb69865dde3827b10cdd98ce67c88b45d2",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "WR",
+      "maddenOvr": 80,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "RECEIVER"
+    },
+    {
+      "personnelEventId": "2026-W11-IND-Will-Mallory-20261119T111940-0700",
+      "caseKey": "2026-W11-IND-Will-Mallory",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "IND",
+      "side": "AWAY",
+      "player": "Will Mallory",
+      "playerEaId": "22831",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official Colts Week 11 report lists Mallory OUT. His locked Walters value is exactly 0.0, so ZERO_CALIBRATED_LOSS records no numeric loss and does not assign any missing replacement value zero.",
+      "sourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ind.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Mallory's official availability changes or the locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Pharaoh Brown"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Mallory is confirmed OUT. His locked value is 0.0 and the official Colts depth chart/roster identify the next TE candidate; the zero-loss invariant yields no numerical change."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "353ba69d70ae4e918f5564715f44e8a0d43ac287d06a360c6923eabecd47200e",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Mallory's official availability changes or the locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    {
+      "personnelEventId": "2026-W11-IND-Jerry-Tillery-20261119T111940-0700",
+      "caseKey": "2026-W11-IND-Jerry-Tillery",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "IND",
+      "side": "AWAY",
+      "player": "Jerry Tillery",
+      "playerEaId": "20554",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official Colts Week 11 report lists Tillery OUT. His locked Walters value is exactly 0.0, so ZERO_CALIBRATED_LOSS records no numeric loss and does not assign any missing replacement value zero.",
+      "sourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ind.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Tillery's official availability changes or the locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tim Smith"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Tillery is confirmed OUT. His locked value is 0.0 and the official Colts depth chart/roster identify Tim Smith next in the DT chain; the zero-loss invariant yields no numerical change."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "756e3556c267eeb941b820d918616fec32cfc692fcf35e1100ebc0d61a1dda96",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 71,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Tillery's official availability changes or the locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    {
+      "personnelEventId": "2026-W11-MIA-Zach-Sieler-20261119T111940-0700",
+      "caseKey": "2026-W11-MIA-Zach-Sieler",
+      "gameKey": "2026-W11-MIA-BUF",
+      "team": "MIA",
+      "side": "AWAY",
+      "player": "Zach Sieler",
+      "playerEaId": "13481",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "REVIEW_REQUIRED_MULTIROLE_DEFENSIVE_LINE_CLUSTER_AND_MISSING_ACTIVE_ROLE_VALUES",
+      "reason": "Miami placed Sieler on IR Nov. 10. The Nov. 17 transactions then placed Jordan Phillips and Zeek Biggers on IR and added Jordan Jefferson and Eric Watts to the active roster. The current depth chart still lists Phillips and Biggers as starters with Kenneth Grant and Keith Cooper Jr. behind them, while the current roster confirms the IR moves and new additions. The active defensive-line role allocation is therefore a multi-vacancy cluster with no source-bound disjoint share; no numeric adjustment is made.",
+      "sourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x8063",
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x8063",
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen when Miami publishes an updated depth chart or coach-confirmed DT rotation/role allocation for the active front, with locked values for every assigned replacement.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jordan Phillips",
+          "Zeek Biggers",
+          "Kenneth Grant",
+          "Keith Cooper Jr.",
+          "Jordan Jefferson",
+          "Eric Watts"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "Sieler's 0.9 locked value is confirmed and the Nov. 10 IR transaction predates the Tuesday baseline, but the baseline omitted this current material absence. Phillips and Biggers are now also IR; Grant and Cooper are the listed depth backups, while Jefferson and Watts were newly added to the active roster without current depth-chart role assignments. Cooper and Watts have no eligible locked value. No disjoint committee allocation is source-supported, so no numeric loss is invented."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "513a1f91e5d55802cabf4ead677b2cd1d71e618fa62d46ab1e1813236b8cf7ae",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "DT",
+      "maddenOvr": 83,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
+    },
+    {
+      "personnelEventId": "2026-W11-MIA-Jordan-Phillips-20261119T111940-0700",
+      "caseKey": "2026-W11-MIA-Jordan-Phillips",
+      "gameKey": "2026-W11-MIA-BUF",
+      "team": "MIA",
+      "side": "AWAY",
+      "player": "Jordan Phillips",
+      "playerEaId": "15244",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Miami placed Phillips on IR Nov. 17. His locked Walters value is exactly 0.0; ZERO_CALIBRATED_LOSS records no numeric loss and excludes any positive upgrade from the next listed player.",
+      "sourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Phillips is activated or his locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Kenneth Grant"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Phillips is confirmed IR. The locked value is exactly 0.0; Grant is the next listed DT candidate. The zero-loss invariant prevents assigning a positive upgrade."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "6e92f268d730e2f40311758bde9728446d6d18aa17ed488b1c3d2107504b493c",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 71,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Phillips is activated or his locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    {
+      "personnelEventId": "2026-W11-MIA-Zeek-Biggers-20261119T111940-0700",
+      "caseKey": "2026-W11-MIA-Zeek-Biggers",
+      "gameKey": "2026-W11-MIA-BUF",
+      "team": "MIA",
+      "side": "AWAY",
+      "player": "Zeek Biggers",
+      "playerEaId": "15234",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Miami placed Biggers on IR Nov. 17. His locked Walters value is exactly 0.0; ZERO_CALIBRATED_LOSS records no numeric loss and does not assign the missing Keith Cooper Jr. replacement value zero.",
+      "sourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Biggers is activated, the DT depth chart changes, or his locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Keith Cooper Jr."
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Biggers is confirmed IR. The locked value is exactly 0.0; the current depth chart lists Keith Cooper Jr. next, but his locked value is missing. The zero-loss invariant is sufficient and no replacement value is inferred."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "2f50ebdad649d68e319cf23d486dc2e9dbb442a0f6055251329812722805e8fb",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Biggers is activated, the DT depth chart changes, or his locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    {
+      "personnelEventId": "2026-W11-SF-Mike-Evans-20261119T111940-0700",
+      "caseKey": "2026-W11-SF-Mike-Evans",
+      "gameKey": "2026-W11-MIN-SF",
+      "team": "SF",
+      "side": "HOME",
+      "player": "Mike Evans",
+      "playerEaId": "10857",
+      "availabilityStatus": "UNRESOLVED",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "REVIEW_REQUIRED_ACHILLES_DNP_GAME_STATUS_UNSPECIFIED",
+      "reason": "The current 49ers Week 11 injury report lists Evans DNP with an Achilles injury and game status UNSPECIFIED. The official depth chart updated Nov. 17 lists him first at WR. This is not a confirmed game absence; no numeric adjustment is permitted without a game designation or approved playing-limited evidence.",
+      "sourceRefs": [
+        "https://www.49ers.com/team/injury-report/week/reg-11",
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/sf.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.49ers.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen on the next official 49ers practice report, a confirmed game designation, or return to full participation.",
+      "marketViewed": false,
+      "inputCaseSha256": "ddfa90f4859ccc85272debb3657e3daade31cda77ffc57da5eca5fd33e3ea358",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "WR",
+      "maddenOvr": 91,
+      "healthyWaltersPoints": 1.7,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "RECEIVER"
+    },
+    {
+      "personnelEventId": "2026-W11-TB-Antoine-Winfield-Jr-20261119T111940-0700",
+      "caseKey": "2026-W11-TB-Antoine-Winfield-Jr",
+      "gameKey": "2026-W11-TB-DET",
+      "team": "TB",
+      "side": "AWAY",
+      "player": "Antoine Winfield Jr",
+      "playerEaId": "21017",
+      "availabilityStatus": "UNRESOLVED",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "REVIEW_REQUIRED_ANKLE_DNP_GAME_STATUS_UNSPECIFIED",
+      "reason": "The current Tampa Bay Week 11 injury report lists Winfield DNP with an ankle injury and game status UNSPECIFIED. Tampa Bay's official safety review identifies Winfield and Tykee Smith as the starting safety tandem. This is not a confirmed game absence; no numeric adjustment is permitted without a game designation or approved playing-limited evidence.",
+      "sourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/",
+        "https://www.buccaneers.com/news/2026-state-of-the-bucs-safety-winfield-smith",
+        "https://www.buccaneers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/tb.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.buccaneers.com/news/2026-state-of-the-bucs-safety-winfield-smith",
+        "https://www.buccaneers.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen on the next official Tampa Bay practice report, a confirmed game designation, or return to full participation.",
+      "marketViewed": false,
+      "inputCaseSha256": "e64d293094ef4fe012455a1182a98af1954a1139424ec9dd765bdb61c8246630",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "FS",
+      "maddenOvr": 93,
+      "healthyWaltersPoints": 1.7,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_BACK"
     }
   ],
   "currentCases": {
@@ -2086,8 +2965,886 @@
       "healthyWaltersPoints": 1.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "DEFENSIVE_BACK"
+    },
+    "2026-W11-HOU-Danielle-Hunter": {
+      "personnelEventId": "2026-W11-HOU-Danielle-Hunter-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Danielle-Hunter",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Danielle Hunter",
+      "playerEaId": "2540",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official NFL Week 11 injury report lists Hunter OUT. The current Houston Week 11 depth chart pairs Hunter and Jadeveon Clowney on the same DE depth line; Clowney is not listed on the current injury report. A labelled PRIMARY_REPLACEMENT depth estimate uses Clowney's locked value 0.9 against Hunter's 1.7, adding only the vacant role and not displacing Clowney's baseline duties.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen if Houston changes the Hunter/Clowney edge depth order, Clowney becomes unavailable, or the official game status changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jadeveon Clowney"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Hunter is confirmed OUT; the official depth chart and current roster establish Clowney as the next available player on the same DE line. Locked values and baseline duties were checked; the one-for-one estimate is explicitly labelled."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Use Jadeveon Clowney only for Hunter's added right-edge duties because the current Week 11 Houston depth chart lists Clowney directly after Hunter on the same DE line. This is a labelled depth estimate, not a predicted snap share.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "The replacement player's existing baseline duties remain intact; only the unavailable player's additional vacant role is estimated. No baseline duty is reassigned or double counted.",
+        "baselineSourceIds": [
+          "https://www.houstontexans.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Jadeveon Clowney",
+            "eaPlayerId": "10845",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "The official Week 11 depth chart lists Clowney directly after Hunter on the same DE line; the current roster lists him active and the league injury report does not list him.",
+            "sourceRefs": [
+              "https://www.houstontexans.com/team/depth-chart",
+              "https://www.houstontexans.com/team/players-roster",
+              "https://www.nfl.com/injuries/"
+            ]
+          }
+        ]
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "5530e2ea7db8ec538708d3ccee662b2da89f459bf5f79da65ce9c7865a457c85",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "EDGE",
+      "maddenOvr": 92,
+      "healthyWaltersPoints": 1.7,
+      "rawTeamContributionDelta": -0.8,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 1.7,
+        "replacementValue": 0.9,
+        "replacementValueRatio": {
+          "numerator": 0.9,
+          "denominator": 1
+        },
+        "injuryLoss": 0.8,
+        "rawTeamContributionDelta": -0.8,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.8,
+          "max": 0.8
+        },
+        "weights": [
+          {
+            "player": "Jadeveon Clowney",
+            "eaPlayerId": "10845",
+            "lockedValue": 0.9,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Use Jadeveon Clowney only for Hunter's added right-edge duties because the current Week 11 Houston depth chart lists Clowney directly after Hunter on the same DE line. This is a labelled depth estimate, not a predicted snap share.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Houston changes the Hunter/Clowney edge depth order, Clowney becomes unavailable, or the official game status changes."
+      }
+    },
+    "2026-W11-HOU-Woody-Marks": {
+      "personnelEventId": "2026-W11-HOU-Woody-Marks-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Woody-Marks",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Woody Marks",
+      "playerEaId": "14809",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official NFL Week 11 injury report lists Marks OUT. Houston's current Week 11 depth chart lists David Montgomery, Woody Marks, then Emari Demercado in the RB chain. Emari is the documented next available depth option; his locked value is 0.0 from the exact full-registry fallback because the Houston team shard does not contain this traded identity. The PRIMARY_REPLACEMENT estimate adds only the vacant role.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen if Houston changes the Montgomery/Marks/Demercado depth order, Demercado becomes unavailable, or the official game status changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Emari Demercado"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Marks is confirmed OUT. The current official depth chart places Emari Demercado immediately after Marks in the RB chain; current roster role was checked. The exact full-registry fallback binds Demercado's identity and locked 0.0 value; no team-shard substitution was made."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Use Emari Demercado only for Marks's additional RB duties because the current Week 11 Houston depth chart lists Demercado immediately after Marks. The Houston team shard does not contain this traded identity, so the exact authorized full-registry fallback is used. This is a labelled depth estimate, not a predicted snap share.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "The replacement player's existing baseline duties remain intact; only the unavailable player's additional vacant role is estimated. No baseline duty is reassigned or double counted.",
+        "baselineSourceIds": [
+          "https://www.houstontexans.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Emari Demercado",
+            "eaPlayerId": "23339",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "The official Week 11 Houston depth chart lists Demercado immediately after Marks; the current Houston roster/depth chart establishes the current club role. The exact full-registry fallback provides the locked identity/value.",
+            "sourceRefs": [
+              "https://www.houstontexans.com/team/depth-chart",
+              "https://www.houstontexans.com/team/players-roster",
+              "https://www.nfl.com/injuries/"
+            ]
+          }
+        ]
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "164014379dfa18c010f4d21a6c1a46737dbec39e764fc87732589c9065e22c5c",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "RB",
+      "maddenOvr": 80,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": -0.9,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 0.9,
+        "rawTeamContributionDelta": -0.9,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.9,
+          "max": 0.9
+        },
+        "weights": [
+          {
+            "player": "Emari Demercado",
+            "eaPlayerId": "23339",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Use Emari Demercado only for Marks's additional RB duties because the current Week 11 Houston depth chart lists Demercado immediately after Marks. The Houston team shard does not contain this traded identity, so the exact authorized full-registry fallback is used. This is a labelled depth estimate, not a predicted snap share.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Houston changes the Montgomery/Marks/Demercado depth order, Demercado becomes unavailable, or the official game status changes."
+      }
+    },
+    "2026-W11-HOU-Brevin-Jordan": {
+      "personnelEventId": "2026-W11-HOU-Brevin-Jordan-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Brevin-Jordan",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Brevin Jordan",
+      "playerEaId": "21562",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official NFL Week 11 injury report lists Jordan OUT. His locked Walters value is exactly 0.0, so the approved ZERO_CALIBRATED_LOSS method records no numeric loss and does not assign a missing replacement value zero.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen if the locked value is formally corrected or Jordan's official availability changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Marlin Klein"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Jordan is confirmed OUT. His exact locked value is 0.0; the current depth chart's next TE candidate was checked. The zero-loss invariant is sufficient and no replacement value is inferred."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "d0c133acc6c1cbecd23b9a1cf1fa33805d22e17db5cb6ce3c68fe5ab2c14f893",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 68,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if the locked value is formally corrected or Jordan's official availability changes.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    "2026-W11-HOU-Marvin-Harrison-Jr": {
+      "personnelEventId": "2026-W11-HOU-Marvin-Harrison-Jr-20261119T111940-0700",
+      "caseKey": "2026-W11-HOU-Marvin-Harrison-Jr",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "HOU",
+      "side": "HOME",
+      "player": "Marvin Harrison Jr.",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "LOCKED_VALUE_MISSING_AFTER_EXACT_TEAM_SHARD_AND_FULL_REGISTRY_FALLBACK",
+      "reason": "The official NFL Week 11 injury report lists Harrison OUT and Houston's current depth chart identifies him as a starting receiver. The exact Houston team shard and authorized full-registry fallback contain no locked identity/value, and the approved supplemental-capture lookup has no matching EA capture. No numerical loss is assigned. The receiver-pair multiplier is not applied: Nico Collins remains available and only one of the top expected options is absent.",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11",
+        "data/walters/nfl/player-values/by-team-v1/hou.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "docs/GRAHAM_CURRENT_VALUE_SOURCE_LOOKUP.md",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/",
+        "https://www.houstontexans.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.houstontexans.com/team/depth-chart",
+        "https://www.houstontexans.com/team/players-roster"
+      ],
+      "reopenOn": "Reopen only when an approved source-bound current EA capture supplies Harrison's exact identity and locked value, or the official availability designation changes.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Kayshon Boutte",
+          "Tank Dell",
+          "Xavier Hutchinson",
+          "Jaylin Noel",
+          "Nico Collins",
+          "Niko Remigio"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "Harrison is confirmed OUT, but no locked player identity/value exists in the exact HOU shard or authorized full-registry blob and no approved supplemental EA capture matches. The available receiver inventory was checked; Nico Collins remains active, so the two-top receiver multiplier is not eligible. No numeric adjustment."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "71831ef41783742ce0a0a0204e4762bb69865dde3827b10cdd98ce67c88b45d2",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "WR",
+      "maddenOvr": 80,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "RECEIVER"
+    },
+    "2026-W11-IND-Will-Mallory": {
+      "personnelEventId": "2026-W11-IND-Will-Mallory-20261119T111940-0700",
+      "caseKey": "2026-W11-IND-Will-Mallory",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "IND",
+      "side": "AWAY",
+      "player": "Will Mallory",
+      "playerEaId": "22831",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official Colts Week 11 report lists Mallory OUT. His locked Walters value is exactly 0.0, so ZERO_CALIBRATED_LOSS records no numeric loss and does not assign any missing replacement value zero.",
+      "sourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ind.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Mallory's official availability changes or the locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Pharaoh Brown"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Mallory is confirmed OUT. His locked value is 0.0 and the official Colts depth chart/roster identify the next TE candidate; the zero-loss invariant yields no numerical change."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "353ba69d70ae4e918f5564715f44e8a0d43ac287d06a360c6923eabecd47200e",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Mallory's official availability changes or the locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    "2026-W11-IND-Jerry-Tillery": {
+      "personnelEventId": "2026-W11-IND-Jerry-Tillery-20261119T111940-0700",
+      "caseKey": "2026-W11-IND-Jerry-Tillery",
+      "gameKey": "2026-W11-IND-HOU",
+      "team": "IND",
+      "side": "AWAY",
+      "player": "Jerry Tillery",
+      "playerEaId": "20554",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "The official Colts Week 11 report lists Tillery OUT. His locked Walters value is exactly 0.0, so ZERO_CALIBRATED_LOSS records no numeric loss and does not assign any missing replacement value zero.",
+      "sourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ind.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.colts.com/news/colts-rule-out-5-players-for-week-11-thursday-night-football-game-vs-houston-texans"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-11",
+        "https://www.colts.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Tillery's official availability changes or the locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tim Smith"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Tillery is confirmed OUT. His locked value is 0.0 and the official Colts depth chart/roster identify Tim Smith next in the DT chain; the zero-loss invariant yields no numerical change."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "756e3556c267eeb941b820d918616fec32cfc692fcf35e1100ebc0d61a1dda96",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 71,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Tillery's official availability changes or the locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    "2026-W11-MIA-Zach-Sieler": {
+      "personnelEventId": "2026-W11-MIA-Zach-Sieler-20261119T111940-0700",
+      "caseKey": "2026-W11-MIA-Zach-Sieler",
+      "gameKey": "2026-W11-MIA-BUF",
+      "team": "MIA",
+      "side": "AWAY",
+      "player": "Zach Sieler",
+      "playerEaId": "13481",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "REVIEW_REQUIRED_MULTIROLE_DEFENSIVE_LINE_CLUSTER_AND_MISSING_ACTIVE_ROLE_VALUES",
+      "reason": "Miami placed Sieler on IR Nov. 10. The Nov. 17 transactions then placed Jordan Phillips and Zeek Biggers on IR and added Jordan Jefferson and Eric Watts to the active roster. The current depth chart still lists Phillips and Biggers as starters with Kenneth Grant and Keith Cooper Jr. behind them, while the current roster confirms the IR moves and new additions. The active defensive-line role allocation is therefore a multi-vacancy cluster with no source-bound disjoint share; no numeric adjustment is made.",
+      "sourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x8063",
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x8063",
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen when Miami publishes an updated depth chart or coach-confirmed DT rotation/role allocation for the active front, with locked values for every assigned replacement.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jordan Phillips",
+          "Zeek Biggers",
+          "Kenneth Grant",
+          "Keith Cooper Jr.",
+          "Jordan Jefferson",
+          "Eric Watts"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "Sieler's 0.9 locked value is confirmed and the Nov. 10 IR transaction predates the Tuesday baseline, but the baseline omitted this current material absence. Phillips and Biggers are now also IR; Grant and Cooper are the listed depth backups, while Jefferson and Watts were newly added to the active roster without current depth-chart role assignments. Cooper and Watts have no eligible locked value. No disjoint committee allocation is source-supported, so no numeric loss is invented."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "513a1f91e5d55802cabf4ead677b2cd1d71e618fa62d46ab1e1813236b8cf7ae",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "DT",
+      "maddenOvr": 83,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
+    },
+    "2026-W11-MIA-Jordan-Phillips": {
+      "personnelEventId": "2026-W11-MIA-Jordan-Phillips-20261119T111940-0700",
+      "caseKey": "2026-W11-MIA-Jordan-Phillips",
+      "gameKey": "2026-W11-MIA-BUF",
+      "team": "MIA",
+      "side": "AWAY",
+      "player": "Jordan Phillips",
+      "playerEaId": "15244",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Miami placed Phillips on IR Nov. 17. His locked Walters value is exactly 0.0; ZERO_CALIBRATED_LOSS records no numeric loss and excludes any positive upgrade from the next listed player.",
+      "sourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Phillips is activated or his locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Kenneth Grant"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Phillips is confirmed IR. The locked value is exactly 0.0; Grant is the next listed DT candidate. The zero-loss invariant prevents assigning a positive upgrade."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "6e92f268d730e2f40311758bde9728446d6d18aa17ed488b1c3d2107504b493c",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 71,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Phillips is activated or his locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    "2026-W11-MIA-Zeek-Biggers": {
+      "personnelEventId": "2026-W11-MIA-Zeek-Biggers-20261119T111940-0700",
+      "caseKey": "2026-W11-MIA-Zeek-Biggers",
+      "gameKey": "2026-W11-MIA-BUF",
+      "team": "MIA",
+      "side": "AWAY",
+      "player": "Zeek Biggers",
+      "playerEaId": "15234",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Miami placed Biggers on IR Nov. 17. His locked Walters value is exactly 0.0; ZERO_CALIBRATED_LOSS records no numeric loss and does not assign the missing Keith Cooper Jr. replacement value zero.",
+      "sourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x7086",
+        "https://www.miamidolphins.com/team/transactions/2026",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart",
+        "https://www.miamidolphins.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Biggers is activated, the DT depth chart changes, or his locked value is formally corrected.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Keith Cooper Jr."
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Biggers is confirmed IR. The locked value is exactly 0.0; the current depth chart lists Keith Cooper Jr. next, but his locked value is missing. The zero-loss invariant is sufficient and no replacement value is inferred."
+      },
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero."
+      },
+      "marketViewed": false,
+      "inputCaseSha256": "2f50ebdad649d68e319cf23d486dc2e9dbb442a0f6055251329812722805e8fb",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "The locked Walters value for the unavailable player is exactly 0.0. The approved zero-calibrated-loss invariant therefore records no numeric loss and does not assign any missing replacement value zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Biggers is activated, the DT depth chart changes, or his locked value is formally corrected.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    "2026-W11-SF-Mike-Evans": {
+      "personnelEventId": "2026-W11-SF-Mike-Evans-20261119T111940-0700",
+      "caseKey": "2026-W11-SF-Mike-Evans",
+      "gameKey": "2026-W11-MIN-SF",
+      "team": "SF",
+      "side": "HOME",
+      "player": "Mike Evans",
+      "playerEaId": "10857",
+      "availabilityStatus": "UNRESOLVED",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "REVIEW_REQUIRED_ACHILLES_DNP_GAME_STATUS_UNSPECIFIED",
+      "reason": "The current 49ers Week 11 injury report lists Evans DNP with an Achilles injury and game status UNSPECIFIED. The official depth chart updated Nov. 17 lists him first at WR. This is not a confirmed game absence; no numeric adjustment is permitted without a game designation or approved playing-limited evidence.",
+      "sourceRefs": [
+        "https://www.49ers.com/team/injury-report/week/reg-11",
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/sf.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.49ers.com/team/injury-report/week/reg-11"
+      ],
+      "roleSourceRefs": [
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen on the next official 49ers practice report, a confirmed game designation, or return to full participation.",
+      "marketViewed": false,
+      "inputCaseSha256": "ddfa90f4859ccc85272debb3657e3daade31cda77ffc57da5eca5fd33e3ea358",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "WR",
+      "maddenOvr": 91,
+      "healthyWaltersPoints": 1.7,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "RECEIVER"
+    },
+    "2026-W11-TB-Antoine-Winfield-Jr": {
+      "personnelEventId": "2026-W11-TB-Antoine-Winfield-Jr-20261119T111940-0700",
+      "caseKey": "2026-W11-TB-Antoine-Winfield-Jr",
+      "gameKey": "2026-W11-TB-DET",
+      "team": "TB",
+      "side": "AWAY",
+      "player": "Antoine Winfield Jr",
+      "playerEaId": "21017",
+      "availabilityStatus": "UNRESOLVED",
+      "resolutionStatus": "UNRESOLVED",
+      "failClosedCode": "REVIEW_REQUIRED_ANKLE_DNP_GAME_STATUS_UNSPECIFIED",
+      "reason": "The current Tampa Bay Week 11 injury report lists Winfield DNP with an ankle injury and game status UNSPECIFIED. Tampa Bay's official safety review identifies Winfield and Tykee Smith as the starting safety tandem. This is not a confirmed game absence; no numeric adjustment is permitted without a game designation or approved playing-limited evidence.",
+      "sourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/",
+        "https://www.buccaneers.com/news/2026-state-of-the-bucs-safety-winfield-smith",
+        "https://www.buccaneers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/tb.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.buccaneers.com/news/2026-state-of-the-bucs-safety-winfield-smith",
+        "https://www.buccaneers.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen on the next official Tampa Bay practice report, a confirmed game designation, or return to full participation.",
+      "marketViewed": false,
+      "inputCaseSha256": "e64d293094ef4fe012455a1182a98af1954a1139424ec9dd765bdb61c8246630",
+      "batchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
+      "effectiveAt": "2026-11-19T11:19:40-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "FS",
+      "maddenOvr": 93,
+      "healthyWaltersPoints": 1.7,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_BACK"
     }
   },
-  "lastBatchId": "graham-w11-wed-daily-review-personnel-20261118T151528-0800",
+  "lastBatchId": "graham-w11-thu-daily-review-personnel-20261119T111940-0700",
   "lastBatchSourceTask": "DAILY_REVIEW"
 }
