@@ -58,7 +58,7 @@
     "status": "PUBLISHED",
     "discovery": {
       "freshDiscoveryCompletedFirst": true,
-      "newTodayCount": 1,
+      "newTodayCount": 2,
       "carriedForwardCount": 2,
       "retainedPassReviewCount": 0,
       "newToday": [
@@ -67,6 +67,12 @@
           "selection": "Michal Cieslak moneyline vs David Benavidez",
           "status": "PASS",
           "reason": "Current direct PokerStars Sports France three-way price +850 is below same-book no-vig fair +950; no Canadian direct price confirmed."
+        },
+        {
+          "id": "2026-11-21-mayer-cameron-ml-pass",
+          "selection": "Mikaela Mayer moneyline vs Chantelle Cameron",
+          "status": "PASS",
+          "reason": "Fresh Bad Left Hook interview supplies only self-reported adjustments; FightLuck +186 is below its own three-way no-vig fair near +209 and no direct Canadian sportsbook quote is confirmed."
         }
       ],
       "carriedForward": [
@@ -87,7 +93,7 @@
       "freshRejectedBeforeCarding": [
         {
           "candidate": "Granit Stein vs Marius Antonietti",
-          "reason": "Exact active MAIN event is within 30 hours, but data/live-odds.json is about 13h12 old (90-minute limit) and diagnostics.cryptoWatchUnmatched lists the exact pair. External search found only a model reference, not a sportsbook price; no substitute or odds refresh."
+          "reason": "Exact active MAIN event is today and within 30 hours, but the current main data/live-odds.json blob is empty, so no internal quote or diagnostics can be read. Exact-pair external searches found no sportsbook price; the only model reference explicitly says verified data is insufficient. The published card start is conflicting (Prime Video 12:00 PM ET vs the older Bad Left Hook schedule at 12:30 PM ET); no substitute or odds refresh."
         },
         {
           "candidate": "Dillian Whyte vs Deontay Wilder",
@@ -104,10 +110,6 @@
         {
           "candidate": "Benavidez-Cieslak KO/TKO and fight-distance props",
           "reason": "Only older UK-page prices surfaced for these exact markets; no fresh direct quote. They were excluded rather than treated as current."
-        },
-        {
-          "candidate": "Mikaela Mayer vs Chantelle Cameron PASS",
-          "reason": "Prior PASS was not retained: the latest accessible FightLuck two-way quote was about two days old and no fresh direct sportsbook price surfaced."
         },
         {
           "candidate": "Other newly confirmed main/co-main schedule entries",
@@ -158,12 +160,20 @@
           "detail": "Tszyu remains +110 versus cross-book fair +127 and direct +150 trigger; Jarvis remains +1000 versus fair +1078 and direct +1200 trigger. Neither promoted."
         },
         {
+          "topic": "Mayer-Cameron interview and market",
+          "detail": "Bad Left Hook's Nov. 18 interview has Mayer saying Cameron's physicality and ring generalship were better in their first fight; Mayer cites a new coach and revised plan, which remain self-reported. FightLuck's current three-way reference is Mayer +186 versus its own no-vig fair near +209; no direct Canadian sportsbook quote was confirmed, so the candidate is PASS."
+        },
+        {
+          "topic": "Stein-Antonietti start and internal market",
+          "detail": "Prime Video currently lists 12:00 PM ET (9:00 AM Pacific), while Bad Left Hook's Nov. 15 schedule lists 12:30 PM ET (9:30 AM Pacific); the current start is TBA pending a consistent published card time. data/live-odds.json is empty at the inspected main blob, so neither an internal quote nor diagnostics can be read. External exact-pair searches found no sportsbook price."
+        },
+        {
           "topic": "Internal odds snapshot",
-          "detail": "UTC generatedAt 2026-11-21T01:19:31Z converts to 17:19:31 PST Nov. 20; at analysis it was about 13h12 old. Stored generatedAtVancouver is one hour ahead of IANA conversion. Exact Stein-Antonietti pair is listed unmatched; no refresh or substitution."
+          "detail": "The current main data/live-odds.json blob is empty (blob SHA 296878e8ff56cf0713dc9e71ababfbc8b63b184a); no generatedAt, FanDuel/DraftKings quote or cryptoWatchUnmatched diagnostics are available. The exact Stein-Antonietti market is therefore unavailable internally; no odds refresh or substitute was used."
         }
       ]
     },
-    "summary": "NEW TODAY: 1 PASS — Cieslak ML +850 direct PokerStars Sports France versus same-book no-vig +950; Oddschecker cross-book reference +900. No Canadian executable quote, no PLAY. CARRIED FORWARD: 2 WATCH — Tszyu +110 versus cross-book fair +127 (standing direct +150 trigger); Jarvis +1000 versus cross-book fair +1078 (standing direct +1200 trigger). No prior PASS retained: Mayer's latest accessible two-way quote was stale and no fresh direct price surfaced. PLAY 0 · WAIT 0 · WATCH 2 · PASS 1. Watchlist: 12 MAIN / 7 CO_MAIN / 0 FEATURED. One within-30-hour exact-match miss: Stein-Antonietti; internal snapshot about 13h12 old and diagnostics unmatched. No substitute and no odds refresh.",
+    "summary": "NEW TODAY: 2 PASS — Cieslak ML: direct PokerStars Sports France +850 versus same-book no-vig +950; no Canadian direct quote. Mayer ML: FightLuck aggregator +186 versus same-market no-vig about +209; Mayer's adjustment thesis is self-reported and no Canadian direct quote is confirmed. CARRIED FORWARD: 2 WATCH — Tszyu +110 versus cross-book fair +127 (direct +150 trigger); Jarvis +1000 versus cross-book fair +1078 (direct +1200 trigger). PLAY 0 · WAIT 0 · WATCH 2 · PASS 2. Watchlist: 12 MAIN / 7 CO_MAIN / 0 FEATURED. Stein-Antonietti is today's within-30-hour exact-pair miss: internal snapshot file is empty and external searches found no sportsbook price; published card start is TBA because Prime Video lists 12:00 PM ET while the older Bad Left Hook schedule lists 12:30 PM ET.",
     "cards": [
       {
         "id": "2026-11-21-benavidez-cieslak-cieslak-ml-pass",
@@ -183,6 +193,25 @@
         "movement": "No same-book movement series is exposed by PokerStars. Oddschecker cross-book reference is +900; it is not used as a direct price or same-book fair.",
         "priceNote": "PokerStars Sports France is a direct named-book quote but not a Canadian book. Oddschecker is cross-book aggregation. The sources do not expose a per-quote timestamp; no Canadian executable price was confirmed.",
         "sourceLabel": "BAD LEFT HOOK NOV20 + PBC OFFICIAL + DESERT DIAMOND ARENA + BOXINGSCENE + AP + POKERSTARS SPORTS FR + ODDSCHECKER"
+      },
+      {
+        "id": "2026-11-21-mayer-cameron-ml-pass",
+        "status": "PASS",
+        "selection": "Mikaela Mayer moneyline vs Chantelle Cameron",
+        "market": "BOXING THREE-WAY FIGHT WINNER · MAYER ML",
+        "observedPrice": "FIGHTLUCK AGGREGATOR: MAYER 2.857 (+186), DRAW 33.00 (+3200), CAMERON 1.425 (-235). NO DIRECT CANADIAN SPORTSBOOK QUOTE CONFIRMED.",
+        "fairPrice": "≈ +209 no-vig from FightLuck's displayed three-way set; aggregator reference only, not a sportsbook fair.",
+        "targetPrice": "REASSESS ABOVE +209 FAIR ONLY AT A FRESH DIRECT CANADIAN BOOK; NO CANADIAN DIRECT PRICE CONFIRMED.",
+        "actionLabel": "PASS",
+        "decision": "PASS; FightLuck's +186 reference is below its own three-way no-vig fair near +209. Mayer's claimed adjustments and new coach are self-reported, while she acknowledged Cameron's physicality and ring generalship were better in the first fight; no direct Canadian sportsbook price is confirmed.",
+        "event": "MVP · JAKE PAUL VS CÉDRIC DOUMBÉ",
+        "eventDate": "DEC 24, 2026",
+        "eventStartPt": "TBA",
+        "venue": "Coca-Cola Arena · Dubai, UAE",
+        "rationale": "Mayer says she has added a new coach and is narrowing the game plan after losing the first meeting. In the same interview she credited Cameron's physicality and ring generalship as superior and said her own plan was not tight enough; those proposed changes are self-reported rather than independently verified. FightLuck's three-way reference is 2.857 (+186) for Mayer, 33.00 for the draw and 1.425 (-235) for Cameron, producing a no-vig Mayer fair near +209. The +186 reference is below that fair, is an aggregator rather than a named sportsbook quote, and no direct Canadian price was confirmed. PASS.",
+        "movement": "No reliable named-book movement series was found; the current FightLuck market is an aggregator reference only.",
+        "priceNote": "FightLuck identifies itself as a prediction-market/odds source, not a named sportsbook. No direct Canadian sportsbook quote or executable price was confirmed.",
+        "sourceLabel": "BAD LEFT HOOK NOV 18 MAYER INTERVIEW + FIGHTLUCK CURRENT THREE-WAY MARKET"
       },
       {
         "id": "2026-11-21-tszyu-lara-ml-watch",
@@ -225,7 +254,7 @@
         "sourceLabel": "BAD LEFT HOOK NOV18 CHARLO COMMENTS + ODDSCHECKER NOV21"
       }
     ],
-    "publishedAt": "2026-11-21T06:41:30-08:00",
+    "publishedAt": "2026-11-21T07:03:54-08:00",
     "watchlist": {
       "activeMain": 12,
       "activeCoMain": 7,
