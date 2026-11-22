@@ -19,8 +19,25 @@
   "failure": {
     "phase": "RUNTIME_START_WORKFLOW_VERIFICATION",
     "code": "LEGACY_COMPLETED_RUNTIME_RECEIPT_FIELD_MISSING_SEASON",
-    "summary": "The exact RUN_STARTED commit was durably read back, but its required Graham research runtime workflow failed during live-record validation with GRAHAM_RESEARCH_RUNTIME_RECEIPT_FIELD_MISSING:season. The failing record is pre-existing historical data, not this run. Per authority, no expensive source loading or football research was started. A blocked SUNDAY_PREGAME sweep was appended to the active Week 11 research ledger; its separate completion receipt is pending verification.",
-    "automatic": false
+    "summary": "The exact RUN_STARTED commit was durably read back, but its required Graham research runtime workflow failed during live-record validation with GRAHAM_RESEARCH_RUNTIME_RECEIPT_FIELD_MISSING:season. The failing record is pre-existing historical data, not this run. Per authority, no expensive source loading or football research was started. The blocked SUNDAY_PREGAME sweep is durably recorded and its exact BLOCKED_WITH_DURABLE_RECORD completion receipt is VERIFIED; the runtime validation workflow remains unable to pass because of the pre-existing historical record.",
+    "automatic": false,
+    "completionReceiptEvidence": {
+      "path": "data/walters/nfl/research-completion-current.json",
+      "state": "VERIFIED",
+      "policyId": "graham-research-completion-v1",
+      "verifiedAt": "2026-11-22T18:15:11.757Z",
+      "runEventId": "graham-sunday-pregame-2026-w11-20261122T100657-0800",
+      "taskKey": "SUNDAY_PREGAME",
+      "season": 2026,
+      "week": 11,
+      "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
+      "marketViewed": false,
+      "ledgerBlobSha": "a49f63d9427ccdd0eb0626bb1c60b07f7e5d083c",
+      "receiptBlobSha": "765077bd01715ec786e11b405a3bd029a768b0bc",
+      "sweepSequence": 6,
+      "sweepType": "SUNDAY_PREGAME",
+      "sweepCompletedAt": "2026-11-22T10:10:40-0800"
+    }
   },
   "blockedAt": "2026-11-22T10:12:47-0800"
 }
