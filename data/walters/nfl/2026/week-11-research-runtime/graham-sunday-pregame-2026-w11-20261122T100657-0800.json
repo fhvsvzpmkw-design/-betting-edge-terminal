@@ -7,14 +7,20 @@
   "season": 2026,
   "week": 11,
   "ledgerPath": "data/walters/nfl/2026/week-11-research-ledger.json",
-  "state": "RUN_STARTED",
-  "checkpoint": "STARTED",
+  "state": "BLOCKED_WITH_DURABLE_RECORD",
+  "checkpoint": "CONTROLLED_FAILURE",
   "startedAt": "2026-11-22T10:06:57-0800",
-  "lastCheckpointAt": "2026-11-22T10:06:57-0800",
+  "lastCheckpointAt": "2026-11-22T10:12:47-0800",
   "staleAfter": "2026-11-22T11:06:57-0800",
   "marketViewed": false,
-  "ledgerSweepPresent": false,
-  "completionResult": null,
+  "ledgerSweepPresent": true,
+  "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
   "completionReceipt": null,
-  "failure": null
+  "failure": {
+    "phase": "RUNTIME_START_WORKFLOW_VERIFICATION",
+    "code": "LEGACY_COMPLETED_RUNTIME_RECEIPT_FIELD_MISSING_SEASON",
+    "summary": "The exact RUN_STARTED commit was durably read back, but its required Graham research runtime workflow failed during live-record validation with GRAHAM_RESEARCH_RUNTIME_RECEIPT_FIELD_MISSING:season. The failing record is pre-existing historical data, not this run. Per authority, no expensive source loading or football research was started. A blocked SUNDAY_PREGAME sweep was appended to the active Week 11 research ledger; its separate completion receipt is pending verification.",
+    "automatic": false
+  },
+  "blockedAt": "2026-11-22T10:12:47-0800"
 }
