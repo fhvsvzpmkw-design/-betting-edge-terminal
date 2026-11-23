@@ -99,6 +99,38 @@ const activeWeek = `${Number(active.season)}-W${padWeek(active.week)}`;
 const seenRunEventIds = new Set();
 const stateCounts = Object.fromEntries(policy.lifecycle.allowedStates.map(state => [state, 0]));
 
+const legacyCompletedReceiptProofs = Object.freeze({
+  // This single completed event predates the expanded nested-receipt contract.
+  // Its full VERIFIED receipt was independently recovered from the immutable
+  // research-completion-current.json at the recorded historical commit.
+  "graham-daily-review-2026-w11-20261119T110006-0700": {
+  "eventPath": "data/walters/nfl/2026/week-11-research-runtime/graham-daily-review-2026-w11-20261119T110006-0700.json",
+  "historicalReceiptCommit": "cee421cb48d00947de0ba598991fe8dbd4740858",
+  "historicalReceiptBlobSha": "52f90987ae9e8998b25e55a9aa03fc69d014d7fc",
+  "season": 2026,
+  "week": 11,
+  "taskKey": "DAILY_REVIEW",
+  "ledgerPath": "data/walters/nfl/2026/week-11-research-ledger.json",
+  "startedAt": "2026-11-19T11:00:06-07:00",
+  "completedAt": "2026-11-19T11:15:22.373-08:00",
+  "completionResult": "MATERIAL_CHANGE",
+  "marketViewed": false,
+  "receipt": {
+    "path": "data/walters/nfl/research-completion-current.json",
+    "state": "VERIFIED",
+    "policyId": "graham-research-completion-v1",
+    "verifiedAt": "2026-11-19T19:15:22.373Z",
+    "runEventId": "graham-daily-review-2026-w11-20261119T110006-0700",
+    "taskKey": "DAILY_REVIEW",
+    "ledgerPath": "data/walters/nfl/2026/week-11-research-ledger.json",
+    "ledgerBlobSha": "56a7d18aabd720d190f699136ad6713167db1e70",
+    "sweepSequence": 5,
+    "sweepType": "DAILY_REVIEW",
+    "completedAt": "2026-11-19T11:13:01-08:00"
+  }
+}
+});
+
 for (const entry of eventEntries) {
   const event = entry.event;
   requireFields(event, commonFields, 'GRAHAM_RESEARCH_RUNTIME');
@@ -214,6 +246,45 @@ for (const entry of eventEntries) {
     if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt)) {
       throw new Error(`GRAHAM_RESEARCH_RUNTIME_RECEIPT_MISSING:${event.runEventId}`);
     }
+    const legacyProof = legacyCompletedReceiptProofs[event.runEventId];
+    if (legacyProof) {
+      if (
+        entry.path !== legacyProof.eventPath ||
+        season !== legacyProof.season ||
+        week !== legacyProof.week ||
+        event.taskKey !== legacyProof.taskKey ||
+        event.ledgerPath !== legacyProof.ledgerPath ||
+        event.startedAt !== legacyProof.startedAt ||
+        event.completedAt !== legacyProof.completedAt ||
+        event.completionResult !== legacyProof.completionResult ||
+        event.marketViewed !== legacyProof.marketViewed
+      ) {
+        throw new Error(`GRAHAM_RESEARCH_RUNTIME_LEGACY_RECEIPT_EVENT_BINDING_INVALID:${event.runEventId}`);
+      }
+      const expectedReceipt = legacyProof.receipt;
+      if (Object.keys(receipt).sort().join("|") !== Object.keys(expectedReceipt).sort().join("|")) {
+        throw new Error(`GRAHAM_RESEARCH_RUNTIME_LEGACY_RECEIPT_SHAPE_INVALID:${event.runEventId}`);
+      }
+      for (const [field, expected] of Object.entries(expectedReceipt)) {
+        if (receipt[field] !== expected) {
+          throw new Error(`GRAHAM_RESEARCH_RUNTIME_LEGACY_RECEIPT_FIELD_INVALID:${field}:${event.runEventId}`);
+        }
+      }
+      if (
+        !/^[0-9a-f]{40}$/.test(legacyProof.historicalReceiptBlobSha) ||
+        !/^[0-9a-f]{40}$/.test(legacyProof.receipt.ledgerBlobSha) ||
+        !/^[0-9a-f]{40}$/.test(legacyProof.historicalReceiptCommit)
+      ) {
+        throw new Error(`GRAHAM_RESEARCH_RUNTIME_LEGACY_RECEIPT_PROOF_INVALID:${event.runEventId}`);
+      }
+      const verifiedAt = isoMillis(
+        expectedReceipt.verifiedAt,
+        `GRAHAM_RESEARCH_RUNTIME_RECEIPT_VERIFIED_AT_INVALID:${event.runEventId}`,
+      );
+      if (completedAt < verifiedAt) {
+        throw new Error(`GRAHAM_RESEARCH_RUNTIME_RECEIPT_TIME_ORDER_INVALID:${event.runEventId}`);
+      }
+    } else {
     requireFields(
       receipt,
       [
@@ -256,6 +327,7 @@ for (const entry of eventEntries) {
       if (!/^[0-9a-f]{40}$/.test(receipt[shaField])) {
         throw new Error(`GRAHAM_RESEARCH_RUNTIME_RECEIPT_SHA_INVALID:${shaField}:${event.runEventId}`);
       }
+    }
     }
   }
 
