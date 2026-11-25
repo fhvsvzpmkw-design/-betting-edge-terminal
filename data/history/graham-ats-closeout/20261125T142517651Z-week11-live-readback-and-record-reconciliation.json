@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "kind": "graham-ats-closeout-receipt",
+  "runId": "20261125T142517651Z-week11-live-readback-and-record-reconciliation",
+  "status": "PARTIAL",
+  "noOp": true,
+  "startedAt": "2026-11-25T14:17:36.000Z",
+  "completedAt": "2026-11-25T14:25:46.353Z",
+  "season": 2026,
+  "completedWeek": 11,
+  "timezone": "America/Vancouver",
+  "sourceWeeks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "reason": "The named outstanding Week 11 closeout was already published and deployed by the existing workflow. Reused its final facts and current main comparison without rerunning handicapping or changing fairs, ratings, market snapshots or issued records. Re-attempted both configured public data readbacks; DNS resolution failed. Independently recalculated the Week 11 Graham selections from the 13 exact current-main rows using the documented builder/analytics rule and found a mismatch with the prior durable receipt's Week 11 subrecord; the current season totals are consistent with the independently calculated 7-5-1, so this receipt discrepancy remains open for controlled correction.",
+  "inputs": {
+    "finalFactsPath": "data/walters/nfl/2026/week-11-final-facts-20261124.json",
+    "finalFactsBlobSha": "ea76997ceb365dae43f080b5b50c4ed936e4490d",
+    "finalFactsCommitSha": "558e482a45af822ee5bfbb5cec5587cd7b352f3e",
+    "finalFactsVerifiedAt": "2026-11-24T14:24:38.465Z",
+    "finalGames": 13,
+    "resultSource": "https://www.nfl.com/schedules/2026/reg11",
+    "ledgerPath": "data/walters/nfl/2026/week-11-daily-market-ledger.json",
+    "ledgerBlobSha": "4d19a004d05c973aedde85f06b71a89ed7dc5fe8",
+    "marketViewedForResults": false,
+    "conflicts": [],
+    "missingCompletedGames": []
+  },
+  "output": {
+    "path": "data/history/graham-pinnacle-value.json",
+    "outputBlobSha": "827c00723a175b75aefca4b1e042adf4f073a788",
+    "outputCommitSha": "82ae2976ea7c2735e5d04ca9fea5577887953b3d",
+    "generatedAt": "2026-11-24T22:22:09.744Z",
+    "latestMainHeadSha": "2d872d8931d72368d6c3b04689804e7fcf7da2fc",
+    "repositoryReadback": {
+      "matched": true,
+      "week11Rows": 13,
+      "week11FinalRows": 13,
+      "gameLevelScoreIdentityMismatches": 0,
+      "publicationBlobSha": "827c00723a175b75aefca4b1e042adf4f073a788",
+      "latestMainBlobSha": "827c00723a175b75aefca4b1e042adf4f073a788"
+    },
+    "coverage": {
+      "games": 178,
+      "settled": 162,
+      "pending": 16,
+      "excluded": 1,
+      "recordedCloses": 0,
+      "sameLines": 6,
+      "quoteProvenance": "LAST_SAVED_PREGAME"
+    },
+    "records": {
+      "week11": {
+        "graham": {
+          "wins": 7,
+          "losses": 5,
+          "pushes": 1,
+          "winPctExcludingPushes": 58.333333333333336
+        },
+        "pinnacleFavorites": {
+          "wins": 6,
+          "losses": 6,
+          "pushes": 1,
+          "winPctExcludingPushes": 50
+        },
+        "pinnacleUnderdogs": {
+          "wins": 6,
+          "losses": 6,
+          "pushes": 1,
+          "winPctExcludingPushes": 50
+        },
+        "sameLineSelections": 2
+      },
+      "previousReceiptWeek11": {
+        "graham": {
+          "wins": 5,
+          "losses": 7,
+          "pushes": 1
+        },
+        "mismatch": "Prior receipt 20261124T144003545Z-week11-partial.json reports 5-7-1. Regrading the exact published rows by the current documented method yields 7-5-1; season totals 76-81-5 are consistent with 7-5-1. No published numerical output was changed."
+      },
+      "season": {
+        "graham": {
+          "wins": 76,
+          "losses": 81,
+          "pushes": 5,
+          "winPctExcludingPushes": 48.40764331210191
+        },
+        "pinnacleFavorites": {
+          "wins": 80,
+          "losses": 77,
+          "pushes": 5,
+          "winPctExcludingPushes": 50.955414012738856
+        },
+        "pinnacleUnderdogs": {
+          "wins": 77,
+          "losses": 80,
+          "pushes": 5,
+          "winPctExcludingPushes": 49.044585987261144
+        }
+      }
+    }
+  },
+  "workflows": {
+    "originalBuilderPublisher": {
+      "runId": 45413780567,
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/45413780567",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "latestComparisonRefresh": {
+      "commit": "82ae2976ea7c2735e5d04ca9fea5577887953b3d",
+      "status": "published-main",
+      "currentOutputBlobSha": "827c00723a175b75aefca4b1e042adf4f073a788"
+    },
+    "latestPagesDeployment": {
+      "runId": 45525174301,
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/45525174301",
+      "headSha": "715ac46890ac1563ccf846b22ed806e6890ee67e",
+      "status": "completed",
+      "conclusion": "success",
+      "buildStep": "success",
+      "deployStep": "success",
+      "deployedComparisonBlobSha": null,
+      "comment": "Successful Pages deployment ran after the current comparison commit, but exact public file bytes were not independently read back."
+    }
+  },
+  "liveReadback": {
+    "checkedAt": "2026-11-25T14:25:46.353Z",
+    "canonicalPage": "https://vigwirelabs.com/vigscope",
+    "dataUrl": "https://vigwirelabs.com/data/history/graham-pinnacle-value.json",
+    "configuredPagesOriginUrl": "https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/data/history/graham-pinnacle-value.json",
+    "status": "UNAVAILABLE",
+    "attempts": [
+      {
+        "method": "web reader",
+        "url": "https://vigwirelabs.com/data/history/graham-pinnacle-value.json",
+        "result": "URL not accessible via web reader"
+      },
+      {
+        "method": "web reader",
+        "url": "https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/data/history/graham-pinnacle-value.json",
+        "result": "URL not accessible via web reader"
+      },
+      {
+        "method": "HTTPS curl",
+        "url": "https://vigwirelabs.com/data/history/graham-pinnacle-value.json",
+        "result": "curl: (6) Could not resolve host: vigwirelabs.com"
+      },
+      {
+        "method": "HTTPS curl",
+        "url": "https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/data/history/graham-pinnacle-value.json",
+        "result": "curl: (6) Could not resolve host: fhvsvzpmkw-design.github.io"
+      }
+    ],
+    "matchedCurrentMain": null
+  },
+  "excluded": [
+    {
+      "gameKey": "2026-W08-LAC-LAR",
+      "reason": "No timestamped pre-kickoff Graham/Pinnacle pair"
+    }
+  ],
+  "pendingNextWeek": {
+    "season": 2026,
+    "week": 12,
+    "state": "AWAITING_SEPARATE_ROLLOVER",
+    "games": 16,
+    "reason": "Week 12 remains separate pending coverage; rollover is owned by the separate production task."
+  },
+  "outstanding": [
+    {
+      "code": "PUBLIC_LIVE_READBACK_UNVERIFIED",
+      "reason": "Both exact configured public data URLs failed DNS resolution; repository readback and deployment run succeeded.",
+      "nextAction": "Retry public fetch and compare output blob/generatedAt and all settled rows."
+    },
+    {
+      "code": "WEEK11_RECEIPT_RECORD_MISMATCH",
+      "reason": "Prior durable Week 11 receipt says Graham 5-7-1, while the exact current published rows independently grade 7-5-1 and current season record supports 7-5-1.",
+      "nextAction": "Audit and correct only the closeout receipt record under the existing ATS receipt workflow; do not alter numerical sources or issued records."
+    }
+  ]
+}
